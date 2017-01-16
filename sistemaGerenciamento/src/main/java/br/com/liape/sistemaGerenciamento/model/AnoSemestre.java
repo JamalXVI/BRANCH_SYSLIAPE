@@ -3,7 +3,6 @@ package br.com.liape.sistemaGerenciamento.model;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-import br.com.unaerp.jdbc.anotation.Boolean;
 import br.com.unaerp.jdbc.anotation.Chave;
 import br.com.unaerp.jdbc.anotation.Coluna;
 import br.com.unaerp.jdbc.anotation.Date;
