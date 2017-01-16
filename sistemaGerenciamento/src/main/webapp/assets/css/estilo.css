@@ -1,0 +1,15 @@
+.centralizar_logo{
+	display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 0.3em;
+}
+#div_titulo{
+	boder: 0;
+}
+.nav-md .aparecerSm{
+	display:none;
+}
+.nav-sm .aparecerSm{
+	display: inline-block;
+}

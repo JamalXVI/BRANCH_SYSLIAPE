@@ -1,0 +1,206 @@
+if not @findobject 'knife'
+  promptalias 'knife'
+endif
+if not listexists 'Fish'
+  createlist 'Fish'
+endif
+if list 'Fish' == 0
+  @pushlist 'Fish' 0x9cc
+  @pushlist 'Fish' 0x9cd
+  @pushlist 'Fish' 0x9ce
+  @pushlist 'Fish' 0x9cf
+endif
+if not listexists 'Boots'
+  createlist 'Boots'
+endif
+if list 'Boots' == 0
+  @pushlist 'Boots' 0x170f
+  @pushlist 'Boots' 0x170b
+  @pushlist 'Boots' 0x1711
+  @pushlist 'Boots' 0x170d
+endif
+if not listexists 'mobs'
+  createlist 'mobs'
+endif
+if list 'mobs' == 0
+  @pushlist 'mobs' 0x96
+  @pushlist 'mobs' 0x4d
+  @pushlist 'mobs' 0x10
+endif
+//////////////////////start
+@clearjournal
+msg 'forward'
+pause 500
+if @injournal 'is not moving' or @injournal 'stopped'
+  pause 1000
+  clearjournal
+  msg 'backwards'
+  pause 4000
+  msg 'stop'
+  pause 1000
+  msg 'turn right'
+  pause 1000
+  msg 'turn right'
+  pause 1000
+  msg 'forward'
+  pause 4000
+  msg 'stop'
+  pause 1000
+  @clearjournal
+endif
+msg 'stop'
+pause 500
+clearjournal
+while not @injournal 'biting here'
+  ///////////////////Prepare Elemental
+  if not @findtype 0x2006 'any' 'ground' 1 2
+    clearignorelist
+    while not followers > 1
+      cast "Summon Earth Elemental"
+      pause 4000
+    endwhile
+    if @findtype 0xe 'any' 'ground'
+      @setalias 'tank' 'found'
+    endif
+  endif
+  if @hits 'self' < maxhits 'self'
+    cast "Greater Heal" 'self'
+    pause 1000
+  endif
+  ///////////////////Adjust corpse alias
+  if @findtype 0x2006 'any' 'ground' 1 2
+    @setalias 'corpse' 'found'
+  endif
+  ///////////////////////////////////mobs
+  for 0 to 'mobs'
+    if @findtype mobs[] 'any' 'ground' 'any' 10
+      pause 100
+      @setalias 'serpent' 'found'
+      msg 'stop'
+      while not followers > 0
+        while not mana == maxmana
+        endwhile
+        cast "Summon Earth Elemental"
+        pause 3000
+      endwhile
+      if @findtype 0xe 'any' 'ground'
+        @setalias 'tank' 'found'
+      endif
+      msg 'all guard me'
+      while @findobject 'serpent'
+        @canceltarget
+        while not followers > 0
+          while not mana == maxmana
+          endwhile
+          cast "Summon Earth Elemental"
+          pause 3000
+        endwhile
+        if @hits 'tank' < maxhits 'tank'
+          cast "Greater Heal" 'tank'
+          pause 1000
+        endif
+        if @hits 'self' < maxhits 'self'
+          cast "Greater Heal" 'self'
+          pause 1000
+        endif
+      endwhile
+    endif
+  endfor
+  ///////////////////Cast fishing pole
+  turn 'east'
+  @canceltarget
+  @usetype 0xdbf 'any' 'backpack'
+  waitfortarget 1500
+  targettilerelative 'self' 3
+  pause 9000
+  /////////////Cut Fish
+  if @findtype 0x9cc 'any' 'backpack'
+    @useobject 'knife'
+    waitfortarget 1500
+    target! 'found'
+    pause 600
+  endif
+  if @findtype 0x9cd 'any' 'backpack'
+    @useobject 'knife'
+    waitfortarget 1500
+    target! 'found'
+    pause 600
+  endif
+  if @findtype 0x9ce 'any' 'backpack'
+    @useobject 'knife'
+    waitfortarget 1500
+    target! 'found'
+    pause 600
+  endif
+  if @findtype 0x9cf 'any' 'backpack'
+    @useobject 'knife'
+    waitfortarget 1500
+    target! 'found'
+    pause 600
+  endif
+  /////////////Trash Steaks
+  if @findobject 'corpse'
+    @movetype 0x97a 'backpack' 'corpse'
+    pause 800
+  endif
+  //////////////////Handle footwear
+  if @findobject 'corpse'
+    if @findtype 0x170f 0 'backpack'
+      @movetype 0x170f 'backpack' 'corpse'
+      pause 800
+    endif
+  endif
+  if @findobject 'corpse'
+    if @findtype 0x170d 0 'backpack'
+      @movetype 0x170d 'backpack' 'corpse'
+      pause 800
+    endif
+  endif
+  if @findobject 'corpse'
+    if @findtype 0x170b 0 'backpack'
+      @movetype 0x170b 'backpack' 'corpse'
+      pause 800
+    endif
+  endif
+  if @findobject 'corpse'
+    if @findtype 0x1711 0 'backpack'
+      @movetype 0x1711 'backpack' 'corpse'
+      pause 800
+    endif
+  endif
+  //////////////////// Eat prized fish
+  if @findtype 0xdd6 'any' 'backpack'
+    @usetype 0xdd6 'any' 'backpack'
+    pause 800
+  endif
+  //////////////////// Maintain health
+  if @hits 'tank' < maxhits 'tank'
+    cast "Greater Heal" 'tank'
+    pause 1000
+  endif
+  if @hits 'self' < maxhits 'self'
+    cast "Greater Heal" 'self'
+    pause 1000
+  endif
+endwhile
+@clearjournal
+//////////////////forward
+msg 'forward'
+pause 1000
+if @injournal 'is not moving' or @injournal 'stopped'
+  pause 1000
+  clearjournal
+  msg 'backwards'
+  pause 4000
+  msg 'stop'
+  pause 1000
+  msg 'turn right'
+  pause 1000
+  msg 'turn right'
+  pause 1000
+  msg 'forward'
+  pause 4000
+  @clearjournal
+endif
+pause 7000
+msg 'stop'

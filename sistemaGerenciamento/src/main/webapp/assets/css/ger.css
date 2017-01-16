@@ -1,0 +1,90 @@
+
+	a {
+		text-decoration: none;
+		color: #000;
+		font-weight: bold;
+	}
+
+	#tooltip {
+		position: absolute;
+		border: 1px solid #000;
+		background-color: #ffffe1;
+		padding: 2px 5px;
+		color: #000;
+		display: none;
+	}
+
+	#esq {
+		width: 100%;
+		float: left;
+	}
+	.nav-md > .secao_menu{
+	margin-top: 6em;
+	}
+	#dir {
+		width: 20%;
+		float: left;
+	}
+
+	.tableGrade {
+		border-collapse: collapse;
+		width: 95%;
+	}
+
+	.tableGrade tr td{
+		text-align:left;
+		margin: 0px;
+		padding: 0px;
+	}
+
+	.tableColunaDestaque{
+		background-color: #EEF6FC;
+		height: 20px !important;
+	}
+
+	.min30 {
+		border-bottom: solid #15428B 2px;
+		height: 20px;
+		vertical-align: top;
+	}
+
+	.min00 {
+		border-bottom: solid #666 1px;
+		height: 20px;
+		vertical-align: top;
+	}
+
+	.minSize{
+		height: 20px;
+		width: 20px;
+	}
+
+	.hora {
+		border-bottom: solid #15428B 2px;
+		font-weight: bold;
+		height: 40px;
+		text-align: center;
+		width: 20px !important ;
+	}
+
+	.box {
+		background-color: #efefef;
+		border-color: #777;
+		border-style: solid;
+		border-top-width: 1px;
+		border-left-width: 1px;
+		border-right-width: 2px;
+		border-bottom-width: 3px;
+		position:absolute;
+		float:none;
+		width: 7%;
+	}
+
+	.box table {
+		font-size: 9px;
+		font-weight: normal;
+	}
+
+	.box img {
+		border: none;
+	}

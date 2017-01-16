@@ -1,0 +1,116 @@
+.teste{
+    background: #3faed9;
+}
+
+.fundo-menu{
+    background-color: #3faed9;
+    border-color: #1fd7ed;    
+} 
+
+.espaco_cima{
+	margin-top: 0.3em;
+}
+.espaco_direita{
+	margin-right: 0.3em;
+}
+.navbar-inverse .navbar-brand .dropdown-toggle{
+     color: #fff;
+}
+
+.navbar-inverse .navbar-nav>li>a {
+    color: #fff;
+}
+
+.img-logo{
+
+width: 100%;
+}
+
+.img-custon{
+        max-width: 40%;
+}
+
+.panel-default>.panel-heading {
+    color: #fff;
+    background-color: #cacaca;
+    border-color: #ddd;
+}
+
+.btn-espaco{
+	margin-top: 10px;
+	
+}
+
+.validation-error{
+	color: red;
+}
+
+.error{
+	color: red;
+}
+
+.rankPage-position-user-avatar {
+    vertical-align: middle;
+    min-width: 45px;
+    height: 45px;
+}
+.profileAvatar {
+    background-color: #f1f3f4;
+    border-radius: 50%;
+}
+
+
+.my-table-label{
+	color: #fff;
+}
+
+.my-table-label-body{
+	font-size: 14px;
+	margin-top: 16px;
+	text-transform: uppercase;	
+}
+
+.my-table-photo{
+	height: 60px;
+	width: 60px;
+	    border-radius: 50%;
+}
+
+.my-profile-photo{
+	height: 35px;
+	width: 35px;
+	border-radius: 50%;
+}
+
+.my-profile-label{
+	text-transform: capitalize;
+	padding-top: 10px;
+	font-size: 15px;
+
+	}
+
+.center{
+	width: 40%;
+}
+
+.txt-send-message{
+	width: 100%;
+}
+
+.label-send-message{
+	font-size: 20px;
+}
+
+.option-send-message{
+	font-size: 17px;
+	text-transform: capitalize;
+}
+
+.img-noticia{
+	height: 200px; 
+	width: 250px;
+	display: block; 
+	margin-left: auto; 
+	margin-right: auto;
+}
+
