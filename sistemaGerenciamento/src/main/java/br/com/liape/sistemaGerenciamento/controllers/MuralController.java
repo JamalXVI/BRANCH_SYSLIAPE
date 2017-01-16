@@ -31,6 +31,7 @@ import br.com.liape.sistemaGerenciamento.modelView.MuralUsuario;
 import br.com.liape.sistemaGerenciamento.modelView.RecadoUsuario;
 import br.com.liape.sistemaGerenciamento.outros.Conversor;
 import br.com.liape.sistemaGerenciamento.outros.MensagemSistema;
+import br.com.liape.sistemaGerenciamento.seguranca.NivelPermissao;
 import br.com.liape.sistemaGerenciamento.seguranca.UsuarioLogado;
 
 @Controller
@@ -69,6 +70,7 @@ public class MuralController {
 	/*
 	 * PÁGINA INICIAL DO PROJETO
 	 */
+	@NivelPermissao(idPermissao = 16)
 	@Path("/Mural/Nova/")
 	public void nova() {
 		// result.include("msg", "Message from your controller");
@@ -205,7 +207,7 @@ public class MuralController {
 		}
 		result.use(Results.json()).withoutRoot().from(msg).serialize();
 	}
-
+	@NivelPermissao(idPermissao = 16)
 	@Post("/Mural/Enviar/")
 	public void enviar(Mensagem mensagem) {
 		if (verificarPreenchimento(mensagem)) {
