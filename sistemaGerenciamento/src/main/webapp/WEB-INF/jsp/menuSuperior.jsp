@@ -106,12 +106,12 @@
 
 					<!-- MENU EVENTOS -->
 					<li><a href="javascript:;" data-toggle="collapse"
-						data-target="#evento"> <i class="glyphicon glyphicon-user">
-						</i> Eventos <i class="fa fa-fw fa-caret-down"> </i>
+						data-target="#evento"> <i class="fa fa-exclamation" aria-hidden="true"></i>
+						Pendências <i class="fa fa-fw fa-caret-down"> </i>
 					</a>
 						<ul id="evento" class="collapse">
-							<li><a href="#">Cadastrar</a></li>
-							<li><a href="#">Listar</a></li>
+							<li><a href="${linkTo[OrdemServicoController].nova()}">
+							Nova Ordem Serviço</a></li>
 						</ul></li>
 					<!-- FIM MENU PUBLICAÇÕES -->
 

@@ -22,6 +22,18 @@ public class Computador implements Serializable {
 	@NotNull
 	@Chave
 	private int numeroPc;
+	public int getIdSal() {
+		return idSal;
+	}
+	public void setIdSal(int idSal) {
+		this.idSal = idSal;
+	}
+	public int getNumeroPc() {
+		return numeroPc;
+	}
+	public void setNumeroPc(int numeroPc) {
+		this.numeroPc = numeroPc;
+	}
 	
 	
 	

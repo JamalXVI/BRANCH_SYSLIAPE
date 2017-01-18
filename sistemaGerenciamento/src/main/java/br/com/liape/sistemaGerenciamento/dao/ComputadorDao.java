@@ -3,12 +3,13 @@ package br.com.liape.sistemaGerenciamento.dao;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import br.com.liape.sistemaGerenciamento.model.SubOrdemTurno;
+import br.com.liape.sistemaGerenciamento.model.Computador;
+import br.com.liape.sistemaGerenciamento.model.SubOrdem;
 import br.com.sistemaGerenciamento.conexao.ConnectionFactory;
 import br.com.unaerp.jdbc.persistence.PersistenceJDBC;
 
-public class SubOrdemTurnoDao extends PersistenceJDBC<SubOrdemTurno> {
-	public SubOrdemTurnoDao() {
+public class ComputadorDao extends PersistenceJDBC<Computador> {
+	public ComputadorDao() {
 	}
 	
 	@Override

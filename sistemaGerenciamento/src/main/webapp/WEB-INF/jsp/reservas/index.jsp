@@ -116,7 +116,7 @@ float:right;
 			
 				<div class="col-xs-6">
 					<label for="calendarioReserva">Data:</label>
-					<input type="date" value="${agora }" max="2050-01-01" min="2001-01-01" name="calendarioReserva"
+					<input type="datetime" value="${agora }" max="2050-01-01" min="2001-01-01" name="calendarioReserva"
 					id="calendarioReserva" class="dataCalendario form-control text-center" />
 				</div>
 				<div class="col-xs-6">
