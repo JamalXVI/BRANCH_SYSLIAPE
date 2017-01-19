@@ -21,7 +21,6 @@ import br.com.liape.sistemaGerenciamento.dao.TelefoneDao;
 import br.com.liape.sistemaGerenciamento.model.Pessoa;
 import br.com.liape.sistemaGerenciamento.model.Professor;
 import br.com.liape.sistemaGerenciamento.model.Telefone;
-import br.com.liape.sistemaGerenciamento.model.Usuario;
 import br.com.liape.sistemaGerenciamento.outros.Conversor;
 import br.com.liape.sistemaGerenciamento.outros.MensagemSistema;
 import br.com.liape.sistemaGerenciamento.seguranca.NivelPermissao;

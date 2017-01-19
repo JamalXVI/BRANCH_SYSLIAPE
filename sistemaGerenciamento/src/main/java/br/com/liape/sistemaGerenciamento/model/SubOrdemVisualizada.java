@@ -8,7 +8,7 @@ import br.com.unaerp.jdbc.anotation.Chave;
 import br.com.unaerp.jdbc.anotation.Coluna;
 import br.com.unaerp.jdbc.anotation.Tabela;
 
-@Tabela(nome = "Sub_Ordem_Visualizada")
+@Tabela(nome = "SubOrdem_Visualizada")
 public class SubOrdemVisualizada implements Serializable {
 	/**
 	 * 

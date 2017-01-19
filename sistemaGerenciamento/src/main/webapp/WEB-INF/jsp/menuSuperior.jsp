@@ -112,6 +112,8 @@
 						<ul id="evento" class="collapse">
 							<li><a href="${linkTo[OrdemServicoController].nova()}">
 							Nova Ordem Serviço</a></li>
+							<li><a href="${linkTo[OrdemServicoController].listarAtivas()}">
+							Ver Ordens de Serviço Ativas</a></li>
 						</ul></li>
 					<!-- FIM MENU PUBLICAÇÕES -->
 

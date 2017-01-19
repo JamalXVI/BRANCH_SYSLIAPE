@@ -2,8 +2,6 @@ package br.com.liape.sistemaGerenciamento.modelView;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class RecadoUsuario implements Serializable{
 	/**
