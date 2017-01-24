@@ -22,6 +22,15 @@ public class Computador implements Serializable {
 	@NotNull
 	@Chave
 	private int numeroPc;
+	@Coluna(nome="ATIVO_PC")
+	private boolean ativo;
+	
+	public boolean isAtivo() {
+		return ativo;
+	}
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
+	}
 	public int getIdSal() {
 		return idSal;
 	}
