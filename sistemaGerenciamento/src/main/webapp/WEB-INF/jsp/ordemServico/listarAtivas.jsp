@@ -45,8 +45,14 @@ rel="stylesheet">
 </div>
 <c:import url="/WEB-INF/jsp/ordemServico_modal/modal_ver.jsp" />
 <c:import url="/WEB-INF/jsp/ordemServico_modal/modal_excluir.jsp" />
+<c:import url="/WEB-INF/jsp/ordemServico_modal/modal_redirecionar.jsp" />
+<c:import url="/WEB-INF/jsp/ordemServico_modal/modal_finalizar.jsp" />
 <!-- Scripts Específicos e Importação do Rodapé -->
 <t:rodape>
+<!-- Importação do Javascript de  Criação de Eventos da Agenda de Reservas-->
+<script src="<c:url value='/assets/js/jquery-ui-1.7.2.custom.min.js' /> "></script>
+<!-- Importação do Javascript de Autocompletar Select-->
+<script src="<c:url value='/assets/js/select2.full.min.js' /> "></script>
 <script type="text/javascript">
  var ordems;
  var ordemsSalas = [];
@@ -273,19 +279,32 @@ rel="stylesheet">
 		}
 		var diaHj = new Date();
 		var diaOr = new Date(subOrdems[indice_ordem][0].dataParaSerExecutada);
-		texto += criarTextoAcao("finalizarOrdem", "fa fa-check", indice_ordem);
-		if(verificarDataRepasse(diaHj, diaOr))
+		if (temPermissaoCadastro) {
+			texto += criarTextoAcao("finalizarOrdem", "fa fa-check", indice_ordem);
+		}
+		if(verificarDataRepasse(diaHj, diaOr) && temPermissao)
 		{
 			texto += criarTextoAcao("repassarOrdem", "fa fa-reply", indice_ordem);
 		}
-		texto += criarTextoAcao("excluirOrdem", "fa fa-trash", indice_ordem);
+		if (temPermissaoExcluir) {
+			texto += criarTextoAcao("excluirOrdem", "fa fa-trash", indice_ordem);
+		}
+		
 		texto += criarTextoAcao("detalhesOrdem", "fa fa-search", indice_ordem);
 		texto += "</td></tr>";
 		$("#corpoTabelaOrdemServicos").append(texto);
 	 });
  }
  $(document).ready(function(){
-	 atualizarValoresTabela();
+	 $.when(atualizarValoresTabela()).done(function(){
+		 verificarPermissao();
+		 regrasRepassar();
+		 mudarDataExecutada();
+		 verficarDestino();
+		 
+	 });
+	 
+	 
  });
 </script>
 <script type="text/javascript">
@@ -306,14 +325,14 @@ var retornarTurno = function(turno) {
 var criarTextoAcao = function(funcao, icone, indice_ordem)
 {
 	return "<a href='' onclick='return "+funcao+"("+indice_ordem+")'><i class='"+icone+"'></i></a>";
-};
+}
 var verificarDataRepasse = function(dataHj, dataOr){
 	if(dataHj.getYear() > dataOr.getYear() || 
 	   dataHj.getYear() == dataOr.getYear() && dataHj.getMonth() > dataOr.getMonth() ||
 	   dataHj.getYear() == dataOr.getYear() && dataHj.getMonth() == dataOr.getMonth()
-	   && dataHj.getDay() > dataOr.getDay() ||
+	   && dataHj.getDate() > dataOr.getDate() ||
 	   dataHj.getYear() == dataOr.getYear() && dataHj.getMonth() == dataOr.getMonth()
-	   && dataHj.getDay() == dataOr.getDay() && dataHj.getHours() >= dataOr.getHours())
+	   && dataHj.getDate() == dataOr.getDate() && dataHj.getHours() >= dataOr.getHours())
 	{
 		return true;
 	}
@@ -332,6 +351,7 @@ var detalhesOrdem = function(indice_ordem)
 	if (ordem.descricao) {
 		$("#descricao").val(ordem.descricao);
 	}
+	debugger;
 	if (subOrdem.justificativa) {
 		$("#justificativa").val(subOrdem.justificativa);
 	}
@@ -341,8 +361,6 @@ var detalhesOrdem = function(indice_ordem)
 var visualizarOrdem = function(id)
 {
 	var enviar = {"idSor" : id};
-
-	debugger;
 	 return $.ajax({  
 		    type:"post",  
 		    url: "${linkTo[OrdemServicoController].visualizar() }",
@@ -379,5 +397,166 @@ $("#excluirOrdemSim").on('click', function(){
 		    }
 		});
 });
+var finalizarOrdem = function(indice_ordem){
+	$("#finalizarSubOrdemId").val(subOrdems[indice_ordem][0].id)
+	$("#novoFinalizarOrdem").modal('show');
+	return false;
+}
+$("#finalizarOrdemSim").on('click', function(){
+	var enviar = {"idSor" : $("#finalizarSubOrdemId").val()};
+	 return $.ajax({  
+		    type:"post",  
+		    url: "${linkTo[OrdemServicoController].finalizar() }",
+		    data: enviar,
+		    dataType: "json",  // Isso diz que você espera um JSON do servidor
+		    beforeSend: function(xhr, settings){},  
+		    success: function(data, textStatus, xhr){
+		    	atualizarValoresTabela();
+		    	//criarPermissoes();
+		    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
+		    error: function(xhr, textStatus, errorThrown){
+		    	tratarErroAjax(xhr, textStatus, errorThrown);
+		    }
+		});
+});
+</script>
+<script type="text/javascript">
+var adicionarZero = function(numero)
+{
+	if (numero < 10) {
+		return "0"+numero;
+	}
+	return numero;
+}
+var mudarDataExecutada = function(){
+	var dataEsc = new Date();
+	$("#dataExecutada").val(dataEsc.getFullYear()
+			+"-"+adicionarZero(dataEsc.getMonth()+1)+
+			"-"+adicionarZero(dataEsc.getDate()));
+}
+var adicionarTurnos = function(){
+	$("#tipoAlvo").find("div").remove().end();
+	$("#tipoAlvo").append("<div><label>Selecione um Turno:</label>"+
+	"<select class=\"form-control\" id=\"idAlvo\" name=\"redirecionada.idDestino\">"
+	+"<option value='1'>Manhã</option> "
+	+"<option value='2'>Tarde</option>"
+	+"<option value='3'>Noite</option>"
+	+"</div>");
+	
+}
+var adicionarUsuario = function(){
+		$("#tipoAlvo").find("div").remove().end();
+		$.when(criarSelectUsuario()).done(function(){
+			$(usuarios).each(function(indice_usuario, usuario){
+				$("#idAlvo").append("<option value='"+usuario.login+ "'>"
+				+usuario.pessoa.nome+" "+usuario.pessoa.sobrenome+"</option>")
+			});
+			$(".select_auto_completar").select2();
+		});
+		
+}
+var criarSelectUsuario = function(){
+	return $("#tipoAlvo").append("<div><label>Selecione um Usuário:</label>"+
+	"<select class=\"form-control select_auto_completar \" id=\"idAlvo\" name=\"redirecionada.idDestino\">"+
+	"</div>");
+}
+var verficarDestino = function(){
+	if($("#selecionarAlvo").val() == "0"){
+		adicionarUsuario();
+	}else{
+		adicionarTurnos();
+	}
+}
+$("#selecionarAlvo").on("change", function(){
+	verficarDestino();
+});
+var cadastrarRepasseOrdem = function(){
+	enviarMensagemRedirecionar();
+	return false;
+}
+var enviarMensagemRedirecionar = function(){
+	 if ($("#formRepasse").valid()) {
+		 var enviar = $("#formRepasse").serialize();
+		 return $.ajax({  
+			    type:"post",  
+			    url: "${linkTo[OrdemServicoController].redirecionar() }",
+			    data: enviar,
+			    dataType: "json",  // Isso diz que você espera um JSON do servidor
+			    beforeSend: function(xhr, settings){},  
+			    success: function(data, textStatus, xhr){
+			    	if (data.mensagem.indexOf("Erro") !== -1) {
+			    		formularErro(data.mensagem);
+					}else{
+						atualizarValoresTabela();
+					}
+			    	
+			    },
+			    error: function(xhr, textStatus, errorThrown){
+			    	tratarErroAjax(xhr, textStatus, errorThrown);
+			    }
+			});
+	}else{
+		formularErro("Formulário Inválido!");
+	}
+}
+var repassarOrdem = function(indice_ordem)
+{
+	var ordem = ordems[indice_ordem];
+	var subOrdem = subOrdems[indice_ordem][0];
+	$("#idOrdemRedirecionada").val(ordem.id);
+	$("#idSubOrsAntiga").val(subOrdem.id);
+	$("#novoRepasseOrdem").modal('show');
+	return false;
+}
+
+</script>
+<script type="text/javascript">
+var regrasRepassar = function(){
+	$("#formRepasse").validate(function(){});
+	$("#dataExecutadaHora").rules("add",{
+		required: true,
+		  minlength: 5,
+		  maxlength: 5,
+		  hora: true,
+		  messages: {
+		    required: iniMensagemAlerta+"Campo obrigatório"+fimMensagemAlerta,
+		    minlength: jQuery.validator.format
+		    (iniMensagemAlerta+"Por favor insira os {0} caracteres."+fimMensagemAlerta),
+		    maxlength: jQuery.validator.format
+		    (iniMensagemAlerta+"Por favor insira os {0} caracteres."+fimMensagemAlerta)
+		  }}
+	);
+	$("#justificativaRedirecionada").rules("add",{
+		required: true,
+		  minlength: 5,
+		  maxlength: 1000,
+		  messages: {
+		    required: iniMensagemAlerta+"Campo obrigatório"+fimMensagemAlerta,
+		    minlength: jQuery.validator.format
+		    (iniMensagemAlerta+"Por favor insira no mínimo {0} caracteres."+fimMensagemAlerta),
+		    maxlength: jQuery.validator.format
+		    (iniMensagemAlerta+"Por favor insira até {0} caracteres."+fimMensagemAlerta)
+		  }}
+	);
+}
+</script>
+<script type="text/javascript">
+var temPermissao = false;
+var temPermissaoExcluir = false;
+var temPermissaoCadastro = false;
+var verificarPermissao = function(){
+	
+	$(permissoesUsuario).each(function(i,permi){
+		if(permi== 18 || permi == 1){
+			  temPermissao = true;
+		  }
+		if(permi== 19 || permi == 1){
+			temPermissaoExcluir = true;
+		  }
+		if(permi== 17 || permi == 1){
+			temPermissaoCadastro = true;
+		  }
+	});
+}
 </script>
 </t:rodape>

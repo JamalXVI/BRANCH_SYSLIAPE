@@ -93,6 +93,25 @@ rel="stylesheet">
 			    (iniMensagemAlerta+"Por favor insira os {0} caracteres."+fimMensagemAlerta)
 			  }}
 			);
+		$("#descricaoOrdem").rules("add",{
+			required: true,
+			  minlength: 5,
+			  maxlength: 1000,
+			  messages: {
+			    required: iniMensagemAlerta+"Campo obrigatório"+fimMensagemAlerta,
+			    minlength: jQuery.validator.format
+			    (iniMensagemAlerta+"Por favor no mínimo {0} caracteres."+fimMensagemAlerta),
+			    maxlength: jQuery.validator.format
+			    (iniMensagemAlerta+"Por favor insira até {0} caracteres."+fimMensagemAlerta)
+			  }}
+			);
+		$("#dataExecutada").rules("add",{
+			required: true,
+			  messages: {
+			    required: iniMensagemAlerta+"Campo obrigatório"+fimMensagemAlerta,
+			  }}
+			);
+		
 	}
 </script>
 <script type="text/javascript">
