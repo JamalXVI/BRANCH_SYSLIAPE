@@ -116,7 +116,7 @@ float:right;
 			
 				<div class="col-xs-6">
 					<label for="calendarioReserva">Data:</label>
-					<input type="datetime" value="${agora }" max="2050-01-01" min="2001-01-01" name="calendarioReserva"
+					<input type="date" value="${agora }" max="2050-01-01" min="2001-01-01" name="calendarioReserva"
 					id="calendarioReserva" class="dataCalendario form-control text-center" />
 				</div>
 				<div class="col-xs-6">
@@ -127,12 +127,12 @@ float:right;
 					class="form-control select_auto_completar" style="width: 100%;"
 					id="opcaoExtra" name="">
 					<option value="">---Selecione uma Opção---</option>
-					<option class="permissaoSala" value="aparecerModalSala">Cadastro de Sala</option>
-					<option class="permissaoDisciplina" value="aparecerModalDisciplina">Cadastro de Desciplina</option>
-					<option class="permissaoCurso" value="aparecerModalCurso">Cadastro de Curso</option>
-					<option class="" value="aparecerModalSlctAnoSemestre">Ano/Semestre</option>
 					<option class="permissao" value="aparecerModalReserva">Cadastro de Reserva</option>
 					<option class="" value="verExporadicasMesModal">Ver Exporádicas do Mês</option>
+					<option class="" value="aparecerModalSlctAnoSemestre">Ano/Semestre</option>
+					<option class="permissaoSala" value="aparecerModalSala">Cadastro de Sala</option>
+					<option class="permissaoDisciplina" value="aparecerModalDisciplina">Cadastro de Disciplina</option>
+					<option class="permissaoCurso" value="aparecerModalCurso">Cadastro de Curso</option>
 					
 					</select>
 				</div>
@@ -493,7 +493,7 @@ var cadastrarAnoSemestre = function(){
 //POPULAR AnoSemestre
 var listarAnoSemestreAjax = function(){
 	
-	$.ajax({  
+	return $.ajax({  
 	    type:"post",  
 	    url: "${linkTo[AnoSemestreController].listar() }", 
 	    dataType: "json",  // Isso diz que você espera um JSON do servidor
@@ -506,7 +506,7 @@ var listarAnoSemestreAjax = function(){
 		 }
 	});
 }
-listarAnoSemestreAjax();
+
 //Script de População de Todos os Anos/Semestres na Lista de Ano/Semestre
 var popularSelectAnoSemestre = function(anoSemestre)
 {
@@ -615,6 +615,7 @@ var validarComAnoSemestre = function(inputDate){
 	//Atualizar o Formulário de Reserva de Acordo com o Tipo de Reserva
 	var atualizarTipoReserva = function(){
 		$("#divTipoReserva").find("div").remove().end();
+		$("#idObservacaoReserva").find('div').remove().end();
 		if($("#selecionarTipoReserva").val() == "semestral")
 		{
 			semestral();
@@ -640,11 +641,11 @@ var validarComAnoSemestre = function(inputDate){
 						"<option value='5'>Sábado</option>"+
 						"<option value='6'>Domingo</option>"+
 					"</select></div><div class='col-xs-12 col-md-6'><label>Hora de Início:</label>"+
-					"<input type='text' class='form-control horaReserva' value='"+horaInicio+"' name='tipoReserva.horaInicio' /></div>"+
+					"<input type='text' id='modalReservaHoraInicio' class='form-control horaReserva' value='"+horaInicio+"' name='tipoReserva.horaInicio' /></div>"+
 					"<div class='col-xs-12 col-md-6'><label>Hora de Fim:</label>"+
-					"<input type='text' class='form-control horaReserva' value='' name='tipoReserva.horaFim' /></div>"+
-					"<div class='col-xs-12 col-md-6'><label>Observação:</label>"+
-					"<input type='text' class='form-control' value='' name='tipoReserva.observacao' /></div>");
+					"<input type='text' id='modalReservaHoraFim' class='form-control horaReserva' value='' name='tipoReserva.horaFim' /></div>");
+		$("#idObservacaoReserva").append("<div><label>Observação:</label>"+
+		"<input type='text' class='form-control' value='' name='tipoReserva.observacao' /></div>");
 	};
 	//Mostrar dados de Reserva Exporádica
 	var exporadica = function(){
@@ -652,11 +653,11 @@ var validarComAnoSemestre = function(inputDate){
 				"<input id='dataEscolhidaExporadicaForm'type='date' value='"+dataEscolhida+"' "+
 				"class='form-control' name='tipoReserva.dataMarcada' />"+
 				"</div><div class='col-xs-12 col-md-6'><label>Hora de Início:</label>"+
-					"<input type='text' class='form-control horaReserva' value='"+horaInicio+"' name='tipoReserva.horaInicio' /></div>"+
+					"<input type='text' id='modalReservaHoraInicio' class='form-control horaReserva' value='"+horaInicio+"' name='tipoReserva.horaInicio' /></div>"+
 					"<div class='col-xs-12 col-md-6'><label>Hora de Fim:</label>"+
-					"<input type='text' class='form-control horaReserva' value='' name='tipoReserva.horaFim' /></div>"+
-					"<div class='col-xs-12 col-md-6'><label>Observação:</label>"+
-					"<input type='text' class='form-control' value='' name='tipoReserva.observacao' /></div>");
+					"<input type='text' id='modalReservaHoraFim' class='form-control horaReserva' value='' name='tipoReserva.horaFim' /></div>");
+		$("#idObservacaoReserva").append("<div><label>Observação:</label>"+
+				"<input type='text' class='form-control' value='' name='tipoReserva.observacao' /></div>");
 	};
 </script>
 <!-- Popular Reservas -->
@@ -721,7 +722,7 @@ var listarSalasAjax = function(){
 		 }
 	});
 }
-listarSalasAjax();
+
 //Escrever Observação na Reserva na caixa Caso tenha uma
 var escreverObservacao = function(observacao)
 {
@@ -732,8 +733,8 @@ var escreverObservacao = function(observacao)
 }
 //Script para Ajustar o tamanho da fonte da caixa, de acordo com o tamanho dela
 var ajustarTamanhoFonte = function(idCaixaTexto){
-	if ($("#"+idCaixaTexto)[0].scrollHeight >  $('#'+idCaixaTexto).innerHeight() ||
-			$("#"+idCaixaTexto)[0].scrollWidth >  $('#'+idCaixaTexto).innerWidth()) {
+	if ($("#"+idCaixaTexto)[0].scrollHeight >  $('#'+idCaixaTexto).innerHeight()+1 ||
+			$("#"+idCaixaTexto)[0].scrollWidth >  $('#'+idCaixaTexto).innerWidth()+1) {
 			
 			var tamanhoFonte = parseInt($("#"+idCaixaTexto).css("font-size").replace("px",""));
 			tamanhoFonte--;
@@ -783,7 +784,15 @@ var cancelarRerserva = function(idRes)
 	cadastrarDeletarReserva(idRes);
 	return false;
 }
+var cancelarReservaAlterar = function(idRes)
+{
+	return cadastrarDeletarReserva(idRes);
+}
 //Script para Cancelar Reserva Exporádica
+var cancelarReservaAlterarExp = function(idRes, dataMarcada, horaIni, horaFim)
+{
+	return cadastrarDeletarReservaExp(idRes, dataMarcada, horaIni, horaFim);
+}
 var cancelarRerservaExp = function(idRes, dataMarcada, horaIni, horaFim)
 {
 	cadastrarDeletarReservaExp(idRes, dataMarcada, horaIni, horaFim);
@@ -1144,6 +1153,24 @@ var validarSeExporadico = function(){
 }
 //Enviar Formulário de Cadastro de Sala
 var cadastrarReserva = function(){
+	if (!valoresAlterarReserva[0]) {
+		inserirReserva();
+	}
+	if (valoresAlterarReserva[0] == "sem") {
+		$.when(cancelarReservaAlterar(valoresAlterarReserva[1])).done(function(){
+			inserirReserva();
+			valoresAlterarReserva = [];
+		});
+	}
+	if (valoresAlterarReserva[0] == "exp") {
+		$.when(cancelarReservaAlterarExp(valoresAlterarReserva[1],valoresAlterarReserva[2],
+				valoresAlterarReserva[3], valoresAlterarReserva[4])).done(function(){
+			inserirReserva();
+			valoresAlterarReserva = [];
+		});
+	}
+};
+var inserirReserva = function(){
 	if($("#formReserva").valid() && validarSeExporadico())
 	{
 		$.ajax({  
@@ -1166,8 +1193,7 @@ var cadastrarReserva = function(){
 	}else{
 		formularErro("Formulário Inválido!");
 	}
-	
-};
+}
 </script>
 <!-- Script de Select com Pesquisa -->
 <script type="text/javascript">
@@ -1195,7 +1221,7 @@ var cadastrarReserva = function(){
 <script type="text/javascript">
 //Deletar Reserva Semestral
 var cadastrarDeletarReserva = function(idResSem){
-	$.ajax({  
+	return $.ajax({  
 	    type:"post",  
 	    url: "${linkTo[ReservasController].deletarSem() }", 
 	    data: {"idResSem" : idResSem},
@@ -1216,7 +1242,7 @@ var cadastrarDeletarReserva = function(idResSem){
 };
 //Deletar Reserva Exporádica
 var cadastrarDeletarReservaExp = function(idResExp, dataMaraca, horaIni, horaFim){
-	$.ajax({  
+	return $.ajax({  
 	    type:"post",  
 	    url: "${linkTo[ReservasController].deletarExp() }", 
 	    data: {"idResExp" : idResExp, "dataMarcada" : dataMaraca, "horaIni" : horaIni, "horaFim" : horaFim},
@@ -1347,6 +1373,7 @@ var atualizarReservasExporadicasMes = function(){
 	});
 }
 var atualizarTabelaExporadicasMes = function(){
+	$("#reservaLerTodasTBodyExpMes").find("tr").remove().end();
 	$(reservasExporadicasMes).each(function(i,s){
 		$("#reservaLerTodasTBodyExpMes").append("<tr><td>"+
 				retornarMinuto(s.data.day)+"/"+retornarMinuto(s.data.month)+"/"
@@ -1358,8 +1385,78 @@ var atualizarTabelaExporadicasMes = function(){
 }
 </script>
 <script type="text/javascript">
-$("#opcaoExtra").on("change", function(){
+$("#opcaoExtra").on("select2:close", function(){
 	$(eval($(this).val()+"()"));
 });
 	</script>
+<script type="text/javascript">
+$(document).ready(function(){
+	$.when(listarAnoSemestreAjax()).done(function(){
+		listarSalasAjax();
+	});
+});
+</script>
+<script type="text/javascript">
+	var valoresAlterarReserva = [];
+	$("#excluirReservaExpAlt").on("click", function(){
+		valoresAlterarReserva = [];
+		valoresAlterarReserva[0] = "exp";
+		valoresAlterarReserva[1] = $("#deletarIdReservaExp").val();
+		valoresAlterarReserva[2] = $("#deletarDataReservaExp").val();
+		valoresAlterarReserva[3] = $("#deletarHoraIniReservaExp").val();
+		valoresAlterarReserva[4] = $("#deletarHoraFimReservaExp").val();
+		$("#selecionarTipoReserva").val("exporadica").trigger("change");
+		aparecerModalReserva();
+		$(reservasExporadica).each(function(indice_reserva, reserva){
+			var horaIni = retornarMinuto(reserva.horaInicio.hour)+":"+
+			retornarMinuto(reserva.horaInicio.minute);
+			var horaFim = retornarMinuto(reserva.horaFim.hour)+":"+
+			retornarMinuto(reserva.horaFim.minute);
+			var dataMarcadaExporadico = reserva.data.year+"-"+
+				retornarMinuto(reserva.data.month)+"-"+retornarMinuto(reserva.data.day);
+			if (reserva.idRes == valoresAlterarReserva[1]
+			&& valoresAlterarReserva[2] == dataMarcadaExporadico && valoresAlterarReserva[3] == horaIni &&
+			valoresAlterarReserva[4] == horaFim) {
+				$("#modalReservaHoraInicio").val(retornarMinuto(reserva.horaInicio.hour)+":"+
+						retornarMinuto(reserva.horaInicio.minute));
+				$("#modalReservaHoraFim").val(retornarMinuto(reserva.horaFim.hour)+":"+
+						retornarMinuto(reserva.horaFim.minute));
+				$("#dataEscolhidaExporadicaForm").val(dataMarcadaExporadico);
+				$("#selecionarSala").val(reserva.idSal).trigger("change");
+				$("#selecionarCursoReserva").val(reserva.reserva.codigoCur).trigger("change");
+				$("#selecionarDisciplina").val(reserva.reserva.codigoDis).trigger("change");
+				$("#reservaTurma").val(reserva.reserva.turma);
+				$("#selecionarProfessor").val(reserva.reserva.codigoPro).trigger("change");
+				$("#idObservacaoReserva").find('input').val(reserva.observacao).end();
+			}
+		});
+		
+	});
+	$("#excluirReservaSemAlt").on("click", function(){
+		valoresAlterarReserva = [];
+		valoresAlterarReserva[0] = "sem";
+		valoresAlterarReserva[1] = $("#deletarIdReservaSem").val();
+		$("#selecionarTipoReserva").val("semestral").trigger("change");
+		aparecerModalReserva();
+		$(reservasSemestral).each(function(indice_reserva, reserva){
+			if (reserva.id == valoresAlterarReserva[1]) {
+				$("#modalReservaHoraInicio").val(retornarMinuto(reserva.horaInicio.hour)+":"+
+						retornarMinuto(reserva.horaInicio.minute));
+				$("#modalReservaHoraFim").val(retornarMinuto(reserva.horaFim.hour)+":"+
+						retornarMinuto(reserva.horaFim.minute));
+				$("#selecionarDiaSemanaSemestral").val(reserva.diaSemana).trigger("change");
+				$("#selecionarSala").val(reserva.idSal).trigger("change");
+				$("#selecionarCursoReserva").val(reserva.reserva.codigoCur).trigger("change");
+				$("#selecionarDisciplina").val(reserva.reserva.codigoDis).trigger("change");
+				$("#reservaTurma").val(reserva.reserva.turma);
+				$("#selecionarProfessor").val(reserva.reserva.codigoPro).trigger("change");
+				$("#idObservacaoReserva").find('input').val(reserva.observacao).end();
+			}
+			
+		});
+	});
+	$('#novaReserva').on('hidden.bs.modal', function () {
+		valoresAlterarReserva = [];
+	});
+</script>
 </t:rodape>

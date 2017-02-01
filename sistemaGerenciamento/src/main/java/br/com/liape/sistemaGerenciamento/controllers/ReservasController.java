@@ -35,7 +35,6 @@ import br.com.liape.sistemaGerenciamento.outros.Conversor;
 import br.com.liape.sistemaGerenciamento.outros.MensagemSistema;
 import br.com.liape.sistemaGerenciamento.seguranca.NivelPermissao;
 import br.com.liape.sistemaGerenciamento.seguranca.UsuarioLogado;
-import jdk.nashorn.internal.runtime.ListAdapter;
 
 @Controller
 public class ReservasController {
@@ -233,8 +232,6 @@ public class ReservasController {
 		if (tipoReserva.getDiaSemana() != null) {
 			for (LocalDate dataEsc = LocalDate.now(); dataEsc
 					.isBefore(ans.getDataFim()); dataEsc = dataEsc.plusDays((1))) {
-				// System.out.println("DS: "+diaSemana+" / DE "+
-				// dataEsc.getDayOfWeek().getValue());
 				if (diaSemana == dataEsc.getDayOfWeek().getValue() - 1) {
 					List<Exporadico> listarDataMarcada = exporadicoDao.listarDataMarcada(dataEsc);
 
@@ -336,8 +333,10 @@ public class ReservasController {
 
 	private Boolean verficarValidadeReserva(Reserva res, AnoSemestre ans, Reserva tipoReserva, int idSalTipoReserva,
 			int idSal) {
-		return idSal == idSalTipoReserva && ans.getAno() == tipoReserva.getAnoAns()
-				&& ans.getSemestre() == tipoReserva.getSemestreAns();
+		boolean anoValido = ans.getAno() == res.getAnoAns() ? true : false;
+		boolean semestreValido = ans.getSemestre() == res.getSemestreAns() ? true : false;
+		boolean salaValida = idSal == idSalTipoReserva? true : false;
+		return salaValida && anoValido && semestreValido;
 	}
 
 	private int retornarDiaSemana(TipoReserva tipoReserva) {
@@ -386,7 +385,14 @@ public class ReservasController {
 					exporadico.setIdRes(reserva.getId());
 					exporadico.setIdSal(tipoReserva.getIdSala());
 					exporadico.setAtivo(true);
-					exporadicoDao.inserir(exporadico);
+					if (exporadicoDao.verSeExite(exporadico.getIdRes(),
+					exporadico.getData()
+					, exporadico.getHoraInicio(), exporadico.getHoraFim()).size() > 0) {
+						exporadicoDao.atualizar(exporadico);
+					}else{
+						exporadicoDao.inserir(exporadico);
+					}
+					
 				} else {
 					Semestral semestral = new Semestral();
 					semestral.setDiaSemana(Integer.valueOf(tipoReserva.getDiaSemana()));

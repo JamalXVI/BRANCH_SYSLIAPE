@@ -62,20 +62,7 @@
 					<!-- FIM MENU USUARIO -->
 
 
-					<!-- MENU MENSAGENS -->
-					<li><a href="javascript:;" data-toggle="collapse"
-						data-target="#mensagem"> <i
-							class="glyphicon glyphicon-envelope"> </i> Mensagens <i
-							class="fa fa-fw fa-caret-down"> </i>
-					</a>
-						<ul id="mensagem" class="collapse">
-							<li><a href="${linkTo[MensagemController].entrada()}">
-									Minhas Mensagens</a></li>
-							<li><a href="${linkTo[MensagemController].enviados()}">
-									Itens Enviados</a></li>
-							<li><a href="${linkTo[MensagemController].nova()}">
-									Enviar Mensagem</a></li>
-						</ul></li>
+					
 					<!-- FIM MENU MENSAGENS -->
 
 
@@ -104,7 +91,7 @@
 						</ul></li>
 					<!-- FIM MENU PUBLICAÇÕES -->
 
-					<!-- MENU EVENTOS -->
+					<!-- MENU DE PENDÊNCIAS -->
 					<li><a href="javascript:;" data-toggle="collapse"
 						data-target="#evento"> <i class="fa fa-exclamation" aria-hidden="true"></i>
 						Pendências <i class="fa fa-fw fa-caret-down"> </i>
@@ -114,6 +101,20 @@
 							Nova Ordem Serviço</a></li>
 							<li><a href="${linkTo[OrdemServicoController].listarAtivas()}">
 							Ver Ordens de Serviço Ativas</a></li>
+						</ul></li>
+					<!-- MENU MENSAGENS -->
+					<li><a href="javascript:;" data-toggle="collapse"
+						data-target="#mensagem"> <i
+							class="glyphicon glyphicon-envelope"> </i> Mensagens <i
+							class="fa fa-fw fa-caret-down"> </i>
+					</a>
+						<ul id="mensagem" class="collapse">
+							<li><a href="${linkTo[MensagemController].entrada()}">
+									Minhas Mensagens</a></li>
+							<li><a href="${linkTo[MensagemController].enviados()}">
+									Itens Enviados</a></li>
+							<li><a href="${linkTo[MensagemController].nova()}">
+									Enviar Mensagem</a></li>
 						</ul></li>
 					<!-- FIM MENU PUBLICAÇÕES -->
 

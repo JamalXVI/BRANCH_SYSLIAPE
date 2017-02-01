@@ -100,10 +100,6 @@ var tratarErroAjax = function(xhr, textStatus, errorThrown){
 	if (xhr.status == 404 || xhr.status == 500) {
 		window.location.replace("${linkTo[ErrosController].erro_operacao()}");
 	}else{
-    	alert(xhr);
-    	alert(textStatus);
-    	alert(errorThrown);
-		
 	}
 }
 </script>
