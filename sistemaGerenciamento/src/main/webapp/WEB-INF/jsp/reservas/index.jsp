@@ -108,21 +108,25 @@ float:right;
 			<div id="mensagemErro">
 			
 			</div>
-			<img src="<c:url value='/assets/img/fechar.png' />" alt="Fechar" style="display:none"
+			<img src="<c:url value='/assets/img/config.png' />" alt="Fechar" style="display:none"
 			id="fecharBase" />
 			
-			<t:centralizarDiv divCol="12" divColmd="6">
+			<t:centralizarDiv divCol="12" divColmd="8" classes="row container-fluid text-center">
 
 			
-				<div class="col-xs-6">
+				<div class="col-xs-4">
 					<label for="calendarioReserva">Data:</label>
 					<input type="date" value="${agora }" max="2050-01-01" min="2001-01-01" name="calendarioReserva"
 					id="calendarioReserva" class="dataCalendario form-control text-center" />
 				</div>
-				<div class="col-xs-6">
+				<div class="col-xs-3">
+					<button class="btn btn-info" style='margin-top:25px'
+					 id="pesquisarDataEscolhida">Pesquisar</button>
+				</div>
+				<div class="col-xs-5">
 <!-- 					<label>Outras:</label> -->
 <!-- 					<a class="btn btn-info" href="" onclick="return mostrarOpcoes();"><i class="fa fa-cog" aria-hidden="true"></i>Opções</a> -->
-					<label>Selecione uma Opção:</label> 
+					<label>Opções:</label> 
 					<select
 					class="form-control select_auto_completar" style="width: 100%;"
 					id="opcaoExtra" name="">
@@ -248,7 +252,7 @@ var aparecerModalDisciplina = function()
 //POPULAR DISCIPLINA
 var listarDisciplinaAjax = function(){
 	
-	$.ajax({  
+	return $.ajax({  
 	    type:"post",  
 	    url: "${linkTo[DisciplinaController].listar() }", 
 	    dataType: "json",  // Isso diz que você espera um JSON do servidor
@@ -271,12 +275,49 @@ function popularDisciplina(disciplinas){
     .find('option')
     .remove()
     .end();
+	$("#corpotabelaDisciplinas")
+	.find('tr')
+	.remove()
+	.end();
+	contagemDisciplinas = 0;
 	$(disciplinas).each(function(indice, disciplina){
 		$("<option />", {value: disciplina.codigo, text: disciplina.codigo + " - "+ disciplina.nome}).appendTo($("#selecionarDisciplina"));
+		adicionarDisicplinaPesquisa(disciplina);
 	});
-	
 };
-listarDisciplinaAjax();
+var contagemDisciplinas = 0;
+var contagemDisciplinasMax = 5;
+$("#pesquisarDisciplina").on("keyup", function(){
+	atualizarPesquisaDisciplina();
+});
+$("#pesquisarDisciplina").on("keydown", function(){
+	atualizarPesquisaDisciplina();
+});
+$("#pesquisarDisciplina").on("tap", function(){
+	atualizarPesquisaDisciplina();
+});
+var atualizarPesquisaDisciplina = function(){
+	var textoFiltro = $("#pesquisarDisciplina").val();
+	contagemDisciplinas = 0;
+	$("#corpotabelaDisciplinas")
+	.find('tr')
+	.remove()
+	.end();
+	$.each(hashDisciplina, function (key, disciplina) {
+		if (disciplina.codigo.toLowerCase().indexOf(textoFiltro) != -1 ||
+				disciplina.nome.toLowerCase().indexOf(textoFiltro)  != -1) {
+				adicionarDisicplinaPesquisa(disciplina);
+			}
+	});
+
+}
+var adicionarDisicplinaPesquisa = function(disciplina){
+	contagemDisciplinas++;
+	if (contagemDisciplinas <= contagemDisciplinasMax) {
+		$("#corpotabelaDisciplinas").append("<tr><td>"+disciplina.codigo.toUpperCase()
+				+"</td><td>"+disciplina.nome+"</td></tr>");
+	}
+}
 //Ajax de Cadastramento de Disciplina
 var cadastrarDisciplina = function(){
 	if($("#formDisciplina").valid())
@@ -307,7 +348,7 @@ var cadastrarDisciplina = function(){
 //POPULAR PROFESSOR
 var listarProfessorAjax = function(){
 	
-	$.ajax({  
+	return $.ajax({  
 	    type:"post",  
 	    url: "${linkTo[ProfessorController].listar() }", 
 	    dataType: "json",  // Isso diz que você espera um JSON do servidor
@@ -336,7 +377,6 @@ function popularProfessor(professores){
 	});
 	
 };
-listarProfessorAjax();
 
 </script>
 
@@ -373,11 +413,45 @@ function popularCurso(cursos){
     .end();
 	$(cursos).each(function(indice, curso){
 		hashCurso[curso.codigo] = curso;
-		$("<option />", {value: curso.codigo, text: curso.nome}).appendTo($("#selecionarCursoReserva"));
+		$("<option />", {value: curso.codigo, text: curso.codigo.toUpperCase()+" - "+curso.nome})
+		.appendTo($("#selecionarCursoReserva"));
+		adicionarCursosPesquisa(curso);
 	});
 	
 };
-listarCursoAjax();
+var contagemCursos = 0;
+var contagemCursosMax = 5;
+$("#pesquisarCursos").on("keyup", function(){
+	atualizarPesquisaCursos();
+});
+$("#pesquisarDisciplina").on("keydown", function(){
+	atualizarPesquisaCursos();
+});
+$("#pesquisarDisciplina").on("tap", function(){
+	atualizarPesquisaCursos();
+});
+var atualizarPesquisaCursos = function(){
+	var textoFiltro = $("#pesquisarCursos").val();
+	contagemCursos = 0;
+	$("#corpotabelaCursos")
+	.find('tr')
+	.remove()
+	.end();
+	$.each(hashCurso, function (key, curso) {
+		if (curso.codigo.toLowerCase().indexOf(textoFiltro) != -1 ||
+				curso.nome.toLowerCase().indexOf(textoFiltro)  != -1) {
+				adicionarCursosPesquisa(curso);
+			}
+	});
+
+}
+var adicionarCursosPesquisa = function(curso){
+	contagemCursos++;
+	if (contagemCursos <= contagemCursosMax) {
+		$("#corpotabelaCursos").append("<tr><td>"+curso.codigo.toUpperCase()
+				+"</td><td>"+curso.nome+"</td></tr>");
+	}
+}
 //Ajax de Cadastramento de Curso
 var cadastrarCurso = function(){
 	if($("#formCurso").valid())
@@ -894,7 +968,7 @@ var popularSala = function(data)
 		hashReserva[elementoReserva.horaInicio.hour].push(elementoReserva); 
 	});
 	
-$("#selecionarSala").append('<option value="">---Selecione uma Sala---</option>');
+//$("#selecionarSala").append('<option value="">---Selecione uma Sala---</option>');
 var realIndice = 0;
 	$(data).each(function(indiceSala,sala){
 		hashSalas[sala.id] = sala;
@@ -1182,8 +1256,11 @@ var inserirReserva = function(){
 		    success: function(data, textStatus, xhr){
 		    	if (data.mensagem.indexOf("Erro") !== -1) {
 		    		formularErro(data.mensagem);
+		    		reservaErro = true;
 				}
+		    	var valSala = $("#selecionarSala").val();
 		    	listarSalasAjax();
+		    	$("#selecionarSala").val(valSala).trigger("change");
 //	 	    	popularSelectAnoSemestre(data);
 		    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
 		    error: function(xhr, textStatus, errorThrown){ 
@@ -1204,7 +1281,20 @@ var inserirReserva = function(){
 
 <!-- Atualizar Salas -->
 <script type="text/javascript">
-	$("#calendarioReserva").on("change", function(){
+	$('#calendarioReserva').bind("enterKey",function(e){
+			atualizarDataReserva();
+		});
+		$('#calendarioReserva').keyup(function(e){
+		    if(e.keyCode == 13)
+		    {
+		        $(this).trigger("enterKey");
+		    }
+		});
+	$("#pesquisarDataEscolhida").on("click", function(){
+		atualizarDataReserva();
+	});
+	
+	var atualizarDataReserva = function(){
 		if(dataValida())
 		{
 			$.when(listarSalasAjax()).done(function(){
@@ -1214,7 +1304,7 @@ var inserirReserva = function(){
 			formularErro("Data Inválida! Por Favor Insira uma data Válida!");
 			restaurarDataInicial();
 		}
-	});
+	}
 </script>
 
 <!-- Deletar Reserva -->
@@ -1391,7 +1481,8 @@ $("#opcaoExtra").on("select2:close", function(){
 	</script>
 <script type="text/javascript">
 $(document).ready(function(){
-	$.when(listarAnoSemestreAjax()).done(function(){
+	$.when(listarAnoSemestreAjax(), listarProfessorAjax(), listarDisciplinaAjax(),
+			listarCursoAjax()).done(function(){
 		listarSalasAjax();
 	});
 });
@@ -1458,5 +1549,28 @@ $(document).ready(function(){
 	$('#novaReserva').on('hidden.bs.modal', function () {
 		valoresAlterarReserva = [];
 	});
+</script>
+<script type="text/javascript">
+	var reservaErro = false;
+	$("#novaMensagemErro").on('hidden.bs.modal', function(){
+		if (reservaErro) {
+			reservaErro = false;
+			$("#novaReserva").modal('show');
+		}
+	})
+	
+</script>
+<script type="text/javascript">
+var acionarModalDisciplina = function(){
+	$("#novaDisciplina").modal('show');
+	return false;
+}
+var acionarModalCurso = function(){
+	$("#novoCurso").modal('show');
+	return false;
+}
+$("#novaReserva").draggable({
+    handle: ".modal-header"
+});
 </script>
 </t:rodape>

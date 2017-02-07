@@ -4,6 +4,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 
 import br.com.caelum.vraptor.Controller;
+import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.validator.Validator;
@@ -31,7 +32,11 @@ public class DisciplinaController {
 	public DisciplinaController() {
 		this(null, null, null);
 	}
-
+	@Path("/Disciplina/")
+	public void index()
+	{
+		
+	}
 	/*
 	 * SEÇÃO DE REQUISIÇÕES AJAX
 	 */

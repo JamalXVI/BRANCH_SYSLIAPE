@@ -101,6 +101,8 @@
 							Nova Ordem Serviço</a></li>
 							<li><a href="${linkTo[OrdemServicoController].listarAtivas()}">
 							Ver Ordens de Serviço Ativas</a></li>
+							<li><a href="${linkTo[EscalaController].index()}">
+							Escalas</a></li>
 						</ul></li>
 					<!-- MENU MENSAGENS -->
 					<li><a href="javascript:;" data-toggle="collapse"

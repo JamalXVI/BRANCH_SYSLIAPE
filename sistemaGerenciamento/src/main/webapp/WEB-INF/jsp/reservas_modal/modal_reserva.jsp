@@ -18,7 +18,7 @@
 			<!-- Div que demarca a inserção a especificação da reserva -->
 			<div id="divTipoReserva"></div>
 		</div>
-		
+
 		<!-- Script de AutoCompletar Select -->
 		<div class="col-xs-12 col-md-6">
 			<label>Selecione uma Sala:</label> <select
@@ -28,22 +28,31 @@
 			</select>
 		</div>
 		<div class="col-xs-12 col-md-6">
-			<label>Selecione uma Curso:</label> <select
+			<label>Selecione uma Curso:<a href=''
+				onclick='return acionarModalCurso();' data-dismiss="modal"><i
+					class="fa fa-plus" style="color: #304FFE;" aria-hidden="true">
+			</i></a></label>
+			<select
 				class="form-control select_auto_completar" style="width: 100%;"
 				id="selecionarCursoReserva" name="reserva.codigoCur">
 				<option value="">---Selecione uma Curso---</option>
 			</select>
 		</div>
 		<div class="col-xs-12 col-md-6">
-			<label>Selecione uma Disciplina:</label> <select
-				class="form-control select_auto_completar" style="width: 100%;"
-				id="selecionarDisciplina" name="reserva.codigoDis">
+			<label>Selecione uma Disciplina: <a href=''
+				onclick='return acionarModalDisciplina();' data-dismiss="modal"><i
+					class="fa fa-plus" style="color: #304FFE;" aria-hidden="true">
+				</i></a></label> 
+			<select class="form-control select_auto_completar"
+				style="width: 100%;" id="selecionarDisciplina"
+				name="reserva.codigoDis">
 				<option value="">---Selecione uma Disciplina---</option>
 			</select>
 		</div>
-		
+
 		<t:input valorPadrao="" divCol="col-xs-12 col-md-6" nomeLabel="Turma:"
-			nome="reserva.turma" tipo="text" id="reservaTurma" classes="upperCase"></t:input>
+			nome="reserva.turma" tipo="text" id="reservaTurma"
+			classes="upperCase"></t:input>
 		<div class="col-xs-12 col-md-6">
 			<label>Selecione um Professor:</label> <select
 				class="form-control select_auto_completar" style="width: 100%;"
@@ -51,7 +60,6 @@
 				<option value="">---Selecione um Professor---</option>
 			</select>
 		</div>
-		<div class="col-xs-12 col-md-6" id="idObservacaoReserva">
-		</div>
+		<div class="col-xs-12 col-md-6" id="idObservacaoReserva"></div>
 	</form>
 </t:modal_geralLg>

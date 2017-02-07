@@ -95,6 +95,7 @@ public class OrdemServicoController {
 	}
 	//CADASTRAR NOVA ORDEM DE SERVIÇO
 	@Path("/Cadastro/Ordem/")
+	@NivelPermissao(idPermissao = 17)
 	public void nova() {
 	}
 	//LISTAR TODAS AS ORDEMS ATIVAS QUE NÃO FORAM EXECUTADAS

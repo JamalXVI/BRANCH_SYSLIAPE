@@ -263,7 +263,10 @@ rel="stylesheet">
 				}
 			}
 		});
-		texto += subOrdems[indice_ordem][0].dataParaSerExecutada.toLocaleString()+"</td><td>";
+		var dataEsc = new Date(subOrdems[indice_ordem][0].dataParaSerExecutada);
+		texto += adicionarZero(dataEsc.getDay())+"/"+adicionarZero(dataEsc.getMonth()+1)+
+		"/"+adicionarZero(dataEsc.getFullYear())+" "+
+		adicionarZero(dataEsc.getHours())+":"+adicionarZero(dataEsc.getMinutes())+"</td><td>";
 		if (subOrdemsTurno[indice_ordem].length > 0) {
 			$(turnos).each(function(indice_turno, turno){
 				if (turno.id == subOrdemsTurno[indice_ordem][0].idTur) {
@@ -351,7 +354,6 @@ var detalhesOrdem = function(indice_ordem)
 	if (ordem.descricao) {
 		$("#descricao").val(ordem.descricao);
 	}
-	debugger;
 	if (subOrdem.justificativa) {
 		$("#justificativa").val(subOrdem.justificativa);
 	}
