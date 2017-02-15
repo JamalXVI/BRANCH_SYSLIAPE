@@ -189,8 +189,8 @@ public class MensagemController {
 						}
 
 					}
-					result.redirectTo(this).entrada();
 				}
+				result.redirectTo(this).entrada();
 			} else {
 				result.redirectTo(ErrosController.class).erro_operacao();
 

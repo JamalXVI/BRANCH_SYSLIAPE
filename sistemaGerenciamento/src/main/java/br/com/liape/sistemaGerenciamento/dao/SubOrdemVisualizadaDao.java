@@ -11,6 +11,8 @@ import br.com.unaerp.jdbc.persistence.PersistenceJDBC;
 public class SubOrdemVisualizadaDao extends PersistenceJDBC<SubOrdemVisualizada> {
 	private static final String LISTAR_ID = "SELECT * FROM"
 			+ " SUBORDEM_VISUALIZADA WHERE ID_SOR = ?";
+	private static final String LISTAR_ID_LOGIN = "SELECT * FROM"
+			+ " SUBORDEM_VISUALIZADA WHERE ID_SOR = ? AND LOGIN_USR = ?";
 	public SubOrdemVisualizadaDao() {
 	}
 	
@@ -20,5 +22,8 @@ public class SubOrdemVisualizadaDao extends PersistenceJDBC<SubOrdemVisualizada>
 	}
 	public List<SubOrdemVisualizada> listarId(int id) {
 		return super.consultarLista(LISTAR_ID, id);
+	}
+	public List<SubOrdemVisualizada> listarIdLogin(int id, String login) {
+		return super.consultarLista(LISTAR_ID_LOGIN, id, login);
 	}
 }

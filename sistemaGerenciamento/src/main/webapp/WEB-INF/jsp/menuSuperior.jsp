@@ -118,6 +118,17 @@
 							<li><a href="${linkTo[MensagemController].nova()}">
 									Enviar Mensagem</a></li>
 						</ul></li>
+					<!-- MENU OUTRAS -->
+					<li><a href="javascript:;" data-toggle="collapse"
+						data-target="#outros"> <i
+							class="fa fa-certificate"> </i> Outros <i
+							class="fa fa-fw fa-caret-down"> </i>
+					</a>
+						<ul id="outros" class="collapse">
+							<li><a href="${linkTo[HomeController].linux()}">
+									Configurar Wi-fi Linux</a></li>
+						</ul></li>
+					
 					<!-- FIM MENU PUBLICAÇÕES -->
 
 				</ul>

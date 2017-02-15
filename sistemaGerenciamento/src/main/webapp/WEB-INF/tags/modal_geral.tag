@@ -3,8 +3,8 @@
 <%@ attribute name="nome" required="true" %>
 <%@ attribute name="genero" required="true" %>
 <%@ attribute name="nomeLabel" required="true" %>
-<%@ attribute name="semSalvar" required="false"  %>
-
+<%@ attribute name="semSalvar" required="false"   %>
+<%@ attribute name="fecharSalvar" required="false" type="java.lang.String" %>
 <div class="modal fade" id="nov${genero }${nome}" role="dialog" aria-labelledby="nov${genero }${nome}Label" data-focus-on="input:first">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -20,7 +20,12 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
         <c:if test="${semSalvar == null || semSalvar != 0  }">
-        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="cadastrar${nome}();">Salvar</button>
+        	<button type="button" class="btn btn-primary"
+        	<c:if test="${empty fecharSalvar}" >
+        	 data-dismiss="modal"
+        	 </c:if>
+        	 onclick="cadastrar${nome}();">Salvar</button>
+        	
 		</c:if>      
       </div>
     </div>

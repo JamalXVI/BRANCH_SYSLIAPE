@@ -11,7 +11,7 @@ public class HomeController {
 
 	@Inject
 	private Result result;
-	
+
 	public HomeController() {
 	}
 
@@ -20,6 +20,21 @@ public class HomeController {
 	 */
 	@Path("/")
 	public void index() {
-	//	result.include("msg", "Message from your controller");
+		// result.include("msg", "Message from your controller");
+	}
+
+	@Path("/Configurar/Wifi/Linux/")
+	public void linux()
+	{
+		String[] passos = new String[7];
+		passos[0] = "";
+		passos[1] = "Clicar no Ícone de Wi-fi";
+		passos[2] = "Selecionar a rede da Unaerp";
+		passos[3] = "Colocar:</p><p>Segurança Wi-Fi: WPA &"
+				+ " WPA2(Enterprise)</p><p>Autenticação Interna:MSCHAPv2";
+		passos[4] = "Lembrar de Selecionar \"Nenhum Certificado CA nescessário\"";
+		passos[5] = "Checar Status da Rede";
+		passos[6] =  "Verificar se está conectada";
+		result.include(passos);
 	}
 }

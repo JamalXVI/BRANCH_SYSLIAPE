@@ -264,6 +264,7 @@ rel="stylesheet">
 			}
 		});
 		var dataEsc = new Date(subOrdems[indice_ordem][0].dataParaSerExecutada);
+		var paraUsuario = false;
 		texto += adicionarZero(dataEsc.getDay())+"/"+adicionarZero(dataEsc.getMonth()+1)+
 		"/"+adicionarZero(dataEsc.getFullYear())+" "+
 		adicionarZero(dataEsc.getHours())+":"+adicionarZero(dataEsc.getMinutes())+"</td><td>";
@@ -276,6 +277,7 @@ rel="stylesheet">
 		}else{
 			$(usuarios).each(function(indice_usuario, usuario){
 				if (usuario.login == subOrdemsUsuario[indice_ordem][0].loginUsr) {
+					paraUsuario = true;
 					texto += "Usuário: "+usuario.pessoa.nome+" "+usuario.pessoa.sobrenome+"</td><td>";
 				}
 			});
@@ -284,10 +286,21 @@ rel="stylesheet">
 		var diaOr = new Date(subOrdems[indice_ordem][0].dataParaSerExecutada);
 		if (temPermissaoCadastro) {
 			texto += criarTextoAcao("finalizarOrdem", "fa fa-check", indice_ordem);
+		}else if (paraUsuario){
+			if(subOrdemsUsuario[indice_ordem][0].loginUsr == "${usuarioLogado.usuario.login}"){
+				texto += criarTextoAcao("finalizarOrdemUsr", "fa fa-check", indice_ordem);
+			}
 		}
-		if(verificarDataRepasse(diaHj, diaOr) && temPermissao)
+		if(verificarDataRepasse(diaHj, diaOr))
 		{
-			texto += criarTextoAcao("repassarOrdem", "fa fa-reply", indice_ordem);
+			if (temPermissao) {
+				texto += criarTextoAcao("repassarOrdem", "fa fa-reply", indice_ordem);
+			}else if (paraUsuario){
+				if(subOrdemsUsuario[indice_ordem][0].loginUsr == "${usuarioLogado.usuario.login}"){
+					texto += criarTextoAcao("repassarOrdemUsr", "fa fa-reply", indice_ordem);
+				}
+			}
+			
 		}
 		if (temPermissaoExcluir) {
 			texto += criarTextoAcao("excluirOrdem", "fa fa-trash", indice_ordem);
@@ -400,13 +413,22 @@ $("#excluirOrdemSim").on('click', function(){
 		});
 });
 var finalizarOrdem = function(indice_ordem){
+	fazerFinalizacaoOrdem(indice_ordem);
+	return false;
+}
+var finalizarOrdemUsr = function(indice_ordem){
+	redirecionada = true;
+	fazerFinalizacaoOrdem(indice_ordem);
+	return false;
+}
+var fazerFinalizacaoOrdem = function(indice_ordem){
 	$("#finalizarSubOrdemId").val(subOrdems[indice_ordem][0].id)
 	$("#novoFinalizarOrdem").modal('show');
-	return false;
 }
 $("#finalizarOrdemSim").on('click', function(){
 	var enviar = {"idSor" : $("#finalizarSubOrdemId").val()};
-	 return $.ajax({  
+	if (!redirecionada) {
+		return $.ajax({  
 		    type:"post",  
 		    url: "${linkTo[OrdemServicoController].finalizar() }",
 		    data: enviar,
@@ -420,6 +442,24 @@ $("#finalizarOrdemSim").on('click', function(){
 		    	tratarErroAjax(xhr, textStatus, errorThrown);
 		    }
 		});
+	}else{
+		redirecionada = false;
+		return $.ajax({  
+		    type:"post",  
+		    url: "${linkTo[OrdemServicoController].finalizarUsuario() }",
+		    data: enviar,
+		    dataType: "json",  // Isso diz que você espera um JSON do servidor
+		    beforeSend: function(xhr, settings){},  
+		    success: function(data, textStatus, xhr){
+		    	atualizarValoresTabela();
+		    	//criarPermissoes();
+		    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
+		    error: function(xhr, textStatus, errorThrown){
+		    	tratarErroAjax(xhr, textStatus, errorThrown);
+		    }
+		});
+	}
+	 
 });
 </script>
 <script type="text/javascript">
@@ -472,6 +512,7 @@ var verficarDestino = function(){
 $("#selecionarAlvo").on("change", function(){
 	verficarDestino();
 });
+var redirecionada = false;
 var cadastrarRepasseOrdem = function(){
 	enviarMensagemRedirecionar();
 	return false;
@@ -479,9 +520,30 @@ var cadastrarRepasseOrdem = function(){
 var enviarMensagemRedirecionar = function(){
 	 if ($("#formRepasse").valid()) {
 		 var enviar = $("#formRepasse").serialize();
-		 return $.ajax({  
+		 if (!redirecionada) {
+			 return $.ajax({  
+				    type:"post",  
+				    url: "${linkTo[OrdemServicoController].redirecionar() }",
+				    data: enviar,
+				    dataType: "json",  // Isso diz que você espera um JSON do servidor
+				    beforeSend: function(xhr, settings){},  
+				    success: function(data, textStatus, xhr){
+				    	if (data.mensagem.indexOf("Erro") !== -1) {
+				    		formularErro(data.mensagem);
+						}else{
+							atualizarValoresTabela();
+						}
+				    	
+				    },
+				    error: function(xhr, textStatus, errorThrown){
+				    	tratarErroAjax(xhr, textStatus, errorThrown);
+				    }
+				});
+		}else{
+			redirecionada = false;
+			return $.ajax({  
 			    type:"post",  
-			    url: "${linkTo[OrdemServicoController].redirecionar() }",
+			    url: "${linkTo[OrdemServicoController].redirecionarOrdemUsuario() }",
 			    data: enviar,
 			    dataType: "json",  // Isso diz que você espera um JSON do servidor
 			    beforeSend: function(xhr, settings){},  
@@ -497,18 +559,27 @@ var enviarMensagemRedirecionar = function(){
 			    	tratarErroAjax(xhr, textStatus, errorThrown);
 			    }
 			});
+		}
 	}else{
 		formularErro("Formulário Inválido!");
 	}
 }
 var repassarOrdem = function(indice_ordem)
 {
+	repassandoOrdem(indice_ordem);
+	return false;
+}
+var repassarOrdemUsr = function(indice_ordem){
+	redirecionada = true;
+	repassandoOrdem(indice_ordem);
+	return false;
+}
+var repassandoOrdem = function(indice_ordem){
 	var ordem = ordems[indice_ordem];
 	var subOrdem = subOrdems[indice_ordem][0];
 	$("#idOrdemRedirecionada").val(ordem.id);
 	$("#idSubOrsAntiga").val(subOrdem.id);
 	$("#novoRepasseOrdem").modal('show');
-	return false;
 }
 
 </script>

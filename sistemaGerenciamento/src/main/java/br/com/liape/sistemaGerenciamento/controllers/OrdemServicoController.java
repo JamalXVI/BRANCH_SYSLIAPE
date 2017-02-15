@@ -93,32 +93,38 @@ public class OrdemServicoController {
 	public OrdemServicoController() {
 		this(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 	}
-	//CADASTRAR NOVA ORDEM DE SERVIÇO
+
+	// CADASTRAR NOVA ORDEM DE SERVIÇO
 	@Path("/Cadastro/Ordem/")
 	@NivelPermissao(idPermissao = 17)
 	public void nova() {
 	}
-	//LISTAR TODAS AS ORDEMS ATIVAS QUE NÃO FORAM EXECUTADAS
+
+	// LISTAR TODAS AS ORDEMS ATIVAS QUE NÃO FORAM EXECUTADAS
 	@Path("/Listar/Ordem/Ativas/")
 	public void listarAtivas() {
 	}
-	//LISTAR TODAS AS ORDEMS ATIVAS E NÃO EXECUTAS E SERIALIZAR EM JSON
+
+	// LISTAR TODAS AS ORDEMS ATIVAS E NÃO EXECUTAS E SERIALIZAR EM JSON
 	@Post("/Listar/Ordem/")
 	public void listar() {
 		result.use(Results.json()).withoutRoot().from(ordemServicoDao.listarExecucao(false)).serialize();
 
 	}
-	//LISTAR TODAS AS ORDEMS DE SERVIÇOS DIRECIONADAS PARA SALA
+
+	// LISTAR TODAS AS ORDEMS DE SERVIÇOS DIRECIONADAS PARA SALA
 	@Post("/Listar/Ordem/Sala/")
 	public void listarSala(int idOrs) {
 		result.use(Results.json()).withoutRoot().from(ordemServicoSalaDao.listarId(idOrs)).serialize();
 	}
-	//LISTAR A ORDEM SERVIÇO COMPUTADOR DE UMA ORDEM DE SERVIÇO
+
+	// LISTAR A ORDEM SERVIÇO COMPUTADOR DE UMA ORDEM DE SERVIÇO
 	@Post("/Listar/Ordem/Computador/")
 	public void listarComputador(int idOrs) {
 		result.use(Results.json()).withoutRoot().from(ordemServicoComputadorDao.listarId(idOrs)).serialize();
 	}
-	//LISTAR A SUBORDEM ATIVA DE UMA ORDEM.
+
+	// LISTAR A SUBORDEM ATIVA DE UMA ORDEM.
 	@Post("/Listar/SubOrdem/")
 	public void listarSubOrdem(int idOrs) {
 		List<SubOrdem> listarId = subOrdemDao.listarId(idOrs);
@@ -138,12 +144,80 @@ public class OrdemServicoController {
 				.serialize();
 
 	}
-	//LISTAR SUBORDEM TURNO DE UMA SUBORDEM
+
+	@Post("/Listar/SubOrdem/Usuario/Ativo")
+	public void listarParaUsuarioAtivo() {
+		Turno turno = retornarTurnosUsuarioAtivo();
+		List<SubOrdemView> view = new ArrayList<>();
+		if (turno != null) {
+			List<SubOrdemTurno> subOrdens = subOrdemTurnoDao.listarIdTurno(turno.getId());
+			if (subOrdens.size() > 0) {
+				for (SubOrdemTurno subOrdemTurno : subOrdens) {
+					List<SubOrdem> listarIdSubEsp =
+					subOrdemDao.listarIdSubEsp(subOrdemTurno.getIdSor());
+					if (listarIdSubEsp != null) {
+						if (listarIdSubEsp.size() > 0) {
+							SubOrdem subOrdem = listarIdSubEsp.get(0);
+							if (ordemVisualizadaDao.listarIdLogin(subOrdem.getId(),
+								usuarioLogado.getUsuario().getLogin()).size() <= 0) {
+								adicionarView(view, subOrdem);
+							}
+							
+						}
+					}
+					
+					
+				}
+			}
+		}
+		List<SubOrdemUsuario> subOrdens =
+		subOrdemUsuarioDao.listarLogin(usuarioLogado.getUsuario().getLogin());
+		if (subOrdens.size() > 0) {
+			for (SubOrdemUsuario subOrdemUsuario : subOrdens) {
+				List<SubOrdem> listarIdSubEsp = subOrdemDao.listarIdSubEsp(subOrdemUsuario.getIdSor());
+				if (listarIdSubEsp != null) {
+					if (listarIdSubEsp.size() > 0) {
+						SubOrdem subOrdem = listarIdSubEsp.get(0);
+						if (ordemVisualizadaDao.listarIdLogin(subOrdem.getId(),
+							usuarioLogado.getUsuario().getLogin()).size() <= 0) {
+							adicionarView(view, subOrdem);
+						}
+					}
+				}
+			}
+		}
+		result.use(Results.json()).withoutRoot().from(view).include("dataGerada").include("dataParaSerExecutada")
+		.serialize();
+	}
+
+	private void adicionarView(List<SubOrdemView> view, SubOrdem subOrdem) {
+		SubOrdemView subOrdemView = new SubOrdemView();
+		subOrdemView.setId(subOrdem.getId());
+		subOrdemView.setIdOrs(subOrdem.getIdOrs());
+		subOrdemView.setDataGerada(Conversor.converterLocalDateTimeParaTimeStamp(subOrdem.getDataGerada()));
+		subOrdemView.setDataParaSerExecutada(
+				Conversor.converterLocalDateTimeParaTimeStamp(subOrdem.getDataParaSerExecutada()));
+		view.add(subOrdemView);
+	}
+
+	private Turno retornarTurnosUsuarioAtivo() {
+		List<UsuarioTurno> listarLogin = usuarioTurnoDao.listarLogin(usuarioLogado.getUsuario().getLogin());
+		for (UsuarioTurno usuarioTurno : listarLogin) {
+			Turno turno = turnoDao.listarId(usuarioTurno.getIdTur()).get(0);
+			if (turno.isAtivo()) {
+				return turno;
+			}
+		}
+		return null;
+	}
+
+	// LISTAR SUBORDEM TURNO DE UMA SUBORDEM
 	@Post("/Listar/SubOrdem/Turno/")
 	public void listarTurno(int idSor) {
 		result.use(Results.json()).withoutRoot().from(subOrdemTurnoDao.listarId(idSor)).serialize();
 	}
-	//LISTAR SUBORDEM USUÁRIO DE UMA SUBORDEM
+
+	// LISTAR SUBORDEM USUÁRIO DE UMA SUBORDEM
 	@Post("/Listar/SubOrdem/Usuario/")
 	public void listarUsuario(int idSor) {
 		result.use(Results.json()).withoutRoot().from(subOrdemUsuarioDao.listarId(idSor)).serialize();
@@ -163,7 +237,8 @@ public class OrdemServicoController {
 		}
 		result.redirectTo(this).nova();
 	}
-	//ENVIAR PARA CADASTRAMENTO UMA ORDEM DE SERVIÇO
+
+	// ENVIAR PARA CADASTRAMENTO UMA ORDEM DE SERVIÇO
 	@NivelPermissao(idPermissao = 17)
 	@Post("/Ordem/Enviar/")
 	public void enviar(@Valid NovaOrdem ordem) {
@@ -174,7 +249,8 @@ public class OrdemServicoController {
 		boolean inserir = ordemServicoDao.inserir(ordemServico);
 		inserirOrdemServico(ordem, inserir);
 	}
-	//INSERIR TIPOS DE ORDEMS DE SERVIÇO - RAMIFICAÇÃO DO ENVIAR
+
+	// INSERIR TIPOS DE ORDEMS DE SERVIÇO - RAMIFICAÇÃO DO ENVIAR
 	private void inserirOrdemServico(NovaOrdem ordem, boolean inserir) {
 		if (inserir) {
 			int idOrdemServico = ordemServicoDao.listarUltimo();
@@ -189,7 +265,8 @@ public class OrdemServicoController {
 
 		}
 	}
-	//INSERIR ORDEM DE SERVIÇO DE UMA SALA - RAMIFICAÇÃO DE inserirOrdemServico
+
+	// INSERIR ORDEM DE SERVIÇO DE UMA SALA - RAMIFICAÇÃO DE inserirOrdemServico
 	private boolean inserirOrdemServicoSala(NovaOrdem ordem, int idOrdemServico) {
 		boolean inserir;
 		OrdemServicoSala ordemServicoSala = new OrdemServicoSala();
@@ -198,7 +275,9 @@ public class OrdemServicoController {
 		inserir = ordemServicoSalaDao.inserir(ordemServicoSala);
 		return inserir;
 	}
-	//INSERIR ORDEM DE SERVIÇO DE UM COMPUTADOR - REMIFACAÇÃO DE inserirOrdemServico
+
+	// INSERIR ORDEM DE SERVIÇO DE UM COMPUTADOR - REMIFACAÇÃO DE
+	// inserirOrdemServico
 	private boolean inserirOrdemServicoComputador(NovaOrdem ordem, int idOrdemServico) {
 		boolean inserir;
 		OrdemServicoComputador ordemServicoComputador = new OrdemServicoComputador();
@@ -208,7 +287,8 @@ public class OrdemServicoController {
 		inserir = ordemServicoComputadorDao.inserir(ordemServicoComputador);
 		return inserir;
 	}
-	//INSERIR SUB ORDEM DE SERVIÇO - RAMIFICAÇÃO DE inserirOrdemServico
+
+	// INSERIR SUB ORDEM DE SERVIÇO - RAMIFICAÇÃO DE inserirOrdemServico
 	private void inserirSubOrdem(NovaOrdem ordem, boolean inserir, int idOrdemServico) {
 		if (inserir) {
 			SubOrdem subOrdem = new SubOrdem();
@@ -240,7 +320,8 @@ public class OrdemServicoController {
 			result.redirectTo(ErrosController.class).erro_operacao();
 		}
 	}
-	//INSERIR SUBORDEM DE USUÁRIO - RAMIFICAÇÃO DE inserirSubOrdem
+
+	// INSERIR SUBORDEM DE USUÁRIO - RAMIFICAÇÃO DE inserirSubOrdem
 	private boolean inserirSubOrdemUsuario(NovaOrdem ordem, int idSubOrdem) {
 		boolean inserir;
 		SubOrdemUsuario subOrdemUsuario = new SubOrdemUsuario();
@@ -249,7 +330,8 @@ public class OrdemServicoController {
 		inserir = subOrdemUsuarioDao.inserir(subOrdemUsuario);
 		return inserir;
 	}
-	//INSERIR SUBORDEM DE TURNO - RAMIFICAÇÃO DE inserirSubOrdem
+
+	// INSERIR SUBORDEM DE TURNO - RAMIFICAÇÃO DE inserirSubOrdem
 	private boolean inserirSubOrdemTurno(NovaOrdem ordem, int idSubOrdem) {
 		boolean inserir;
 		SubOrdemTurno subOrdemTurno = new SubOrdemTurno();
@@ -267,7 +349,7 @@ public class OrdemServicoController {
 	/*
 	 * EXCLUIR Ordem Serviço
 	 */
-	
+
 	@Post("/Excluir/Ordem/")
 	/*
 	 * Impedir o Acesso à página caso o grupo não tenha acesso à permissão de id
@@ -287,6 +369,7 @@ public class OrdemServicoController {
 		;
 		result.use(Results.json()).withoutRoot().from(sistema).serialize();
 	}
+
 	/*
 	 * MARCAR ORDEM DE SERVIÇO COMO FINALIZADA
 	 */
@@ -297,6 +380,24 @@ public class OrdemServicoController {
 	 */
 	@NivelPermissao(idPermissao = 17)
 	public void finalizar(int idSor) {
+		finalizarSubOrdem(idSor);
+	}
+	@Post("/Finalizar/Ordem/Usuario/")
+	public void finalizarUsuario(int idSor){
+		
+		List<SubOrdemUsuario> subUsr = subOrdemUsuarioDao.listarId(idSor);
+		if (subUsr.size() > 0) {
+			SubOrdemUsuario subOrdemUsuario = subUsr.get(0);
+			if (subOrdemUsuario.getLoginUsr().equals(usuarioLogado.getUsuario().getLogin())) {
+				finalizarSubOrdem(idSor);
+			}else{
+				result.redirectTo(ErrosController.class).erro_operacao();
+			}
+		}else{
+			result.redirectTo(ErrosController.class).erro_operacao();
+		}
+	}
+	private void finalizarSubOrdem(int idSor) {
 		MensagemSistema sistema = new MensagemSistema("");
 		SubOrdem subOrdem = subOrdemDao.listarIdSub(idSor).get(0);
 		subOrdem.setDataExecutada(LocalDateTime.now());
@@ -312,6 +413,7 @@ public class OrdemServicoController {
 		;
 		result.use(Results.json()).withoutRoot().from(sistema).serialize();
 	}
+
 	/*
 	 * VISUALIZAR ORDEM DE SERVIÇO
 	 */
@@ -327,6 +429,7 @@ public class OrdemServicoController {
 		}
 		result.use(Results.json()).withoutRoot().from(msg).serialize();
 	}
+
 	/*
 	 * REDIRECIONAR ORDEM DE SERVIÇO PARA OUTRO TURNO
 	 */
@@ -337,6 +440,25 @@ public class OrdemServicoController {
 	 */
 	@NivelPermissao(idPermissao = 19)
 	public void redirecionar(NovaOrdemRedirecionada redirecionada) {
+		redirecionarOrdem(redirecionada);
+	}
+	@Post("/Redirecionar/Ordem/Usuario/")
+	public void redirecionarOrdemUsuario(NovaOrdemRedirecionada redirecionada)
+	{
+		List<SubOrdemUsuario> subUsr =
+		subOrdemUsuarioDao.listarId(redirecionada.getIdSubOrsAntiga());
+		if (subUsr.size() > 0) {
+			SubOrdemUsuario subOrdemUsuario = subUsr.get(0);
+			if (subOrdemUsuario.getLoginUsr().equals(usuarioLogado.getUsuario().getLogin())) {
+				redirecionarOrdem(redirecionada);
+			}else{
+				result.redirectTo(ErrosController.class).erro_operacao();
+			}
+		}else{
+			result.redirectTo(ErrosController.class).erro_operacao();
+		}
+	}
+	private void redirecionarOrdem(NovaOrdemRedirecionada redirecionada) {
 		MensagemSistema msg = new MensagemSistema("Sucesso");
 		if (finalizarSubOrdemAntiga(redirecionada)) {
 			SubOrdem subOrdem = cadastrarNovaSubOrdem(redirecionada);
@@ -351,7 +473,7 @@ public class OrdemServicoController {
 		}
 		result.use(Results.json()).withoutRoot().from(msg).serialize();
 	}
-	
+
 	private boolean usuarioAutorizadoRepassar(SubOrdem subOrdem) {
 		boolean passou = false;
 		List<Grupo> grupos = grupoDao.listarPorId(usuarioLogado.getUsuario().getIdGrupo());
@@ -362,12 +484,12 @@ public class OrdemServicoController {
 					passou = true;
 				}
 			}
-			
+
 		}
 		List<SubOrdemTurno> subOrdemTurnos = subOrdemTurnoDao.listarId(subOrdem.getId());
 		if (subOrdemTurnos.size() > 0) {
 			passou = verificarSeEDoTurno(passou, subOrdemTurnos);
-		}else{
+		} else {
 			passou = true;
 		}
 
@@ -404,7 +526,7 @@ public class OrdemServicoController {
 	}
 
 	private void inserirNovaSubOrdem(NovaOrdemRedirecionada redirecionada, MensagemSistema msg) {
-		
+
 		boolean inserir;
 		int idSubOrdem = subOrdemDao.listarUltimo();
 		NovaOrdem ordem = new NovaOrdem();
@@ -421,13 +543,13 @@ public class OrdemServicoController {
 	}
 
 	private boolean finalizarSubOrdemAntiga(NovaOrdemRedirecionada redirecionada) {
-		
+
 		SubOrdem subOrdem = subOrdemDao.listarIdSub(redirecionada.getIdSubOrsAntiga()).get(0);
 		if (usuarioAutorizadoRepassar(subOrdem)) {
 			subOrdem.setDataExecutada(LocalDateTime.now());
 			return subOrdemDao.atualizar(subOrdem);
 		}
 		return false;
-		
+
 	}
 }

@@ -876,7 +876,8 @@ var cancelarRerservaExp = function(idRes, dataMarcada, horaIni, horaFim)
 var preencherInfoReserva = function(){
 	$("#reservaLerDisciplina").val(hashDisciplina[todasDaReserva.reserva.codigoDis].nome);
 	$("#reservaLerCurso").val(hashCurso[todasDaReserva.reserva.codigoCur].nome);
-	$("#reservaLerProfessor").val(hashProfessores[todasDaReserva.reserva.codigoPro].pessoa.nome);
+	$("#reservaLerProfessor").val(hashProfessores[todasDaReserva.reserva.codigoPro].pessoa.nome
+	+" "+hashProfessores[todasDaReserva.reserva.codigoPro].pessoa.sobrenome);
 	$("#reservaLerTurma").val(todasDaReserva.reserva.turma);
 	$("#reservaLerTodasTBody").find('tr').remove().end();
 	$(todasDaReserva.semestrais).each(function(i,s){

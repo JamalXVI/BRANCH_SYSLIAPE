@@ -94,7 +94,8 @@ public class MuralController {
 			recado.setData(Conversor.converterLocalDateTimeParaTimeStamp(mural.getData()));
 			recado.setVisualizado(true);
 			recado.setDescricao(mural.getDescricao());
-			List<MuralVisualizado> visualizado = muralVisualizadoDao.listaId(idMur);
+			List<MuralVisualizado> visualizado = muralVisualizadoDao.listaId(idMur,
+					usuarioLogado.getUsuario().getLogin());
 			if (visualizado.size() <= 0) {
 				MuralVisualizado muralVisualizado = new MuralVisualizado();
 				muralVisualizado.setIdMur(idMur);
@@ -129,7 +130,8 @@ public class MuralController {
 			}
 			for (Mural mural : murais_selecionados) {
 				MuralUsuario muralUsuario = new MuralUsuario();
-				List<MuralVisualizado> visualizado = muralVisualizadoDao.listaId(mural.getId());
+				List<MuralVisualizado> visualizado = muralVisualizadoDao.listaId(mural.getId(),
+						usuarioLogado.getUsuario().getLogin());
 				boolean apagado = false;
 				if (visualizado.size() > 0) {
 					muralUsuario.setVisualizado(true);
@@ -146,6 +148,45 @@ public class MuralController {
 				muralUsuario.setIdMur(mural.getId());
 				if (!apagado) {
 					recados.add(muralUsuario);
+				}
+
+			}
+		}
+
+		result.use(Results.json()).withoutRoot().from(recados).include("data").serialize();
+	}
+
+	@Post("/Listar/Mural/Usuario/Novas/")
+	public void listarMensagensNovas() {
+		List<Mural> murais_selecionados = new ArrayList<>();
+		List<MuralUsuario> recados = new ArrayList<>();
+		Turno turno = retornarTurnosUsuarioAtivo();
+		if (turno != null) {
+			List<MuralTurno> turnosAlvo = muralTurnoDao.listarTurno(turno.getId());
+			for (MuralTurno muralTurno : turnosAlvo) {
+				List<Mural> murais = muralDao.listaId(muralTurno.getIdMur());
+				if (murais.size() > 0) {
+					Mural mural = murais.get(0);
+					if (muralTurno.isAtivo()) {
+						murais_selecionados.add(mural);
+					}
+				}
+			}
+			for (Mural mural : murais_selecionados) {
+				MuralUsuario muralUsuario = new MuralUsuario();
+				List<MuralVisualizado> visualizado = muralVisualizadoDao.listaId(mural.getId(),
+						usuarioLogado.getUsuario().getLogin());
+				boolean apagado = false;
+				if (visualizado.size() <= 0) {
+					muralUsuario.setVisualizado(false);
+					muralUsuario.setTitulo(mural.getTitulo());
+					muralUsuario.setTurnoRemetente(
+							retornarNomeTurno(turnoDao.listarId(mural.getIdTurno()).get(0).getPeriodo()));
+					muralUsuario.setData(Conversor.converterLocalDateTimeParaTimeStamp(mural.getData()));
+					muralUsuario.setIdMur(mural.getId());
+					if (!apagado) {
+						recados.add(muralUsuario);
+					}
 				}
 
 			}
@@ -189,7 +230,8 @@ public class MuralController {
 		List<Mural> murais = muralDao.listaId(idMur);
 		if (murais.size() > 0) {
 			Mural mural = murais.get(0);
-			List<MuralVisualizado> visualizado = muralVisualizadoDao.listaId(mural.getId());
+			List<MuralVisualizado> visualizado = muralVisualizadoDao.listaId(mural.getId(),
+					usuarioLogado.getUsuario().getLogin());
 			if (visualizado.size() <= 0) {
 				MuralVisualizado muralVisualizado = new MuralVisualizado();
 				muralVisualizado.setIdMur(idMur);
@@ -207,6 +249,7 @@ public class MuralController {
 		}
 		result.use(Results.json()).withoutRoot().from(msg).serialize();
 	}
+
 	@NivelPermissao(idPermissao = 16)
 	@Post("/Mural/Enviar/")
 	public void enviar(Mensagem mensagem) {
@@ -237,10 +280,10 @@ public class MuralController {
 					result.redirectTo(this).entrada();
 
 				} else {
-					result.redirectTo(ErrosController.class).erro_acesso();
+					result.redirectTo(ErrosController.class).erro_operacao();
 				}
 			} else {
-				result.redirectTo(ErrosController.class).erro_acesso();
+				result.redirectTo(ErrosController.class).erro_operacao();
 			}
 
 		} else {
@@ -286,7 +329,7 @@ public class MuralController {
 
 	private boolean verificarPreenchimento(Mensagem mensagem) {
 		try {
-			return !mensagem.getPara().isEmpty() || mensagem.getPara() == null;
+			return !mensagem.getPara().isEmpty() || mensagem.getPara() != null;
 		} catch (Exception e) {
 			return false;
 		}

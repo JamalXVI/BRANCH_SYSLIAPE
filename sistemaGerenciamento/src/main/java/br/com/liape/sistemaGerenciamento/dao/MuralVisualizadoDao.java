@@ -10,7 +10,7 @@ import br.com.unaerp.jdbc.persistence.PersistenceJDBC;
 
 public class MuralVisualizadoDao extends PersistenceJDBC<MuralVisualizado> {
 	private static final String LISTAR_ULTIMO = "SELECT ID_MUR FROM mural_visualizado ORDER BY ID_MUR DESC LIMIT 1";
-	private static final String LISTAR_ID = "SELECT * FROM mural_visualizado WHERE ID_MUR = ?";
+	private static final String LISTAR_ID = "SELECT * FROM mural_visualizado WHERE ID_MUR = ? AND LOGIN_USR = ?";
 	private static final String LISTAR_TURNO = "SELECT * FROM mural_visualizado WHERE LOGIN_USR = ? AND APAGADO_MUV = FALSE";
 	@Override
 	protected Connection getConnection() throws SQLException {
@@ -20,9 +20,9 @@ public class MuralVisualizadoDao extends PersistenceJDBC<MuralVisualizado> {
 		// TODO Auto-generated method stub
 		return (int) super.consultarParametros(LISTAR_ULTIMO);
 	}
-	public List<MuralVisualizado> listaId(int id)
+	public List<MuralVisualizado> listaId(int id, String login)
 	{
-		return super.consultarLista(LISTAR_ID, id);
+		return super.consultarLista(LISTAR_ID, id, login);
 	}
 	public List<MuralVisualizado> listarUsuario(String loginUsr)
 	{

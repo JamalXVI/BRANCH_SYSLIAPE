@@ -27,7 +27,7 @@
 			<a href="" onclick="return cadastroEscala();"><i class="fa fa-plus"></i></a> 
 			</li>
 			
-		</ol>
+		</ol>\
 		
 		<div class="col-xs-12">
 			<div class='panel panel-default' id='panel_paginacao_tabela'>
@@ -76,40 +76,56 @@
 			
 			$.when(coletarEscalas()).done(function(){
 				usuariosEscalas = [];
-				$("#corpoTabelaMensagens").find("tr").remove().end();
 				escalas.sort(function(a,b){
 					var x = new Date(a.dataIni);
 					var y = new Date(b.dataIni);
 					return (x < y ? -1 : x > y ? 1 : 0);
 				});
-				$(escalas).each(function(indice_escala, escala){
-					var texto = "<tr><td>";
-					if (escala.dataFim.day == escala.dataIni.day &&
-						escala.dataFim.month == escala.dataIni.month &&
-						escala.dataFim.year == escala.dataIni.year) {
-						texto += montarData(escala.dataIni)+"</td><td>";
-					}else{
-						texto += montarData(escala.dataIni)+" - "
-						+montarData(escala.dataFim)+"</td><td>";
-						
-					}
-					texto += montarHora(escala.horaInicio)+"</td><td>";
-					texto += montarHora(escala.horaFim)+"</td><td>";
-					$.when(coletarUsuariosEscala(escala.id, indice_escala)).done(function(){
-						$(usuariosEscalas[indice_escala]).each(function(indice_usr_escala,usr_escala){
-							$(usuarios).each(function(indice_usuario, usuario){
-								if (usr_escala.loginUsr == usuario.login) {
-									texto += usuario.pessoa.nome+" "+usuario.pessoa.sobrenome+" / ";
-								};
-							});
+				var textos = [];
+				acrescentarEscalas(textos);
+					
+				
+			});
+		}
+		var acrescentarEscalas = function(textos){
+			$(escalas).each(function(indice_escala, escala){
+				var texto = "<tr><td>";
+				if (escala.dataFim.day == escala.dataIni.day &&
+					escala.dataFim.month == escala.dataIni.month &&
+					escala.dataFim.year == escala.dataIni.year) {
+					texto += montarData(escala.dataIni)+"</td><td>";
+				}else{
+					texto += montarData(escala.dataIni)+" - "
+					+montarData(escala.dataFim)+"</td><td>";
+					
+				}
+				texto += montarHora(escala.horaInicio)+"</td><td>";
+				texto += montarHora(escala.horaFim)+"</td><td>";
+				$.when(coletarUsuariosEscala(escala.id, indice_escala)).done(function(){
+					$(usuariosEscalas[indice_escala]).each(function(indice_usr_escala,usr_escala){
+						$(usuarios).each(function(indice_usuario, usuario){
+							if (usr_escala.loginUsr == usuario.login) {
+								texto += usuario.pessoa.nome+" "+usuario.pessoa.sobrenome+" / ";
+								
+							};
 						});
-						texto += "</td><td>";
-						texto += criarTextoAcao("removerEscala",
-								"fa fa-trash", indice_escala)+"</td>";
-						$("#corpoTabelaMensagens").append(texto);	
 					});
+					texto += "</td><td>";
+					texto += criarTextoAcao("removerEscala",
+							"fa fa-trash", indice_escala)+"</td>";
+					textos[indice_escala] = texto;
+					acrescentarTextos(textos);
+						
 				});
 			});
+		}
+		var acrescentarTextos = function(textos){
+			$("#corpoTabelaMensagens").find("tr").remove().end();
+			if (textos.length >= escalas.length) {
+				$(textos).each(function(indice,texto){
+					$("#corpoTabelaMensagens").append(texto);
+				});
+			}
 		}
 		var removerEscala = function(indice_escala){
 			var escala = escalas[indice_escala];
@@ -289,7 +305,13 @@
 			return false;
 		}
 		var cadastrarEscala = function(){
-			enviarEscala();	
+			$.when(enviarEscala()).done(function(){
+				$("#saida").val("");
+				$("#entrada").val("");
+				
+			});
+			
+			return false;
 		};
 		var enviarEscala = function(){
 			if($("#form").valid())

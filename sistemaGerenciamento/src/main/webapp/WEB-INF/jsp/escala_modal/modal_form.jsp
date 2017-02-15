@@ -1,6 +1,6 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib prefix="t" tagdir="/WEB-INF/tags"%>
-<t:modal_geral nomeLabel="Cadastro de Escala" nome="Escala" genero="a">
+<t:modal_geral nomeLabel="Cadastro de Escala" nome="Escala" genero="a" fecharSalvar="1">
 	<div class='row col-xs-12'>
 		<form action="${linkTo[EscalaController].postar() }" method="post"
 			id="form">

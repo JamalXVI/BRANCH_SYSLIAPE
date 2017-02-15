@@ -14,6 +14,8 @@ public class OrdemServicoDao extends PersistenceJDBC<OrdemServico> {
 			+ " ATIVO_ORS = TRUE AND EXECUTADA_ORS = ?";
 	private static final String LISTAR_ID = "SELECT * FROM ORDEM_SERVICO WHERE"
 			+ " ID_ORS = ?";
+	private static final String LISTAR_ATIVO_ID = "SELECT * FROM ORDEM_SERVICO WHERE"
+			+ " ATIVO_ORS = TRUE AND EXECUTADA_ORS = FALSE AND ID_ORS = ?";
 	public OrdemServicoDao() {
 	}
 	
@@ -24,6 +26,10 @@ public class OrdemServicoDao extends PersistenceJDBC<OrdemServico> {
 	public List<OrdemServico> listarExecucao(boolean executada) {
 		// TODO Auto-generated method stub
 		return super.consultarLista(LISTAR_ATIVO, executada);
+	}
+	public List<OrdemServico> listarExecucaoId(int id) {
+		// TODO Auto-generated method stub
+		return super.consultarLista(LISTAR_ATIVO_ID, id);
 	}
 	public List<OrdemServico> listarId(int idOrs) {
 		// TODO Auto-generated method stub

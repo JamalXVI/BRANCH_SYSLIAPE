@@ -52,11 +52,15 @@
 </div>
 </div>
 </div>
-
+<form action="${linkTo[MuralController].visualizar()}" method="POST" id="verMural">
+	<input type='hidden' name='idMur' id='idMurEnviar' />
+</form>
 <!-- Scripts Específicos e Importação do Rodapé -->
 <t:rodape>
 <script type="text/javascript">
 var mensagens;
+var ordens;
+var murais;
 var novasMensagens = function(){
 	return $.ajax({  
 	    type:"post",  
@@ -73,32 +77,96 @@ var novasMensagens = function(){
 	    }
 	});		
 }
-
+var ordemUsuario = function(){
+	return $.ajax({  
+	    type:"post",  
+	    url: "${linkTo[OrdemServicoController].listarParaUsuarioAtivo() }", 
+//	    data: $("#formReserva").serialize(),
+	    dataType: "json",  // Isso diz que você espera um JSON do servidor
+	    beforeSend: function(xhr, settings){},  
+	    success: function(data, textStatus, xhr){
+		    	ordens = data;
+	    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
+	    error: function(xhr, textStatus, errorThrown){ 
+	    	tratarErroAjax(xhr, textStatus, errorThrown);
+	    }
+	});
+	
+}
+var novoMurais = function(){
+	return $.ajax({  
+	    type:"post",  
+	    url: "${linkTo[MuralController].listarMensagensNovas() }", 
+//	    data: $("#formReserva").serialize(),
+	    dataType: "json",  // Isso diz que você espera um JSON do servidor
+	    beforeSend: function(xhr, settings){},  
+	    success: function(data, textStatus, xhr){
+				
+	    	murais = data;
+	    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
+	    error: function(xhr, textStatus, errorThrown){ 
+	    	tratarErroAjax(xhr, textStatus, errorThrown);
+	    }
+	});		
+}
 var adicionarNotificacoes = function(){
 	agora = new Date();
+	notificacaoMensagem(agora);
+	notificacaoOrdem(agora);
+	notificacaoMural(agora);
+}
+var notificacaoMural = function(agora){
+	$.when(novoMurais()).done(function(){
+		$(murais).each(function(indice_mural, mural){
+			var texto = adicionarTextoDiferenca(mural.data, agora);
+			$("#listaNotificacoes").append("<a href='' onclick='return visualizarMural(\""
+					+indice_mural+"\")' class='list-group-item'> <i"+
+					" class='fa fa-envelope fa-fw'></i> Mural de "+mural.turnoRemetente
+					+"<span"+
+					" class='pull-right text-muted small'><em>"+texto+"</em> </span>"+
+				"</a>");
+		});
+	});
+}
+var notificacaoOrdem = function(agora){
+	$.when(ordemUsuario()).done(function(){
+		$(ordens).each(function(indice_ordem, ordem){
+			var texto = adicionarTextoDiferenca(ordem.dataParaSerExecutada, agora);
+			var link = "${linkTo[OrdemServicoController].listarAtivas()}";
+			$("#listaNotificacoes").append("<a href='"+link+"' class='list-group-item'> <i"+
+					" class='fa fa-file-text fa-fw'></i>Ordem de Serviço <span"+
+					" class='pull-right text-muted small'><em>"+texto+"</em> </span>"+
+				"</a>");
+		});
+	});
+}
+var adicionarTextoDiferenca = function(dataEsc, agora){
+	dia = dataEsc.split("T")[0];
+	hora = dataEsc.split("T")[1].split("-")[0];
+	dataMensangem = new Date(dia+" "+hora);
+	diffMs = (agora -dataMensangem);
+	var diffDays = Math.round(diffMs / 86400000); // days
+	var diffHrs = Math.round((diffMs % 86400000) / 3600000); // hours
+	var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
+	var texto ="";
+	if(diffDays == 0 && diffHrs == 0 &&diffMins <= 1)
+	{
+		texto = "Agora";
+	}
+	else if (diffDays == 0 && diffHrs == 0 && diffMins <= 59) {
+		texto = diffMins+"minutos atrás";
+	}
+	else if(diffDays == 0 && diffHrs < 24){
+		texto = hora;
+	}else{
+		texto = dia+" "+hora;
+	}
+	return texto;
+};
+var notificacaoMensagem = function(agora){
 	$.when(novasMensagens()).done(function(){
 		$(mensagens).each(function(i,mensagem){
-			dia = mensagem.data.split("T")[0];
-			hora = mensagem.data.split("T")[1].split("-")[0];
-			dataMensangem = new Date(dia+" "+hora);
-			diffMs = (agora -dataMensangem);
-			var diffDays = Math.round(diffMs / 86400000); // days
-			var diffHrs = Math.round((diffMs % 86400000) / 3600000); // hours
-			var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
-			var texto ="";
-			debugger;
-			if(diffDays == 0 && diffHrs == 0 &&diffMins <= 1)
-			{
-				texto = "Agora";
-			}
-			else if (diffDays == 0 && diffHrs == 0 && diffMins <= 59) {
-				texto = diffMins+"minutos atrás";
-			}
-			else if(diffDays == 0 && diffHrs < 24){
-				texto = hora;
-			}else{
-				texto = dia+" "+hora;
-			}
+			var texto = adicionarTextoDiferenca(mensagem.data, agora);
 			$("#listaNotificacoes").append("<a href='' onclick='return visualizarMensagem(\""
 					+i+"\")' class='list-group-item'> <i"+
 					" class='fa fa-comment fa-fw'></i> Mensagem de "+mensagem.usuarioRemetente
@@ -109,7 +177,9 @@ var adicionarNotificacoes = function(){
 		});
 	});
 }
-adicionarNotificacoes();
+$(document).ready(function(){
+	adicionarNotificacoes();
+});
 </script>
 <script type="text/javascript">
 var todasReservas;
@@ -224,11 +294,17 @@ var adicionarProximas = function(){
 }
 adicionarProximas();
 </script>
-	<script type="text/javascript">
+<script type="text/javascript">
 		var visualizarMensagem = function(indice){
 			var mensagem = mensagens[indice];
 			$("#idRecEnviar").val(mensagem.idRec);
 			$("#verMensagem").submit();
+			return false;
+		};
+		var visualizarMural = function(indice){
+			var mural = murais[indice];
+			$("#idMurEnviar").val(mural.idMur);
+			$("#verMural").submit();
 			return false;
 		};
 </script>

@@ -11,6 +11,8 @@ import br.com.unaerp.jdbc.persistence.PersistenceJDBC;
 public class SubOrdemTurnoDao extends PersistenceJDBC<SubOrdemTurno> {
 	private static final String LISTAR_ID = "SELECT * FROM"
 			+ " SUB_ORDEM_TURNO WHERE ID_SOR = ?";
+	private static final String LISTAR_ID_TUR = "SELECT * FROM"
+			+ " SUB_ORDEM_TURNO WHERE ID_TUR = ?";
 	public SubOrdemTurnoDao() {
 	}
 	
@@ -21,5 +23,9 @@ public class SubOrdemTurnoDao extends PersistenceJDBC<SubOrdemTurno> {
 	public List<SubOrdemTurno> listarId(int id) {
 		// TODO Auto-generated method stub
 		return super.consultarLista(LISTAR_ID, id);
+	}
+	public List<SubOrdemTurno> listarIdTurno(int id) {
+		// TODO Auto-generated method stub
+		return super.consultarLista(LISTAR_ID_TUR, id);
 	}
 }
