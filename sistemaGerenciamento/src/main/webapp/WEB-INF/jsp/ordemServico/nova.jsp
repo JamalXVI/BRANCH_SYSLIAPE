@@ -291,4 +291,65 @@ $("#selecionarTipoOrdem").on("change", function(){
 });
 
 </script>
+<c:if test="${editandoOrdem == true }">
+<script type="text/javascript">
+	var adicionarZero = function(numero)
+	{
+		if (numero < 10) {
+			return "0"+numero;
+		}
+		return numero;
+	}
+	var idEditar;
+	var editarOrdem;
+	$(document).ready(function(){
+		idEditar = "${editarId}";
+		$.when(coletarEditar()).done(function(){
+			if (editarOrdem.ehSala) {
+				$("#selecionarTipoOrdem").val("0").trigger("change");
+				adicionarSala();
+				$("#idTipoAlvo").val(editarOrdem.idSala).trigger("change");
+			}else{
+				$("#selecionarTipoOrdem").val("1").trigger("change");
+				adicionarComputador();
+				$("#idTipoAlvo").val(editarOrdem.idSala).trigger("change");
+				$("#idComputador").val(editarOrdem.idComputador).trigger("change");
+			}
+			if (editarOrdem.ehUsuario) {
+				$("#selecionarAlvo").val("0").trigger("change");
+				adicionarUsuario();
+			}else{
+				$("#selecionarAlvo").val("1").trigger("change");
+				adicionarTurnos();
+			}
+			$("#tipoAlvo").val(editarOrdem.alvo).trigger("change");
+			var dataEsc = new Date(editarOrdem.dataParaSerExecutada);
+			$("#dataExecutada").val(dataEsc.getFullYear()
+					+"-"+adicionarZero(dataEsc.getMonth()+1)+
+					"-"+adicionarZero(dataEsc.getDate()));
+			$("#dataExecutadaHora").val(adicionarZero(dataEsc.getHours())+":"
+			+adicionarZero(dataEsc.getMinutes()));
+			$("#descricaoOrdem").val(editarOrdem.descricao);
+		});
+		
+	});
+	var coletarEditar = function(){
+		var dataEnviar = {"idOrs" : idEditar}
+		return $.ajax({  
+		    type:"post",  
+		    url: "${linkTo[OrdemServicoController].editandoOrdem() }", 
+		    dataType: "json",  // Isso diz que você espera um JSON do servidor
+		    data: dataEnviar,
+		    beforeSend: function(xhr, settings){},  
+		    success: function(data, textStatus, xhr){
+		    	editarOrdem = data;
+		    	//criarPermissoes();
+		    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
+		    error: function(xhr, textStatus, errorThrown){
+		    	tratarErroAjax(xhr, textStatus, errorThrown);
+		    }
+		});
+	}
+</script>
+</c:if>
 </t:rodape>

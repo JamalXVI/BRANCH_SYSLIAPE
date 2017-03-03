@@ -19,8 +19,15 @@
 				<%-- 					<img src="<c:url value='/assets/img/liape.png' />" --%>
 				<!-- 					alt="Logo Liape" style="height:40px;width:auto;margin-left:0.3em;margin-top:0.3em;" /> -->
 				<!-- 					</a> -->
-				<a class="navbar-brand" href="${linkTo[IndexController].index()}">
-					Sistema de Gerenciamento </a>
+				<div class="form-inline navbar-brand" id="logoLiape">
+					<div class="form-group">
+						<img src="<c:url value='/assets/img/sysliape.png' />"
+						 alt="LOGO LIAPE" id="logoLiape"
+						  class="logo_liape">
+						  <a href="${linkTo[HomeController].index()}" id="linkSysliape">
+						  SYSLIAPE</a>
+					</div>
+				</div>
 			</div>
 			<!-- Top Menu Items -->
 			<ul class="nav navbar-right top-nav sumir_pequeno">
@@ -74,8 +81,11 @@
 					<li><a href="${linkTo[ReservasController].index()}"
 						data-toggle="collapse" data-target="#reserva"> <i
 							class="glyphicon glyphicon-calendar"> </i> Reservas
+					</a></li>	
+					<li><a href="${linkTo[CadastroAdController].index()}"
+						data-toggle="collapse" data-target="#cadastroAd"> <i
+							class="glyphicon glyphicon-pawn"> </i> Cadastro Alunos
 					</a></li>
-
 					<li><a href="javascript:;" data-toggle="collapse"
 						data-target="#turno"> <i
 							class="glyphicon glyphicon-hourglass"> </i> Turno <i
@@ -119,14 +129,20 @@
 									Enviar Mensagem</a></li>
 						</ul></li>
 					<!-- MENU OUTRAS -->
+					
 					<li><a href="javascript:;" data-toggle="collapse"
 						data-target="#outros"> <i
 							class="fa fa-certificate"> </i> Outros <i
 							class="fa fa-fw fa-caret-down"> </i>
 					</a>
 						<ul id="outros" class="collapse">
+							<li><a href="${linkTo[HomeController].ramais()}">
+									Ramais</a></li>
 							<li><a href="${linkTo[HomeController].linux()}">
 									Configurar Wi-fi Linux</a></li>
+							<li><a href="${linkTo[AulasLiapeController].cadastro()}">
+									Painel de Informações </a></li>
+							
 						</ul></li>
 					
 					<!-- FIM MENU PUBLICAÇÕES -->

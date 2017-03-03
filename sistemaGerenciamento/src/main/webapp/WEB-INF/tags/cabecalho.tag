@@ -101,8 +101,15 @@ body.modal-open-noscroll {
 .texto_perfil {
 	display: inline;
 }
-
+.logo_liape{
+		width: 30px;
+		height: auto;
+}
 @media ( min-width : 768px) {
+	.logo_liape{
+		width: 40px;
+		height: auto;
+	}
 	.texto_perfil {
 		display: none;
 	}
@@ -111,6 +118,15 @@ body.modal-open-noscroll {
 	}
 	.sumir_pequeno {
 		display: block;
+	}
+	#logoLiape{
+		padding-top : 0px;
+		padding-bottom : 0px;
+		color: white !important;
+	}
+	#linkSysliape:hover, #linkSysliape:visited, #linkSysliape{
+	color: inherit; /* blue colors for links too */
+  text-decoration: inherit; /* no underline */
 	}
 }
 

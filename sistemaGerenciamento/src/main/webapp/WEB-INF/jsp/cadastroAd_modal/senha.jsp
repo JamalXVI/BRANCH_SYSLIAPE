@@ -5,6 +5,7 @@
 		<div class="col-xs-12">
 		<form id="formSenha">
 			<input type="hidden" name="codigo" id="codRes" />
+			<input type="hidden" name="tipo" id="tipoRes" />
 			<t:input divCol="col-xs-6"
 		 	id="senRes" nome="senha" nomeLabel="Senha:" valorPadrao="" tipo="password"></t:input>
 			<t:input divCol="col-xs-6"

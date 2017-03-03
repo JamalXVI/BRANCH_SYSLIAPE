@@ -21,8 +21,11 @@ public class ExporadicaDao extends PersistenceJDBC<Exporadico> {
 			+ " AND DATA_MARCADA_EXP = ? AND HORA_INICIO_EXP = ? AND HORA_FIM_EXP = ?";
 	private static String SQL_POR_MES = "SELECT * FROM EXPORADICO WHERE MONTH(DATA_MARCADA_EXP) = "
 			+ "? AND ATIVO_EXP = TRUE ORDER BY DATA_MARCADA_EXP";
-	private static String SQL_LISTAR_HORA = "SELECT * FROM EXPORADICO WHERE HORA_INICIO_EXP >= ? AND"
-			+ " HORA_INICIO_EXP <= ?  AND ID_RES = ? AND DATA_MARCADA_EXP = ? AND ATIVO_EXP = TRUE";
+	private static String SQL_LISTAR_HORA = "SELECT * FROM EXPORADICO WHERE (HORA_INICIO_EXP >= ? AND"
+			+ " HORA_INICIO_EXP <= ?"
+			+ " AND ID_RES = ? AND DATA_MARCADA_EXP = ? AND ATIVO_EXP = TRUE)"
+			+ " OR (HORA_FIM_EXP >= ? AND HORA_INICIO_EXP <= ?"
+			+ " AND ID_RES = ? AND DATA_MARCADA_EXP = ? AND ATIVO_EXP = TRUE)";
 	
 	public ExporadicaDao() {
 	}
@@ -36,7 +39,8 @@ public class ExporadicaDao extends PersistenceJDBC<Exporadico> {
 	}
 	public List<Exporadico> listarPorHora(LocalTime horaAtu, LocalTime horaLim, int idRes, LocalDate data)
 	{
-		return super.consultarLista(SQL_LISTAR_HORA, horaAtu, horaLim, idRes, data);
+		return super.consultarLista(SQL_LISTAR_HORA, horaAtu, horaLim, idRes, data,
+				horaAtu, horaAtu, idRes, data);
 	}
 	@Override
 	public List<Exporadico> listar() {

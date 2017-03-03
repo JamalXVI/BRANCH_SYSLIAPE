@@ -59,7 +59,7 @@
 					nome="usuario.senha" tipo="password" valorPadrao="${usuario.senha }"
 					id="senha"></t:input>
 				<t:input valorPadrao="${usuario.senha }" divCol="col-xs-12 col-sm-6"
-					nomeLabel="Confirmar Senha" nome="" tipo="password"
+					nomeLabel="Confirmar Senha:" nome="" tipo="password"
 					id="confirmarSenha"></t:input>
 			</t:centralizarDiv>
 			<!--     Adicionar Telefones -->

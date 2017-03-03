@@ -51,10 +51,10 @@ body {
 				onclick="return novoUsuarioForm();"></a>
 		</div>
 	</t:centralizarDiv>
-	<t:centralizarDiv divCol="12" divColmd="10">
+	<div class="container">
 	<div id="listaUsuarios" class="col-xs-12"></div>
 	
-	</t:centralizarDiv>
+	</div>
 	<c:import url="/WEB-INF/jsp/usuario_modal/modal_form.jsp" />
 
 	<c:import url="/WEB-INF/jsp/usuario_modal/modal_grupo.jsp" />
@@ -237,10 +237,9 @@ var fazerListaUsuarios = function(){
 			var acoesUsuarios = "";
 			//Verificar se o Usuário tem a permissão para editar, se tiver acrescentar ações
 			if (temPermissao) {
-				var acoesUsuarios = "<a href='' onclick='return editarUsuario(\""+i+"\")'>"+
-				"<i class='fa fa-2x fa-pencil-square espaco_direitapermissao' aria-hidden='true'></i></a>"+
-				"<a href='' onclick='return excluirUsuario(\""+usuario.login+"\")'>"+
-				"<i class='fa fa-2x fa-minus-square espaco_direita permissao' aria-hidden='true'></i></a>";
+				var acoesUsuarios = criarTextoAcao("editarUsuario", "fa-pencil", i)+
+				criarTextoAcao("excluirUsuario", "fa-trash", usuario.login)+
+				criarTextoAcao("verUsuario", "fa-search", i);
 			}
 			//Inserir linha na tabela com as informações do usuário
 			$("#corpoTabelaListaUsuarios").append("<tr><td><img id='fotoPerfilUsuario"
@@ -252,9 +251,7 @@ var fazerListaUsuarios = function(){
 					+"</td><td class='my-table-label-body'>"+telefone
 					+"</td><td class='my-table-label-body'>"+usuario.grupo.nome
 					+"</td><td style='display:none;' class='usuarioSis'>"+usuario.login
-					+"</td><td class='my-table-label-body'>"+"<a href='' onclick='return"+
-					" verUsuario(\""+i+"\")'><i class='fa fa-2x fa-search"+
-					" espaco_direita permissao' aria-hidden='true'></i></a>"+acoesUsuarios
+					+"</td><td class='my-table-label-body'>"+acoesUsuarios
 					+"</td></tr>");
 			posicionarImagemFotoPerfil(usuario);
 			
@@ -262,6 +259,11 @@ var fazerListaUsuarios = function(){
 		}
 		
 	});
+}
+var criarTextoAcao = function(funcao, icone, id) {
+	return "<a href='' style='margin-left:10px;' onclick='return "
+			+ funcao + "(\"" + id
+			+ "\")'><i class='fa fa-2x "+icone+"'></i></a>";
 }
 //Posicionar Imagem de Perfil na Tabela na <tr> apropriada.
 var posicionarImagemFotoPerfil = function(usuario){
@@ -284,8 +286,12 @@ var editarUsuario = function(indice){
 	$("#login").val(usuario.login);
 	$("#login").attr("readonly","readonly");
 	$("#selecionarGrupo").val(usuario.grupo.id);
-	$("#senha").val(usuario.senha);
-	$("#confirmarSenha").val(usuario.senha)
+	$("#senha").val("654321");
+	$("#confirmarSenha").val("654321");
+	$("#senha").hide();
+	$("#confirmarSenha").hide();
+	$("#labelsenha").hide();
+	$("#labelconfirmarSenha").hide();
 	removerTelefones();
 	$(usuario.pessoa.telefones).each(function(i, telefone){
 		adicionar_telefones(telefone.ddd, telefone.numero, telefone.operadora);
@@ -310,7 +316,8 @@ var clicarExluirUsuario = function(){
 	    beforeSend: function(xhr, settings){},  
 	    success: function(data, textStatus, xhr){
 	    	$("#mensagemErro").fadeIn(0);
-	    	limparFormularioErro();
+	    	debugger;	
+	    	//limparFormularioErro();
 	    	if (data.mensagem.indexOf("Erro") != -1) {
 	    		formularErro(data.mensagem);
 			}else{
@@ -431,6 +438,10 @@ listarUsuarios();
 		$("#selecionarGrupo").val("");
 		$("#senha").val("");
 		$("#confirmarSenha").val("");
+		$("#senha").show();
+		$("#confirmarSenha").show();
+		$("#labelsenha").show();
+		$("#labelconfirmarSenha").show();
 		removerTelefones();
 		$("#novoUsuario").modal('show');
 		

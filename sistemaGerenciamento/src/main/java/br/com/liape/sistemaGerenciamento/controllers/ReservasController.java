@@ -10,19 +10,13 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
-
 import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.validator.Validator;
 import br.com.caelum.vraptor.view.Results;
 import br.com.liape.sistemaGerenciamento.dao.AnoSemestreDao;
-import br.com.liape.sistemaGerenciamento.dao.CursoDao;
-import br.com.liape.sistemaGerenciamento.dao.DisciplinaDao;
 import br.com.liape.sistemaGerenciamento.dao.ExporadicaDao;
-import br.com.liape.sistemaGerenciamento.dao.ProfessorDao;
 import br.com.liape.sistemaGerenciamento.dao.ReservaDao;
 import br.com.liape.sistemaGerenciamento.dao.SemestralDao;
 import br.com.liape.sistemaGerenciamento.model.AnoSemestre;
@@ -38,36 +32,26 @@ import br.com.liape.sistemaGerenciamento.seguranca.UsuarioLogado;
 
 @Controller
 public class ReservasController {
-
-	private Validator validator;
 	private Result result;
 	private ReservaDao reservaDao;
 	private SemestralDao semestralDao;
 	private ExporadicaDao exporadicoDao;
 	private UsuarioLogado usuarioLogado;
 	private AnoSemestreDao anoSemestreDao;
-	private CursoDao cursoDao;
-	private ProfessorDao professorDao;
-	private DisciplinaDao disciplinaDao;
 
 	@Inject
-	public ReservasController(Validator validator, Result result, ReservaDao reservaDao, SemestralDao semestralDao,
-			ExporadicaDao exporadicoDao, UsuarioLogado usuarioLogado, AnoSemestreDao anoSemestreDao, CursoDao cursoDao,
-			ProfessorDao professorDao, DisciplinaDao disciplinaDao) {
-		this.validator = validator;
+	public ReservasController(Result result, ReservaDao reservaDao, SemestralDao semestralDao,
+			ExporadicaDao exporadicoDao, UsuarioLogado usuarioLogado, AnoSemestreDao anoSemestreDao) {
 		this.result = result;
 		this.reservaDao = reservaDao;
 		this.semestralDao = semestralDao;
 		this.exporadicoDao = exporadicoDao;
 		this.usuarioLogado = usuarioLogado;
 		this.anoSemestreDao = anoSemestreDao;
-		this.cursoDao = cursoDao;
-		this.professorDao = professorDao;
-		this.disciplinaDao = disciplinaDao;
 	}
 
 	public ReservasController() {
-		this(null, null, null, null, null, null, null, null, null, null);
+		this(null, null, null, null, null, null);
 	}
 
 	/*
@@ -93,39 +77,36 @@ public class ReservasController {
 				.include("exporadicos.horaInicio").include("exporadicos.horaFim").include("exporadicos.data")
 				.serialize();
 	}
+
 	@Post("/Listar/Reservas/Proximas/")
-	public void listarProximas()
-	{
+	public void listarProximas() {
 		List<TodasDaReserva> todasRes = retornarReservasProximas();
 		result.use(Results.json()).withoutRoot().from(todasRes).include("reserva").include("exporadicos")
-		.include("semestrais").include("semestrais.horaInicio").include("semestrais.horaFim")
-		.include("exporadicos.horaInicio").include("exporadicos.horaFim").include("exporadicos.data")
-		.serialize();
+				.include("semestrais").include("semestrais.horaInicio").include("semestrais.horaFim")
+				.include("exporadicos.horaInicio").include("exporadicos.horaFim").include("exporadicos.data")
+				.serialize();
 	}
-	private List<TodasDaReserva> retornarReservasProximas()
-	{
+
+	private List<TodasDaReserva> retornarReservasProximas() {
 		LocalTime now = LocalTime.now();
 		LocalDate localDate = LocalDate.now();
 		List<TodasDaReserva> todasRes = new ArrayList<>();
-		List<AnoSemestre> pesquisarPorData =
-		anoSemestreDao.pesquisarPorData(localDate);
+		List<AnoSemestre> pesquisarPorData = anoSemestreDao.pesquisarPorData(localDate);
 		if (pesquisarPorData.size() > 0) {
 			AnoSemestre anoSemestre = pesquisarPorData.get(0);
-			List<Reserva> proximasReservas =
-			reservaDao.proximasReservas(anoSemestre.getAno(),
-			anoSemestre.getSemestre());
+			List<Reserva> proximasReservas = reservaDao.proximasReservas(anoSemestre.getAno(),
+					anoSemestre.getSemestre());
 			if (proximasReservas.size() > 0) {
 				for (Reserva reserva : proximasReservas) {
 					TodasDaReserva todas = new TodasDaReserva();
 					todas.setSemestrais(new ArrayList<>());
 					todas.setExporadicos(new ArrayList<>());
-					todas.getSemestrais().addAll(
-					semestralDao.listarHora(now, now.plusMinutes(30), reserva.getId(), localDate));
-					todas.getExporadicos().addAll(
-					exporadicoDao.listarPorHora(now, now.plusMinutes(30), reserva.getId(), localDate));
+					todas.getSemestrais()
+							.addAll(semestralDao.listarHora(now, now.plusMinutes(30), reserva.getId(), localDate));
+					todas.getExporadicos()
+							.addAll(exporadicoDao.listarPorHora(now, now.plusMinutes(30), reserva.getId(), localDate));
 					todas.setReserva(reserva);
-					if (todas.getExporadicos().size() > 0 ||
-						todas.getSemestrais().size() > 0) {
+					if (todas.getExporadicos().size() > 0 || todas.getSemestrais().size() > 0) {
 						todasRes.add(todas);
 					}
 				}
@@ -133,36 +114,34 @@ public class ReservasController {
 		}
 		return todasRes;
 	}
+
 	@Post("/Listar/Reserva/Exporadica/Mes/")
 	public void listarMes(String data, int ano, int semestre) {
 		if (!data.isEmpty()) {
 			AnoSemestre anoSemestre = anoSemestreDao.pesquisarPorChave(ano, semestre).get(0);
 			int mesEsc = Integer.valueOf(data.split("-")[1]);
 			int anoEsc = Integer.valueOf(data.split("-")[0]);
-			if (anoSemestre.getDataIni().getMonth().getValue() <= mesEsc && 
-				anoSemestre.getDataFim().getMonth().getValue() >= mesEsc &&
-				ano == anoEsc) {
+			if (anoSemestre.getDataIni().getMonth().getValue() <= mesEsc
+					&& anoSemestre.getDataFim().getMonth().getValue() >= mesEsc && ano == anoEsc) {
 				List<Exporadico> listarMes = exporadicoDao.listarMes(mesEsc);
 				for (Exporadico exporadico : listarMes) {
 					exporadico.setReserva(reservaDao.listarPorId(exporadico.getIdRes()).get(0));
 				}
-				result.use(Results.json()).withoutRoot().from(listarMes).include("reserva")
-						.include("horaInicio").include("horaFim")
-						.include("data")
-						.serialize();
+				result.use(Results.json()).withoutRoot().from(listarMes).include("reserva").include("horaInicio")
+						.include("horaFim").include("data").serialize();
 			}
-			
+
 		}
-		
+
 	}
+
 	@Post("/Listar/Reserva/Semestral/")
 	public void listarSemestral(int diaSemana, int ano, int semestre) {
 		List<Semestral> listarDiaSemana = semestralDao.listarDiaSemana(diaSemana);
 		List<Semestral> removerSemestrais = new ArrayList<>();
 		for (Semestral semestral : listarDiaSemana) {
 			semestral.setReserva(reservaDao.listarPorId(semestral.getIdRes()).get(0));
-			if (semestral.getReserva().getAnoAns() != ano ||
-				semestral.getReserva().getSemestreAns() != semestre) {
+			if (semestral.getReserva().getAnoAns() != ano || semestral.getReserva().getSemestreAns() != semestre) {
 				removerSemestrais.add(semestral);
 			}
 		}
@@ -171,10 +150,11 @@ public class ReservasController {
 				.include("reserva").serialize();
 
 	}
-	public void pesquisarHorariosProximos()
-	{
-		
+
+	public void pesquisarHorariosProximos() {
+
 	}
+
 	@Post("/Listar/Reserva/Exporadica/")
 	public void listarExporadica(String data) {
 		try {
@@ -187,9 +167,9 @@ public class ReservasController {
 						.include("reserva").include("data").serialize();
 			}
 		} catch (java.text.ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		};
+		}
+		;
 	}
 
 	private boolean dataValida(String data) throws java.text.ParseException {
@@ -197,7 +177,7 @@ public class ReservasController {
 		try {
 			df.parse(data);
 			return true;
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			return false;
 		}
 	}
@@ -335,7 +315,7 @@ public class ReservasController {
 			int idSal) {
 		boolean anoValido = ans.getAno() == res.getAnoAns() ? true : false;
 		boolean semestreValido = ans.getSemestre() == res.getSemestreAns() ? true : false;
-		boolean salaValida = idSal == idSalTipoReserva? true : false;
+		boolean salaValida = idSal == idSalTipoReserva ? true : false;
 		return salaValida && anoValido && semestreValido;
 	}
 
@@ -351,10 +331,10 @@ public class ReservasController {
 
 	@Post("/Cadastro/Reserva/")
 	/*
-	 * Impedir o Acesso à página caso o grupo não tenha acesso à permissão de id 4 
-	 * ou for administrador
+	 * Impedir o Acesso à página caso o grupo não tenha acesso à permissão de id
+	 * 4 ou for administrador
 	 */
-	@NivelPermissao(idPermissao=4)
+	@NivelPermissao(idPermissao = 4)
 	public void postar(@Valid Reserva reserva, TipoReserva tipoReserva) {
 		reserva.setAtivo(true);
 		reserva.setLoginUsr(usuarioLogado.getUsuario().getLogin());
@@ -385,14 +365,13 @@ public class ReservasController {
 					exporadico.setIdRes(reserva.getId());
 					exporadico.setIdSal(tipoReserva.getIdSala());
 					exporadico.setAtivo(true);
-					if (exporadicoDao.verSeExite(exporadico.getIdRes(),
-					exporadico.getData()
-					, exporadico.getHoraInicio(), exporadico.getHoraFim()).size() > 0) {
+					if (exporadicoDao.verSeExite(exporadico.getIdRes(), exporadico.getData(),
+							exporadico.getHoraInicio(), exporadico.getHoraFim()).size() > 0) {
 						exporadicoDao.atualizar(exporadico);
-					}else{
+					} else {
 						exporadicoDao.inserir(exporadico);
 					}
-					
+
 				} else {
 					Semestral semestral = new Semestral();
 					semestral.setDiaSemana(Integer.valueOf(tipoReserva.getDiaSemana()));
@@ -412,14 +391,16 @@ public class ReservasController {
 		result.use(Results.json()).withoutRoot().from(mensagemSistema).serialize();
 
 	}
-	//VERIFICAR SE A RESERVA É VÁLIDA
+
+	// VERIFICAR SE A RESERVA É VÁLIDA
 	private boolean verificarValidade(TipoReserva tipoReserva) {
 		if (tipoReserva.getDataMarcada() == null && tipoReserva.getDiaSemana() == null) {
 			return false;
 		}
 		return true;
 	}
-	//Comparar data com o Ano Semestre
+
+	// Comparar data com o Ano Semestre
 	public boolean validarData(LocalDate dataMarcada, AnoSemestre ans) {
 		if (dataMarcada.isBefore(ans.getDataIni()) || dataMarcada.isAfter(ans.getDataFim())) {
 			return false;
@@ -429,11 +410,11 @@ public class ReservasController {
 
 	@Post("/Deletar/Reserva/Exporadico")
 	/*
-	 * Impedir o Acesso à página caso o grupo não tenha acesso à permissão de id 4 
-	 * ou for administrador
+	 * Impedir o Acesso à página caso o grupo não tenha acesso à permissão de id
+	 * 4 ou for administrador
 	 */
-	//DELETAR RESERVA EXPORÁDICO
-	@NivelPermissao(idPermissao=4)
+	// DELETAR RESERVA EXPORÁDICO
+	@NivelPermissao(idPermissao = 4)
 	public void deletarExp(int idResExp, String dataMarcada, String horaIni, String horaFim) {
 		List<Exporadico> listarExporadico = exporadicoDao.listarExporadico(idResExp,
 				Conversor.converterLocalDate(dataMarcada), Conversor.converterLocalTime(horaIni),
@@ -451,11 +432,11 @@ public class ReservasController {
 
 	@Post("/Deletar/Reserva/Semestral")
 	/*
-	 * Impedir o Acesso à página caso o grupo não tenha acesso à permissão de id 4
-	 * ou for administrador
+	 * Impedir o Acesso à página caso o grupo não tenha acesso à permissão de id
+	 * 4 ou for administrador
 	 */
-	//DELETAR RESERVA SEMESTRAL
-	@NivelPermissao(idPermissao=4)
+	// DELETAR RESERVA SEMESTRAL
+	@NivelPermissao(idPermissao = 4)
 	public void deletarSem(int idResSem) {
 		Semestral semestral = semestralDao.listaIdSem(idResSem).get(0);
 		MensagemSistema msg;

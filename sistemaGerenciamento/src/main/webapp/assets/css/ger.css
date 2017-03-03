@@ -44,7 +44,7 @@
 
 	.min30 {
 		border-bottom: solid #15428B 2px;
-		height: 20px;
+		height: 20px; !important
 		vertical-align: top;
 	}
 

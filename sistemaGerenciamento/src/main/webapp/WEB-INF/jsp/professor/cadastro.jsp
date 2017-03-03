@@ -210,7 +210,7 @@ var retornarComZero = function(valor){
 }
 //Chamar Modal para Editar Professor
 var editarProfessor = function(indice){
-	professor = professores[indice];
+	professor = conteudoTabelaProf[indice];
 	$("#formIdPessoa").val(professor.idPes);
 	$("#nome").val(professor.pessoa.nome);
 	$("#sobrenome").val(professor.pessoa.sobrenome);
@@ -420,8 +420,7 @@ $(verificarPermissao());
 <!-- Ver Professor -->
 <script type="text/javascript">
 var verProfessor = function(indice) {
-	debugger;
-	var professor = professores[indice];
+	var professor = conteudoTabelaProf[indice];
 	$("#verTelefones").find("div").remove().end();
 	$("#nomePessoaVer").val(professor.pessoa.nome);
 	$("#sobrenomePessoaVer").val(professor.pessoa.sobrenome);

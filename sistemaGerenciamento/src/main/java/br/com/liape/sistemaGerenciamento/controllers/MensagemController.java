@@ -70,11 +70,15 @@ public class MensagemController {
 	public void visualizar(int idRec) {
 		List<RecadoUsuarioAlvo> recadosUsuario = recadoUsuarioAlvoDao.listarRecadosUsuario(idRec);
 		if (recadosUsuario.size() > 0) {
-			RecadoUsuarioAlvo recadoUsuarioAlvo = recadosUsuario.get(0);
-			Recado recado = recadoDao.listaId(idRec).get(0);
-			recadoUsuarioAlvo.setVisualizado(true);
-			recadoUsuarioAlvoDao.atualizar(recadoUsuarioAlvo);
-			result.include("recado", recado);
+			for (RecadoUsuarioAlvo recadoUsuarioAlvo : recadosUsuario) {
+				if (recadoUsuarioAlvo.getLogin().equals(usuarioLogado.getUsuario().getLogin())) {
+					Recado recado = recadoDao.listaId(idRec).get(0);
+					recadoUsuarioAlvo.setVisualizado(true);
+					recadoUsuarioAlvoDao.atualizar(recadoUsuarioAlvo);
+					result.include("recado", recado);
+				}
+			}
+			
 		} else {
 			result.redirectTo(ErrosController.class).erro_operacao();
 		}

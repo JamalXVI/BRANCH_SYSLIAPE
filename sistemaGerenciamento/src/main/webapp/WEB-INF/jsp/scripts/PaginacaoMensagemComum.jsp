@@ -64,8 +64,12 @@ var arrayConteudoTabelaMensagem = function(){
 								+ dataMensagem
 								+ "</td>"
 								+ "<td class='my-table-label-body'>"
+								+ "<a href='' onclick='return visualizarMensagem(\""
+								+ i
+								+ "\")'>"
 								+ mensagem.titulo
 								+ nova
+								+ "</a>"
 								+ "</td>"
 								+ "<td class='my-table-label-body'>"
 								+ mensagem.usuarioRemetente

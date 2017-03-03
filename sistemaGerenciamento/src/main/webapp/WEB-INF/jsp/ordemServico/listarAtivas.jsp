@@ -304,6 +304,7 @@ rel="stylesheet">
 		}
 		if (temPermissaoExcluir) {
 			texto += criarTextoAcao("excluirOrdem", "fa fa-trash", indice_ordem);
+			texto += criarTextoAcao("editarOrdem", "fa fa-pencil", indice_ordem);
 		}
 		
 		texto += criarTextoAcao("detalhesOrdem", "fa fa-search", indice_ordem);
@@ -311,6 +312,7 @@ rel="stylesheet">
 		$("#corpoTabelaOrdemServicos").append(texto);
 	 });
  }
+
  $(document).ready(function(){
 	 $.when(atualizarValoresTabela()).done(function(){
 		 verificarPermissao();
@@ -354,6 +356,33 @@ var verificarDataRepasse = function(dataHj, dataOr){
 	}
 	return false;
 };
+var editarOrdem = function(indice_ordem){
+	debugger;
+	var ordem = ordems[indice_ordem];
+	 $.redirectPost("${linkTo[OrdemServicoController].editarOrdem() }",
+				{"idOrs" : ordem.id});
+	 return false;
+}
+$.extend(
+{
+    redirectPost: function(location, args)
+    {
+        var form = $('<form></form>');
+        form.attr("method", "post");
+        form.attr("action", location);
+
+        $.each( args, function( key, value ) {
+            var field = $('<input></input>');
+
+            field.attr("type", "hidden");
+            field.attr("name", key);
+            field.attr("value", value);
+
+            form.append(field);
+        });
+        $(form).appendTo('body').submit();
+    }
+});
 var detalhesOrdem = function(indice_ordem)
 {
 	var ordem = ordems[indice_ordem];

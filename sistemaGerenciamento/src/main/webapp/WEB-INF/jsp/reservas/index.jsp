@@ -64,8 +64,14 @@ text-transform:uppercase;
 	position: relative;
 	width: 100%;
 }
-#minuto {
+.minuto {
 	background-color: #f7f7f7;
+	vertical-align: top;
+}
+.novaHora, .minuto{
+
+	height: 20px;
+	width: 20px;
 }
 .cor_verde {
 	color: #8BC34A;
@@ -89,11 +95,20 @@ text-transform:uppercase;
 }
 @media ( min-width : 768px) {
 	.cancelar_reserva{
-		width: 30px;
+		width: 18px;
 	}
 }
 #formReserva > div{
 float:right;
+}
+#header-fixed {
+    position: fixed;
+    top: 50px;
+    z-index: 10;
+    background-color: white;
+}
+.colorido,  #header-fixed thead th:nth-of-type(2n) {
+	background: #ffffc8;
 }
 </style>
 
@@ -142,12 +157,14 @@ float:right;
 				</div>
 			</t:centralizarDiv>
 			<div>
+				<table id="header-fixed"
+				class="table table-striped table-hover table-bordered"></table>
 				<table class="table table-striped table-hover table-bordered"
 					id="tabelaGrade">
 					<thead id="tabelaGradeThead">
 						<tr>
-							<th>HH</th>
-							<th id="minuto" style="background-color: #f7f7f7;">MM</th>
+							<th class="novaHora">HH</th>
+							<th class="minuto" style="background-color: #f7f7f7;">MM</th>
 	
 						</tr>
 					</thead>
@@ -1482,6 +1499,7 @@ $("#opcaoExtra").on("select2:close", function(){
 	</script>
 <script type="text/javascript">
 $(document).ready(function(){
+	atualizarCabecalho();
 	$.when(listarAnoSemestreAjax(), listarProfessorAjax(), listarDisciplinaAjax(),
 			listarCursoAjax()).done(function(){
 		listarSalasAjax();
@@ -1573,5 +1591,27 @@ var acionarModalCurso = function(){
 $("#novaReserva").draggable({
     handle: ".modal-header"
 });
+</script>
+<script type="text/javascript">
+
+
+$(window).bind("scroll", function() {
+	atualizarCabecalho();
+});
+var atualizarCabecalho = function(){
+	$("#header-fixed").find("thead").remove().end();
+	$("#header-fixed").css({'width': $("#tabelaGrade").outerWidth()});
+	var tableOffset = $("#tabelaGrade").offset().top;
+	var $header = $("#tabelaGrade > thead").clone();
+	var $fixedHeader = $("#header-fixed").append($header);
+    var offset = $(this).scrollTop();
+
+    if (offset >= tableOffset && $fixedHeader.is(":hidden")) {
+        $fixedHeader.show();
+    }
+    else if (offset < tableOffset) {
+        $fixedHeader.hide();
+    }
+}
 </script>
 </t:rodape>

@@ -194,6 +194,7 @@
 				required: true,
 				  minlength: 5,
 				  maxlength: 5,
+				  horaMaiorQue: "#entrada",
 				  hora: true,
 				  messages: {
 				    required: iniMensagemAlerta+"Campo obrigatório"+fimMensagemAlerta,

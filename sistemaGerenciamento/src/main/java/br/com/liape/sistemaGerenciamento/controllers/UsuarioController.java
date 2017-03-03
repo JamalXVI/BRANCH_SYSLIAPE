@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.swing.plaf.synth.SynthSplitPaneUI;
 import javax.validation.Valid;
 
 import org.hibernate.validator.constraints.NotEmpty;
@@ -22,6 +23,7 @@ import br.com.liape.sistemaGerenciamento.dao.PermissaoDao;
 import br.com.liape.sistemaGerenciamento.dao.PessoaDao;
 import br.com.liape.sistemaGerenciamento.dao.TelefoneDao;
 import br.com.liape.sistemaGerenciamento.dao.UsuarioDao;
+import br.com.liape.sistemaGerenciamento.model.Grupo;
 import br.com.liape.sistemaGerenciamento.model.GrupoPermissao;
 import br.com.liape.sistemaGerenciamento.model.Permissao;
 import br.com.liape.sistemaGerenciamento.model.Pessoa;
@@ -90,13 +92,16 @@ public class UsuarioController {
 		Usuario usuario = usuarioDao.listarPorLogin(loginUsuario).get(0);
 		usuario.setPessoa(pessoaDao.listarPorId(usuario.getIdPes()).get(0));
 		usuario.getPessoa().setAtivo(false);
-		if (pessoaDao.atualizar(usuario.getPessoa())) {
-			sistema.setMensagem("Sucesso ao Excluir Usuário!");
+		if (verPermissoesIguais(usuario.getIdGrupo())) {
+			if (pessoaDao.atualizar(usuario.getPessoa())) {
+				sistema.setMensagem("Sucesso: ao Excluir Usuário!");
 
-		} else {
-			sistema.setMensagem("Erro ao Excluir Usuário!");
+			} else {
+				sistema.setMensagem("Erro: ao Excluir Usuário!");
+			}
+		}else{
+			sistema.setMensagem("Erro: ao Excluir Usuário!");
 		}
-		;
 		result.use(Results.json()).withoutRoot().from(sistema).serialize();
 	}
 
@@ -157,11 +162,11 @@ public class UsuarioController {
 		pessoa.setNome(usuario.getPessoa().getNome());
 		pessoa.setSobrenome(usuario.getPessoa().getSobrenome());
 		Usuario usuario2 = usuarioDao.listarPorLogin(usuario.getLogin()).get(0);
-		if (verificarSePodeAtualizar(usuario2)) {
+		if (verificarSePodeAtualizar()) {
 			usuario2.setIdGrupo(usuario.getIdGrupo());
 			usuario2.setSenha(usuario.getSenha());
 			pessoaDao.atualizar(pessoa);
-			usuarioDao.atualizar(usuario2);
+			usuarioDao.atualizarGrupo(usuario.getIdGrupo(), usuario.getLogin());
 			cadastrar_telefone(telefones, pessoa.getId());
 			msg.setMensagem("Atualizado com Sucesso!");
 		} else {
@@ -170,35 +175,55 @@ public class UsuarioController {
 
 	}
 
-	private boolean verificarSePodeAtualizar(Usuario usuario) {
-		List<GrupoPermissao> grpPermissoes = grupoPermissaoDao.listarPermissoesGrupo(usuario.getIdGrupo());
-		for (GrupoPermissao grupoPermissao : grpPermissoes) {
-			Permissao permissao = permissaoDao.listarPorId(grupoPermissao.getIdPer()).get(0);
-			if (permissao.getId() == 1) {
-
-				for (Permissao permissao2 : usr.pegarAutorizacao()) {
-					if (permissao2.getId() == 1) {
-						return true;
-					}
-				}
-				return false;
+	private boolean verificarSePodeAtualizar() {
+		for (Permissao permissao2 : usr.pegarAutorizacao()) {
+			if (permissao2.getId() == 1) {
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 
 	private void inserirUsuario(Usuario usuario, List<Telefone> telefones, String datanascimento, MensagemSistema msg) {
-		usuario.getPessoa().setDatanascimento(Conversor.converterLocalDate(datanascimento));
-		usuario.getPessoa().setAtivo(true);
+		if (verPermissoesIguais(usuario.getIdGrupo())) {
+			usuario.getPessoa().setDatanascimento(Conversor.converterLocalDate(datanascimento));
+			usuario.getPessoa().setAtivo(true);
 
-		if (pessoaDao.inserir(usuario.getPessoa())) {
-			usuario.setIdPes(pessoaDao.ultimoId());
-			usuarioDao.inserir(usuario);
-			cadastrar_telefone(telefones, usuario.getIdPes());
-			msg.setMensagem("Cadastro Sucesso!");
-		} else {
+			if (pessoaDao.inserir(usuario.getPessoa())) {
+				usuario.setIdPes(pessoaDao.ultimoId());
+				usuarioDao.inserir(usuario);
+				cadastrar_telefone(telefones, usuario.getIdPes());
+				msg.setMensagem("Cadastro Sucesso!");
+			} else {
+				msg.setMensagem("Erro: Cadastramento Incorreto!");
+			}
+		}else{
 			msg.setMensagem("Erro: Cadastramento Incorreto!");
 		}
+		
+	}
+
+	private boolean verPermissoesIguais(int idGrupo) {
+		if (verificarSePodeAtualizar()) {
+			return true;
+		}else{
+			List<GrupoPermissao> listarPermissoesGrupo 
+			= grupoPermissaoDao.listarPermissoesGrupo(idGrupo);
+			int contadorNumeroPermissoes = 0;
+			for (GrupoPermissao grupoPermissao : listarPermissoesGrupo) {
+				for (Permissao permissao : usr.pegarAutorizacao()) {
+					if (permissao.getId() == grupoPermissao.getIdPer()) {
+						contadorNumeroPermissoes++;
+					}
+				}
+			}
+			if (contadorNumeroPermissoes >= listarPermissoesGrupo.size()) {
+				return true;
+			}
+			
+		}
+		
+		return false;
 	}
 
 	/*

@@ -10,6 +10,7 @@ import br.com.unaerp.jdbc.persistence.PersistenceJDBC;
 
 public class SalaDao extends PersistenceJDBC<Sala> {
 	private static String LISTAR_NOME = "SELECT * FROM SALA ORDER BY NOME_SAL";
+	private static String LISTAR_ID = "SELECT * FROM SALA WHERE ID_SAL = ?";
 	@Override
 	protected Connection getConnection() throws SQLException {
 		return ConnectionFactory.getConnections();
@@ -17,5 +18,9 @@ public class SalaDao extends PersistenceJDBC<Sala> {
 	public List<Sala> listarNome()
 	{
 		return super.consultarLista(LISTAR_NOME);
+	}
+	public List<Sala> listarId(int idSal)
+	{
+		return super.consultarLista(LISTAR_ID, idSal);
 	}
 }

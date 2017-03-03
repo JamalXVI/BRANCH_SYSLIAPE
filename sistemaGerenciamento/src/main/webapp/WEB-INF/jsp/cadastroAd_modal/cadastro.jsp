@@ -4,22 +4,22 @@
 	<div class="row">
 		<div class="col-xs-12">
 		<form id="form">
-			<input type='hidden' id="tipoUsr" name="usuario.tipoUsuario" value=""/>
+			<input type='hidden' id="tipoUsr" name="tipo" value=""/>
 			<t:input divCol="col-xs-12 col-md-6 col-lg-4"
-		 	id="codUsr" nome="usuario.Codigo" nomeLabel="Código:" valorPadrao="" tipo="text"></t:input>
+		 	id="codUsr" nome="codigo" nomeLabel="Código:" valorPadrao="" tipo="text"></t:input>
 			<t:input divCol="col-xs-12 col-md-6 col-lg-4"
-		 	id="nomeUsr" nome="usuario.Nome" nomeLabel="Nome:" valorPadrao="" tipo="text"></t:input>
+		 	id="nomeUsr" nome="nome" nomeLabel="Nome:" valorPadrao="" tipo="text"></t:input>
 			<t:input divCol="col-xs-12 col-md-6 col-lg-4"
-		 	id="sobUsr" nome="usuario.SobreNome" nomeLabel="Sobrenome:" valorPadrao="" tipo="text">
+		 	id="sobUsr" nome="sobrenome" nomeLabel="Sobrenome:" valorPadrao="" tipo="text">
 		 	</t:input>
 		 	<div class="col-xs-12 col-md-6 col-lg-6" id="divSelectCurso" >
 			<label>Curso:</label> <select
 				class="form-control select_auto_completar" style="width: 100%;"
-				id="selecionarCurso" name="usuario.Curso">
+				id="selecionarCurso" name="curso">
 			</select>
 			</div>
 			<t:input divCol="col-xs-12 col-md-3"
-		 	id="senUsr" nome="usuario.Senha" nomeLabel="Senha:" valorPadrao="" tipo="password"></t:input>
+		 	id="senUsr" nome="senha" nomeLabel="Senha:" valorPadrao="" tipo="password"></t:input>
 			<t:input divCol="col-xs-12 col-md-3"
 		 	id="confUsr" nome="" nomeLabel="Confirmar Senha:"
 		 	 valorPadrao="" tipo="password"></t:input>

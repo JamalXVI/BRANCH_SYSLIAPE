@@ -140,10 +140,24 @@ $('.formData').datetimepicker({
 	});
 
 </script>
+<!-- Validações Customizadas -->
 <script type="text/javascript">
 jQuery.validator.addMethod("hora", function (value, element) {
     return this.optional(element) || /^\d{2}:\d{2}$/.test(value);
 }, "Entre com uma Hora Válida");
+jQuery.validator.addMethod("horaMaiorQue", 
+		function(value, element, params) {
+			var x = new Date();
+			var dia = x.toDateString();
+			var valor1 = dia+" "+value;
+			var valor2 = (dia+" "+$(params).val());
+		    if (!/Invalid|NaN/.test(new Date(valor1))) {
+		        return new Date(valor1) > new Date(valor2);
+		    }
+
+		    return isNaN(valor1) && isNaN(valor2) 
+		        || (Number(valor1) > Number(valor2)); 
+		},'Tem que ser maior que a entrada!');
 
 </script>
 <!-- Rendeizar Scripts Personalizados -->

@@ -17,6 +17,7 @@ import br.com.caelum.vraptor.view.Results;
 import br.com.liape.sistemaGerenciamento.dao.ComputadorDao;
 import br.com.liape.sistemaGerenciamento.dao.GrupoDao;
 import br.com.liape.sistemaGerenciamento.dao.GrupoPermissaoDao;
+import br.com.liape.sistemaGerenciamento.dao.LogAcaoDao;
 import br.com.liape.sistemaGerenciamento.dao.OrdemServicoComputadorDao;
 import br.com.liape.sistemaGerenciamento.dao.OrdemServicoDao;
 import br.com.liape.sistemaGerenciamento.dao.OrdemServicoSalaDao;
@@ -30,6 +31,7 @@ import br.com.liape.sistemaGerenciamento.dao.UsuarioTurnoDao;
 import br.com.liape.sistemaGerenciamento.model.Computador;
 import br.com.liape.sistemaGerenciamento.model.Grupo;
 import br.com.liape.sistemaGerenciamento.model.GrupoPermissao;
+import br.com.liape.sistemaGerenciamento.model.LogAcao;
 import br.com.liape.sistemaGerenciamento.model.OrdemServico;
 import br.com.liape.sistemaGerenciamento.model.OrdemServicoComputador;
 import br.com.liape.sistemaGerenciamento.model.OrdemServicoSala;
@@ -40,6 +42,7 @@ import br.com.liape.sistemaGerenciamento.model.SubOrdemUsuario;
 import br.com.liape.sistemaGerenciamento.model.SubOrdemVisualizada;
 import br.com.liape.sistemaGerenciamento.model.Turno;
 import br.com.liape.sistemaGerenciamento.model.UsuarioTurno;
+import br.com.liape.sistemaGerenciamento.modelView.EditarOrdemView;
 import br.com.liape.sistemaGerenciamento.modelView.NovaOrdem;
 import br.com.liape.sistemaGerenciamento.modelView.NovaOrdemRedirecionada;
 import br.com.liape.sistemaGerenciamento.modelView.SubOrdemView;
@@ -66,13 +69,15 @@ public class OrdemServicoController {
 	private UsuarioTurnoDao usuarioTurnoDao;
 	private GrupoDao grupoDao;
 	private GrupoPermissaoDao grupoPermissaoDao;
+	private LogAcaoDao logAcaoDao;
 
 	@Inject
 	public OrdemServicoController(Result result, OrdemServicoDao ordemServicoDao, SubOrdemDao subOrdemDao,
 			SalaDao salaDao, ComputadorDao computadorDao, OrdemServicoComputadorDao ordemServicoComputadorDao,
 			OrdemServicoSalaDao ordemServicoSalaDao, UsuarioLogado usuarioLogado, SubOrdemTurnoDao subOrdemTurnoDao,
 			SubOrdemUsuarioDao subOrdemUsuarioDao, TurnoDao turnoDao, SubOrdemVisualizadaDao ordemVisualizadaDao,
-			UsuarioTurnoDao usuarioTurnoDao, GrupoDao grupoDao, GrupoPermissaoDao grupoPermissaoDao) {
+			UsuarioTurnoDao usuarioTurnoDao, GrupoDao grupoDao, GrupoPermissaoDao grupoPermissaoDao,
+			LogAcaoDao logAcaoDao) {
 		this.result = result;
 		this.ordemServicoDao = ordemServicoDao;
 		this.subOrdemDao = subOrdemDao;
@@ -88,10 +93,11 @@ public class OrdemServicoController {
 		this.usuarioTurnoDao = usuarioTurnoDao;
 		this.grupoDao = grupoDao;
 		this.grupoPermissaoDao = grupoPermissaoDao;
+		this.logAcaoDao = logAcaoDao;
 	}
 
 	public OrdemServicoController() {
-		this(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+		this(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 	}
 
 	// CADASTRAR NOVA ORDEM DE SERVIÇO
@@ -153,33 +159,31 @@ public class OrdemServicoController {
 			List<SubOrdemTurno> subOrdens = subOrdemTurnoDao.listarIdTurno(turno.getId());
 			if (subOrdens.size() > 0) {
 				for (SubOrdemTurno subOrdemTurno : subOrdens) {
-					List<SubOrdem> listarIdSubEsp =
-					subOrdemDao.listarIdSubEsp(subOrdemTurno.getIdSor());
+					List<SubOrdem> listarIdSubEsp = subOrdemDao.listarIdSubEsp(subOrdemTurno.getIdSor());
 					if (listarIdSubEsp != null) {
 						if (listarIdSubEsp.size() > 0) {
 							SubOrdem subOrdem = listarIdSubEsp.get(0);
-							if (ordemVisualizadaDao.listarIdLogin(subOrdem.getId(),
-								usuarioLogado.getUsuario().getLogin()).size() <= 0) {
+							if (ordemVisualizadaDao
+									.listarIdLogin(subOrdem.getId(), usuarioLogado.getUsuario().getLogin())
+									.size() <= 0) {
 								adicionarView(view, subOrdem);
 							}
-							
+
 						}
 					}
-					
-					
+
 				}
 			}
 		}
-		List<SubOrdemUsuario> subOrdens =
-		subOrdemUsuarioDao.listarLogin(usuarioLogado.getUsuario().getLogin());
+		List<SubOrdemUsuario> subOrdens = subOrdemUsuarioDao.listarLogin(usuarioLogado.getUsuario().getLogin());
 		if (subOrdens.size() > 0) {
 			for (SubOrdemUsuario subOrdemUsuario : subOrdens) {
 				List<SubOrdem> listarIdSubEsp = subOrdemDao.listarIdSubEsp(subOrdemUsuario.getIdSor());
 				if (listarIdSubEsp != null) {
 					if (listarIdSubEsp.size() > 0) {
 						SubOrdem subOrdem = listarIdSubEsp.get(0);
-						if (ordemVisualizadaDao.listarIdLogin(subOrdem.getId(),
-							usuarioLogado.getUsuario().getLogin()).size() <= 0) {
+						if (ordemVisualizadaDao.listarIdLogin(subOrdem.getId(), usuarioLogado.getUsuario().getLogin())
+								.size() <= 0) {
 							adicionarView(view, subOrdem);
 						}
 					}
@@ -187,28 +191,7 @@ public class OrdemServicoController {
 			}
 		}
 		result.use(Results.json()).withoutRoot().from(view).include("dataGerada").include("dataParaSerExecutada")
-		.serialize();
-	}
-
-	private void adicionarView(List<SubOrdemView> view, SubOrdem subOrdem) {
-		SubOrdemView subOrdemView = new SubOrdemView();
-		subOrdemView.setId(subOrdem.getId());
-		subOrdemView.setIdOrs(subOrdem.getIdOrs());
-		subOrdemView.setDataGerada(Conversor.converterLocalDateTimeParaTimeStamp(subOrdem.getDataGerada()));
-		subOrdemView.setDataParaSerExecutada(
-				Conversor.converterLocalDateTimeParaTimeStamp(subOrdem.getDataParaSerExecutada()));
-		view.add(subOrdemView);
-	}
-
-	private Turno retornarTurnosUsuarioAtivo() {
-		List<UsuarioTurno> listarLogin = usuarioTurnoDao.listarLogin(usuarioLogado.getUsuario().getLogin());
-		for (UsuarioTurno usuarioTurno : listarLogin) {
-			Turno turno = turnoDao.listarId(usuarioTurno.getIdTur()).get(0);
-			if (turno.isAtivo()) {
-				return turno;
-			}
-		}
-		return null;
+				.serialize();
 	}
 
 	// LISTAR SUBORDEM TURNO DE UMA SUBORDEM
@@ -248,6 +231,199 @@ public class OrdemServicoController {
 		ordemServico.setExecutada(false);
 		boolean inserir = ordemServicoDao.inserir(ordemServico);
 		inserirOrdemServico(ordem, inserir);
+	}
+
+	/*
+	 * EXCLUIR Ordem Serviço
+	 */
+
+	@Post("/Excluir/Ordem/")
+	/*
+	 * Impedir o Acesso à página caso o grupo não tenha acesso à permissão de id
+	 * 19 ou for administrador
+	 */
+	@NivelPermissao(idPermissao = 19)
+	public void excluir(int idOrs) {
+		MensagemSistema sistema = new MensagemSistema("");
+		if (excluirOrdemServico(idOrs)) {
+			sistema.setMensagem("Sucesso ao Excluir Ordem de Serviço!");
+
+		} else {
+			sistema.setMensagem("Erro ao Excluir Ordem de Serviço!");
+		}
+		;
+		result.use(Results.json()).withoutRoot().from(sistema).serialize();
+	}
+
+	/*
+	 * MARCAR ORDEM DE SERVIÇO COMO FINALIZADA
+	 */
+	@Post("/Finalizar/Ordem/")
+	/*
+	 * Impedir o Acesso à página caso o grupo não tenha acesso à permissão de id
+	 * 19 ou for administrador
+	 */
+	@NivelPermissao(idPermissao = 17)
+	public void finalizar(int idSor) {
+		finalizarSubOrdem(idSor);
+	}
+
+	@Post("/Finalizar/Ordem/Usuario/")
+	public void finalizarUsuario(int idSor) {
+
+		List<SubOrdemUsuario> subUsr = subOrdemUsuarioDao.listarId(idSor);
+		if (subUsr.size() > 0) {
+			SubOrdemUsuario subOrdemUsuario = subUsr.get(0);
+			if (subOrdemUsuario.getLoginUsr().equals(usuarioLogado.getUsuario().getLogin())) {
+				finalizarSubOrdem(idSor);
+			} else {
+				result.redirectTo(ErrosController.class).erro_operacao();
+			}
+		} else {
+			result.redirectTo(ErrosController.class).erro_operacao();
+		}
+	}
+
+	/*
+	 * VISUALIZAR ORDEM DE SERVIÇO
+	 */
+	@Post("/Visualizar/SubOrdem/")
+	public void visualizar(int idSor) {
+		MensagemSistema msg = new MensagemSistema("Sucesso");
+		List<SubOrdemVisualizada> listarId = ordemVisualizadaDao.listarId(idSor);
+		if (listarId.size() <= 0) {
+			SubOrdemVisualizada subOrdemVisualizada = new SubOrdemVisualizada();
+			subOrdemVisualizada.setIdSor(idSor);
+			subOrdemVisualizada.setLoginUsr(usuarioLogado.getUsuario().getLogin());
+			ordemVisualizadaDao.inserir(subOrdemVisualizada);
+		}
+		result.use(Results.json()).withoutRoot().from(msg).serialize();
+	}
+
+	/*
+	 * REDIRECIONAR ORDEM DE SERVIÇO PARA OUTRO TURNO
+	 */
+	@Post("/Redirecionar/Ordem/")
+	/*
+	 * Impedir o Acesso à página caso o grupo não tenha acesso à permissão de id
+	 * 19 ou for administrador
+	 */
+	@NivelPermissao(idPermissao = 19)
+	public void redirecionar(NovaOrdemRedirecionada redirecionada) {
+		redirecionarOrdem(redirecionada);
+	}
+
+	@Post("/Redirecionar/Ordem/Usuario/")
+	public void redirecionarOrdemUsuario(NovaOrdemRedirecionada redirecionada) {
+		List<SubOrdemUsuario> subUsr = subOrdemUsuarioDao.listarId(redirecionada.getIdSubOrsAntiga());
+		if (subUsr.size() > 0) {
+			SubOrdemUsuario subOrdemUsuario = subUsr.get(0);
+			if (subOrdemUsuario.getLoginUsr().equals(usuarioLogado.getUsuario().getLogin())) {
+				redirecionarOrdem(redirecionada);
+			} else {
+				result.redirectTo(ErrosController.class).erro_operacao();
+			}
+		} else {
+			result.redirectTo(ErrosController.class).erro_operacao();
+		}
+	}
+
+	@Post("/Editar/Ordem/")
+	/*
+	 * Impedir o Acesso à página caso o grupo não tenha acesso à permissão de id
+	 * 19 ou for administrador
+	 */
+	@NivelPermissao(idPermissao = 19)
+	public void editarOrdem(int idOrs) {
+		result.include("editandoOrdem", true);
+		result.include("editarId", idOrs);
+		result.redirectTo(this).nova();
+	}
+
+	@Post("/Editando/Ordem/")
+	@NivelPermissao(idPermissao = 19)
+	public void editandoOrdem(int idOrs) {
+		EditarOrdemView editarOrdemView = new EditarOrdemView();
+		List<OrdemServicoSala> orSalas = ordemServicoSalaDao.listarId(idOrs);
+		if (orSalas.size() > 0) {
+			OrdemServicoSala ordemServicoSala = orSalas.get(0);
+			editarOrdemView.setEhSala(true);
+			editarOrdemView.setIdSala(String.valueOf(ordemServicoSala.getIdSala()));
+		} else {
+			List<OrdemServicoComputador> orComputadores = ordemServicoComputadorDao.listarId(idOrs);
+			if (orComputadores.size() > 0) {
+				OrdemServicoComputador ordemServicoComputador = orComputadores.get(0);
+				editarOrdemView.setEhSala(false);
+				editarOrdemView.setIdSala(String.valueOf(ordemServicoComputador.getIdSala()));
+				editarOrdemView.setIdComputador(String.valueOf(ordemServicoComputador.getNumeroPc()));
+
+			}
+		}
+		List<SubOrdem> subOrdens = subOrdemDao.listarIdSubEspOrs(idOrs);
+		if (subOrdens.size() > 0) {
+			SubOrdem subOrdem = subOrdens.get(0);
+			editarOrdemView.setDataParaSerExecutada(
+					Conversor.converterLocalDateTimeParaTimeStamp(subOrdem.getDataParaSerExecutada()));
+			List<SubOrdemUsuario> subUsuarios = subOrdemUsuarioDao.listarId(subOrdem.getId());
+			if (subUsuarios.size() > 0) {
+				SubOrdemUsuario subOrdemUsuario = subUsuarios.get(0);
+				editarOrdemView.setEhUsuario(true);
+				editarOrdemView.setAlvo(subOrdemUsuario.getLoginUsr());
+			} else {
+				List<SubOrdemTurno> subTurnos = subOrdemTurnoDao.listarId(subOrdem.getId());
+				if (subTurnos.size() > 0) {
+					SubOrdemTurno subOrdemTurno = subTurnos.get(0);
+					editarOrdemView.setEhUsuario(false);
+					int periodo = turnoDao.listarId(subOrdemTurno.getIdTur()).get(0).getPeriodo();
+					editarOrdemView.setAlvo(String.valueOf(periodo));
+				}
+			}
+
+		}
+		OrdemServico ordemServico = ordemServicoDao.listarId(idOrs).get(0);
+		editarOrdemView.setDescricao(ordemServico.getDescricao());
+		if (!excluirOrdemServico(idOrs)) {
+			result.redirectTo(ErrosController.class).erro_operacao();
+		}
+		result.use(Results.json()).withoutRoot().from(editarOrdemView)
+		.include("dataParaSerExecutada").serialize();
+	}
+	/*
+	 *******************************************************
+	 *******************************************************
+	 ************* MÉTODOS PRIVADOS*************************
+	 *******************************************************
+	 *******************************************************
+	 */
+
+	private void registrarLogAcao(String mensagem) {
+		LogAcao logAcao = new LogAcao();
+		logAcao.setDescricao(mensagem);
+		logAcao.setData(LocalDateTime.now());
+		logAcaoDao.inserir(logAcao);
+	}
+
+	// ADICIONAR SUBORDEM NA VIEW COM UMA OUTRA CLASSE
+	private void adicionarView(List<SubOrdemView> view, SubOrdem subOrdem) {
+		SubOrdemView subOrdemView = new SubOrdemView();
+		subOrdemView.setId(subOrdem.getId());
+		subOrdemView.setIdOrs(subOrdem.getIdOrs());
+		subOrdemView.setDataGerada(Conversor.converterLocalDateTimeParaTimeStamp(subOrdem.getDataGerada()));
+		subOrdemView.setDataParaSerExecutada(
+				Conversor.converterLocalDateTimeParaTimeStamp(subOrdem.getDataParaSerExecutada()));
+		view.add(subOrdemView);
+	}
+
+	// RETORNAR TUDO PARA USUÁRIO ATIVO
+	private Turno retornarTurnosUsuarioAtivo() {
+		List<UsuarioTurno> listarLogin = usuarioTurnoDao.listarLogin(usuarioLogado.getUsuario().getLogin());
+		for (UsuarioTurno usuarioTurno : listarLogin) {
+			Turno turno = turnoDao.listarId(usuarioTurno.getIdTur()).get(0);
+			if (turno.isAtivo()) {
+				return turno;
+			}
+		}
+		return null;
 	}
 
 	// INSERIR TIPOS DE ORDEMS DE SERVIÇO - RAMIFICAÇÃO DO ENVIAR
@@ -309,6 +485,8 @@ public class OrdemServicoController {
 					inserir = inserirSubOrdemUsuario(ordem, idSubOrdem);
 				}
 				if (inserir) {
+					registrarLogAcao("O usuário " + usuarioLogado.getUsuario().getLogin() + " cadastrou"
+							+ " uma ordem de serviço ");
 					result.redirectTo(HomeController.class).index();
 				} else {
 					result.redirectTo(ErrosController.class).erro_operacao();
@@ -346,118 +524,18 @@ public class OrdemServicoController {
 		return inserir;
 	}
 
-	/*
-	 * EXCLUIR Ordem Serviço
-	 */
-
-	@Post("/Excluir/Ordem/")
-	/*
-	 * Impedir o Acesso à página caso o grupo não tenha acesso à permissão de id
-	 * 19 ou for administrador
-	 */
-	@NivelPermissao(idPermissao = 19)
-	public void excluir(int idOrs) {
-		MensagemSistema sistema = new MensagemSistema("");
+	private boolean excluirOrdemServico(int idOrs) {
 		OrdemServico ordemServico = ordemServicoDao.listarId(idOrs).get(0);
 		ordemServico.setAtivo(false);
-		if (ordemServicoDao.atualizar(ordemServico)) {
-			sistema.setMensagem("Sucesso ao Excluir Ordem de Serviço!");
+		boolean atualizou = ordemServicoDao.atualizar(ordemServico);
+		if (atualizou) {
 
-		} else {
-			sistema.setMensagem("Erro ao Excluir Ordem de Serviço!");
+			registrarLogAcao("O usuário " + usuarioLogado.getUsuario().getLogin() + " excluiu"
+					+ " a ordem de serviço de id " + idOrs);
 		}
-		;
-		result.use(Results.json()).withoutRoot().from(sistema).serialize();
-	}
-
-	/*
-	 * MARCAR ORDEM DE SERVIÇO COMO FINALIZADA
-	 */
-	@Post("/Finalizar/Ordem/")
-	/*
-	 * Impedir o Acesso à página caso o grupo não tenha acesso à permissão de id
-	 * 19 ou for administrador
-	 */
-	@NivelPermissao(idPermissao = 17)
-	public void finalizar(int idSor) {
-		finalizarSubOrdem(idSor);
-	}
-	@Post("/Finalizar/Ordem/Usuario/")
-	public void finalizarUsuario(int idSor){
-		
-		List<SubOrdemUsuario> subUsr = subOrdemUsuarioDao.listarId(idSor);
-		if (subUsr.size() > 0) {
-			SubOrdemUsuario subOrdemUsuario = subUsr.get(0);
-			if (subOrdemUsuario.getLoginUsr().equals(usuarioLogado.getUsuario().getLogin())) {
-				finalizarSubOrdem(idSor);
-			}else{
-				result.redirectTo(ErrosController.class).erro_operacao();
-			}
-		}else{
-			result.redirectTo(ErrosController.class).erro_operacao();
-		}
-	}
-	private void finalizarSubOrdem(int idSor) {
-		MensagemSistema sistema = new MensagemSistema("");
-		SubOrdem subOrdem = subOrdemDao.listarIdSub(idSor).get(0);
-		subOrdem.setDataExecutada(LocalDateTime.now());
-		OrdemServico ordemServico = ordemServicoDao.listarId(subOrdem.getIdOrs()).get(0);
-		ordemServico.setAtivo(true);
-		ordemServico.setExecutada(true);
-		if (ordemServicoDao.atualizar(ordemServico) && subOrdemDao.atualizar(subOrdem)) {
-			sistema.setMensagem("Sucesso ao Excluir Ordem de Serviço!");
-
-		} else {
-			sistema.setMensagem("Erro ao Excluir Ordem de Serviço!");
-		}
-		;
-		result.use(Results.json()).withoutRoot().from(sistema).serialize();
+		return atualizou;
 	}
 
-	/*
-	 * VISUALIZAR ORDEM DE SERVIÇO
-	 */
-	@Post("/Visualizar/SubOrdem/")
-	public void visualizar(int idSor) {
-		MensagemSistema msg = new MensagemSistema("Sucesso");
-		List<SubOrdemVisualizada> listarId = ordemVisualizadaDao.listarId(idSor);
-		if (listarId.size() <= 0) {
-			SubOrdemVisualizada subOrdemVisualizada = new SubOrdemVisualizada();
-			subOrdemVisualizada.setIdSor(idSor);
-			subOrdemVisualizada.setLoginUsr(usuarioLogado.getUsuario().getLogin());
-			ordemVisualizadaDao.inserir(subOrdemVisualizada);
-		}
-		result.use(Results.json()).withoutRoot().from(msg).serialize();
-	}
-
-	/*
-	 * REDIRECIONAR ORDEM DE SERVIÇO PARA OUTRO TURNO
-	 */
-	@Post("/Redirecionar/Ordem/")
-	/*
-	 * Impedir o Acesso à página caso o grupo não tenha acesso à permissão de id
-	 * 19 ou for administrador
-	 */
-	@NivelPermissao(idPermissao = 19)
-	public void redirecionar(NovaOrdemRedirecionada redirecionada) {
-		redirecionarOrdem(redirecionada);
-	}
-	@Post("/Redirecionar/Ordem/Usuario/")
-	public void redirecionarOrdemUsuario(NovaOrdemRedirecionada redirecionada)
-	{
-		List<SubOrdemUsuario> subUsr =
-		subOrdemUsuarioDao.listarId(redirecionada.getIdSubOrsAntiga());
-		if (subUsr.size() > 0) {
-			SubOrdemUsuario subOrdemUsuario = subUsr.get(0);
-			if (subOrdemUsuario.getLoginUsr().equals(usuarioLogado.getUsuario().getLogin())) {
-				redirecionarOrdem(redirecionada);
-			}else{
-				result.redirectTo(ErrosController.class).erro_operacao();
-			}
-		}else{
-			result.redirectTo(ErrosController.class).erro_operacao();
-		}
-	}
 	private void redirecionarOrdem(NovaOrdemRedirecionada redirecionada) {
 		MensagemSistema msg = new MensagemSistema("Sucesso");
 		if (finalizarSubOrdemAntiga(redirecionada)) {
@@ -494,6 +572,25 @@ public class OrdemServicoController {
 		}
 
 		return passou;
+	}
+
+	private void finalizarSubOrdem(int idSor) {
+		MensagemSistema sistema = new MensagemSistema("");
+		SubOrdem subOrdem = subOrdemDao.listarIdSub(idSor).get(0);
+		subOrdem.setDataExecutada(LocalDateTime.now());
+		OrdemServico ordemServico = ordemServicoDao.listarId(subOrdem.getIdOrs()).get(0);
+		ordemServico.setAtivo(true);
+		ordemServico.setExecutada(true);
+		if (ordemServicoDao.atualizar(ordemServico) && subOrdemDao.atualizar(subOrdem)) {
+			registrarLogAcao("O usuário " + usuarioLogado.getUsuario().getLogin() + " finalizou"
+					+ " a subordem de serviço de id " + idSor);
+			sistema.setMensagem("Sucesso ao Excluir Ordem de Serviço!");
+
+		} else {
+			sistema.setMensagem("Erro ao Excluir Ordem de Serviço!");
+		}
+		;
+		result.use(Results.json()).withoutRoot().from(sistema).serialize();
 	}
 
 	private boolean verificarSeEDoTurno(boolean passou, List<SubOrdemTurno> subOrdemTurnos) {

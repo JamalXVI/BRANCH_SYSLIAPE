@@ -57,6 +57,7 @@
 <c:import url="/WEB-INF/jsp/cadastroAd_modal/cadastro.jsp" />
 <c:import url="/WEB-INF/jsp/cadastroAd_modal/senha.jsp" />
 <c:import url="/WEB-INF/jsp/cadastroAd_modal/modal_excluir.jsp" />
+<c:import url="/WEB-INF/jsp/cadastroAd_modal/modal_sucesso.jsp" />
 	<!-- Scripts Específicos e Importação do Rodapé -->
 	<t:rodape>
 	
@@ -70,7 +71,7 @@
 					$("#selecionarCurso").find('option').remove().end();
 					$(cursos).each(function(indice_curso, curso){
 						$("#selecionarCurso").append("<option value='"+curso.Ou+"'>"+
-						curso.Description+"</option>");
+						curso.Descricao+"</option>");
 					})
 				});
 			});
@@ -80,11 +81,10 @@
 			var usuarios;
 			var listarCursos = function() {
 				return $.ajax({
-					type : "post",
-					url : "${linkTo[CadastroAdController].listarCursos() }",
-					dataType : "json", // Isso diz que você espera um JSON do servidor
-					beforeSend : function(xhr, settings) {
-					},
+					type:"get",  
+				    url: "http://svra-aplicacao/servidor/api/Cursos/", 
+				    dataType: "json",  // Isso diz que você espera um JSON do servidor
+				    beforeSend: function(xhr, settings){},  
 					success : function(data, textStatus, xhr) {
 						cursos = data;
 
@@ -95,11 +95,11 @@
 				});
 			}
 			var fazerPesquisas = function(){
-				var enviar = {"pesquisa" : $("#pesquisarUsuarios").val(),
-				"tipo" : $('input[type=radio]:checked').val()};
+				var enviar = {"codigo" : $("#pesquisarUsuarios").val(),
+				"tipo" : retornarTipoUsuario()};
 				return $.ajax({
 					type : "post",
-					url : "${linkTo[CadastroAdController].novo() }",
+					url : "http://svra-aplicacao/servidor/api/BuscaUsuario/",
 					dataType : "json", // Isso diz que você espera um JSON do servidor
 					data: enviar,
 					beforeSend : function(xhr, settings) {
@@ -112,6 +112,19 @@
 						tratarErroAjax(xhr, textStatus, errorThrown);
 					}
 				});
+			}
+			var retornarTipoUsuario = function(){
+				switch($('input[type=radio]:checked').val()) {
+			    case "1":
+			        return "Professores";
+			        break;
+			    case "2":
+			    	return "Monitores";
+			        break;
+			    default:
+			    	return "";
+					break;
+			}
 			}
 		</script>
 		<script type="text/javascript">
@@ -127,7 +140,8 @@
 						$(usuarios).each(function(indice_usuario, usuario){
 							var acoes = criarTextoAcao("resetar", 'fa fa-key', usuario.Codigo)+
 							criarTextoAcao("deletar", 'fa fa-trash', usuario.Codigo)+
-							criarTextoAcao("verificar", 'fa fa-check-square', usuario.Codigo)
+							criarTextoAcao("verificar", 'fa fa-asterisk', usuario.Codigo);
+							// +criarTextoAcao("verificar", 'fa fa-check-square', usuario.Codigo)
 							$("#corpotabelaUsuarios").append('<tr><td>'+usuario.Codigo+"</td>"+
 							"<td style='text-transform: capitalize;'>"+
 							usuario.Nome+"</td><td>"+acoes+
@@ -158,17 +172,41 @@
 					pesquisarUsr();
 				});
 			});
-			var deletarUsuario = function(){
-				var enviar = {"codigo" : $("#excluirUsuarioCodigo").val()};
+			var verificar = function(){
+				fazerVerificacao();
+				return false;
+			}
+			var fazerVerificacao = function(){
+				colocarTipoUsuario();
+				var enviar = {"codigo" : $("#excluirUsuarioCodigo").val(),
+						"tipo" : $("#tipoUsr").val()};
 				return $.ajax({
 					type : "post",
-					url : "${linkTo[CadastroAdController].deletar() }",
+					url : "http://svra-aplicacao/servidor/api/VerificaUsuario/",
 					dataType : "json", // Isso diz que você espera um JSON do servidor
 					data: enviar,
 					beforeSend : function(xhr, settings) {
 					},
 					success : function(data, textStatus, xhr) {
-
+						$("#novaMensagemSucesso").modal('show');
+					}, // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
+					error : function(xhr, textStatus, errorThrown) {
+						tratarErroAjax(xhr, textStatus, errorThrown);
+					}
+				});
+			}
+			var deletarUsuario = function(){
+				colocarTipoUsuario();
+				var enviar = {"codigo" : $("#excluirUsuarioCodigo").val(),
+						"tipo" : $("#tipoUsr").val()};
+				return $.ajax({
+					type : "post",
+					url : "http://svra-aplicacao/servidor/api/Deletar/",
+					dataType : "json", // Isso diz que você espera um JSON do servidor
+					data: enviar,
+					beforeSend : function(xhr, settings) {
+					},
+					success : function(data, textStatus, xhr) {
 					}, // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
 					error : function(xhr, textStatus, errorThrown) {
 						tratarErroAjax(xhr, textStatus, errorThrown);
@@ -176,7 +214,9 @@
 				});
 			}
 			var resetar = function(codigo){
-				$("#codRes").val(codigo)
+				colocarTipoUsuario();
+				$("#codRes").val(codigo);
+				$("#tipoRes").val($("#tipoUsr").val());
 				$("#novaSenha").modal('show');
 				return false;
 			}
@@ -227,7 +267,7 @@
 				var enviar = $("#formSenha").serialize();
 						return $.ajax({
 							type : "post",
-							url : "${linkTo[CadastroAdController].resetar() }",
+							url : "http://svra-aplicacao/servidor/api/ResetarSenha/",
 							dataType : "json", // Isso diz que você espera um JSON do servidor
 							data: enviar,
 							beforeSend : function(xhr, settings) {
@@ -243,7 +283,7 @@
 				var enviar = $("#form").serialize();
 						return $.ajax({
 							type : "post",
-							url : "${linkTo[CadastroAdController].postar() }",
+							url : "http://svra-aplicacao/servidor/api/Cadastro/",
 							dataType : "json", // Isso diz que você espera um JSON do servidor
 							data: enviar,
 							beforeSend : function(xhr, settings) {

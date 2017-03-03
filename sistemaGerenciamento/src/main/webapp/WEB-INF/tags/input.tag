@@ -9,12 +9,15 @@
 <%@ attribute name="id" required="true" %>
 <%@ attribute name="maxLenght" required="false" %>
 <%@ attribute name="editavel" required="false"  %>
+<%@ attribute name="placeholder" required="false"  %>
+
 <div class="${divCol }">
-	<label for="${nome }">${ nomeLabel }</label>
+	<label for="${nome }" id="label${id}">${ nomeLabel }</label>
 	<input type="${tipo}" class="form-control ${classes }" id="${id }"
 	 value="${valorPadrao }" name="${nome }" <c:if test="${maxLenght != null && maxLenght != 0 }">
  		maxlength="${maxLenght }"
 	 </c:if> 
+	 	placeholder="${placeholder }"
 	   <c:if test="${editavel != null && editavel != 0 }">
  		readonly="readonly"
 	 </c:if> />

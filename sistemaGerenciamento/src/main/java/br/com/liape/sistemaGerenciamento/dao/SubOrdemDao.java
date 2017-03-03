@@ -17,6 +17,9 @@ public class SubOrdemDao extends PersistenceJDBC<SubOrdem> {
 	private static final String LISTAR_SUB_ID_ESP = "SELECT SOR.* FROM SUB_ORDEM SOR INNER JOIN ORDEM_SERVICO ORS "
 			+ "ON SOR.ID_ORS = ORS.ID_ORS WHERE ID_SOR = ? AND EXECUTADA_ORS = FALSE AND ATIVO_ORS = TRUE AND "
 			+ "DATA_EXECUTADA_SOR IS NULL ORDER BY ID_SOR DESC LIMIT 1";
+	private static final String LISTAR_SUB_ID_ESP_ORS = "SELECT SOR.* FROM SUB_ORDEM SOR INNER JOIN ORDEM_SERVICO ORS "
+			+ "ON SOR.ID_ORS = ORS.ID_ORS WHERE ORS.ID_ORS = ? AND EXECUTADA_ORS = FALSE AND ATIVO_ORS = TRUE AND "
+			+ "DATA_EXECUTADA_SOR IS NULL ORDER BY ID_SOR DESC LIMIT 1";
 	
 	public SubOrdemDao() {
 	}
@@ -37,5 +40,8 @@ public class SubOrdemDao extends PersistenceJDBC<SubOrdem> {
 	}
 	public List<SubOrdem> listarIdSubEsp(int id) {
 		return super.consultarLista(LISTAR_SUB_ID_ESP, id);
+	}
+	public List<SubOrdem> listarIdSubEspOrs(int id) {
+		return super.consultarLista(LISTAR_SUB_ID_ESP_ORS, id);
 	}
 }

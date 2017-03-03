@@ -54,7 +54,9 @@
 			nome="reserva.turma" tipo="text" id="reservaTurma"
 			classes="upperCase"></t:input>
 		<div class="col-xs-12 col-md-6">
-			<label>Selecione um Professor:</label> <select
+			<label>Selecione um Professor:<a href='${linkTo[ProfessorController].cadastro()}'><i
+					class="fa fa-plus" style="color: #304FFE;" aria-hidden="true">
+				</i></a></label> <select
 				class="form-control select_auto_completar" style="width: 100%;"
 				id="selecionarProfessor" name="reserva.codigoPro">
 				<option value="">---Selecione um Professor---</option>

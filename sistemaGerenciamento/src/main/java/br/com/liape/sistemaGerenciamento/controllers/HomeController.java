@@ -5,6 +5,7 @@ import javax.inject.Inject;
 import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Result;
+import br.com.liape.sistemaGerenciamento.seguranca.LoginFuncionario;
 
 @Controller
 public class HomeController {
@@ -35,6 +36,12 @@ public class HomeController {
 		passos[4] = "Lembrar de Selecionar \"Nenhum Certificado CA nescessário\"";
 		passos[5] = "Checar Status da Rede";
 		passos[6] =  "Verificar se está conectada";
-		result.include(passos);
+		result.include("passos", passos);
+	}
+	@Path("/Ramais")
+	@LoginFuncionario
+	public void ramais()
+	{
+		
 	}
 }
