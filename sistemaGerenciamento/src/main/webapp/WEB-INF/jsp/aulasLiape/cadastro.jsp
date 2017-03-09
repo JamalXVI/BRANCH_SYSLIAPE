@@ -259,7 +259,7 @@
 			$("#descricao").val(sala.descricao);
 			$(salas).each(function(i,e){
 				if (e.nome === sala.sala) {
-					$("#selecionarSala").val(e.id).trigger("change");
+					$("#selecionarSala").val(e.nome).trigger("change");
 				}
 			});
 			$("#selecionarFlag").val(sala.status).trigger("change");

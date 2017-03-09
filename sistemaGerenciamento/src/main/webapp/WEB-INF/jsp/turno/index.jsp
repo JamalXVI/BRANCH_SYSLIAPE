@@ -20,7 +20,7 @@
 			Cadastro <small>Turno</small>
 		</h1>
 		<ol class="breadcrumb">
-			<li><a href="${linkTo[IndexController].index()}">Página
+			<li><a href="${linkTo[HomeController].index()}">Página
 					Inicial</a></li>
 			<li class="active">Turno
 			<a href="" onclick="return cadastroTurno();"><i class="fa fa-plus"></i></a> 

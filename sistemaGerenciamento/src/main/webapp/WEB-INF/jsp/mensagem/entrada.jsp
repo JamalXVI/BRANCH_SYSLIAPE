@@ -22,7 +22,7 @@
 			Nova <small>Mensagem</small>
 		</h1>
 		<ol class="breadcrumb">
-			<li><a href="${linkTo[IndexController].index()}">Página
+			<li><a href="${linkTo[HomeController].index()}">Página
 					Inicial</a></li>
 			<li class="active">Mensagens</li>
 		</ol>
