@@ -11,6 +11,7 @@ import br.com.unaerp.jdbc.persistence.PersistenceJDBC;
 public class UsuarioEscalaDao extends PersistenceJDBC<UsuarioEscala> {
 	
 	private static final String LISTAR_ESCALA = "SELECT * FROM usuario_escala WHERE ID_ESC = ?";
+	private static final String DELETAR_ESCALA = "DELETE FROM usuario_escala WHERE ID_ESC = ?";
 	public UsuarioEscalaDao() {
 	}
 	@Override
@@ -19,5 +20,8 @@ public class UsuarioEscalaDao extends PersistenceJDBC<UsuarioEscala> {
 	}
 	public List<UsuarioEscala> listar_ativo(int id) {
 		return consultarLista(LISTAR_ESCALA, id);
+	}
+	public List<UsuarioEscala> deletar_id(int id) {
+		return consultarLista(DELETAR_ESCALA, id);
 	}
 }

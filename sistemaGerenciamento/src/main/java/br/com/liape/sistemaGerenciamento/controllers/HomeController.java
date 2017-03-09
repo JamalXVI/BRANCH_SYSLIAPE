@@ -44,4 +44,9 @@ public class HomeController {
 	{
 		
 	}
+	@Path("/HorariosEspeciais/")
+	public void horariosEspeciais()
+	{
+		
+	}
 }

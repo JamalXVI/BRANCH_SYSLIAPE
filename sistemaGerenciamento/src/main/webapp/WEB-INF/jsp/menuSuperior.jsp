@@ -82,6 +82,10 @@
 						data-toggle="collapse" data-target="#reserva"> <i
 							class="glyphicon glyphicon-calendar"> </i> Reservas
 					</a></li>	
+					<li><a href="${linkTo[EscalaController].index()}"
+						data-toggle="collapse" data-target="#escala"> <i
+							class="glyphicon glyphicon-list-alt"> </i> Escalas
+					</a></li>	
 					<li><a href="${linkTo[CadastroAdController].index()}"
 						data-toggle="collapse" data-target="#cadastroAd"> <i
 							class="glyphicon glyphicon-pawn"> </i> Cadastro Alunos
@@ -111,8 +115,6 @@
 							Nova Ordem Serviço</a></li>
 							<li><a href="${linkTo[OrdemServicoController].listarAtivas()}">
 							Ver Ordens de Serviço Ativas</a></li>
-							<li><a href="${linkTo[EscalaController].index()}">
-							Escalas</a></li>
 						</ul></li>
 					<!-- MENU MENSAGENS -->
 					<li><a href="javascript:;" data-toggle="collapse"
@@ -140,6 +142,9 @@
 									Ramais</a></li>
 							<li><a href="${linkTo[HomeController].linux()}">
 									Configurar Wi-fi Linux</a></li>
+							<li><a href="${linkTo[HomeController].horariosEspeciais()}">
+									Horários Especiais
+									 </a></li>
 							<li><a href="${linkTo[AulasLiapeController].cadastro()}">
 									Painel de Informações </a></li>
 							

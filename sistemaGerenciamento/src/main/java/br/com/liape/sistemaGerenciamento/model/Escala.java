@@ -6,6 +6,7 @@ import java.time.LocalTime;
 
 import javax.validation.constraints.NotNull;
 
+import br.com.unaerp.jdbc.anotation.AutoIncrement;
 import br.com.unaerp.jdbc.anotation.Chave;
 import br.com.unaerp.jdbc.anotation.Coluna;
 import br.com.unaerp.jdbc.anotation.Date;
@@ -18,26 +19,24 @@ public class Escala implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1212534181587428535L;
+	
 	@Chave
+	@AutoIncrement
 	@Coluna(nome="ID_ESC")
 	private int id;
 	@Coluna(nome="ENTRADA_ESC")
 	@Time
-	@Chave
 	private LocalTime horaInicio;
 	@Coluna(nome="SAIDA_ESC")
 	@Time
-	@Chave
 	private LocalTime horaFim;
 	@Coluna(nome="DIA_INI")
 	@NotNull
 	@Date
-	@Chave
 	private LocalDate dataIni;
 	@Coluna(nome="DIA_FIM")
 	@NotNull
 	@Date
-	@Chave
 	private LocalDate dataFim;
 	@Coluna(nome="ATIVO_ESC")
 	private boolean ativo;

@@ -49,11 +49,25 @@
 			</div>
 		</form>
 	</div>
-	<div class="col-lg-2 col-xs-offset-5" id="divFiltrarSalas" >
+	<div class="col-lg-4 col-xs-offset-4" id="divFiltrarSalas" >
+		<div class="col-xs-6">
 			<label>Filtro de Salas:</label> 
 			<select class="form-control select_auto_completar" style="width: 100%;"
-					id="selectFiltrarSalas">
-		</select>
+			id="selectFiltrarSalas">
+			</select>
+		</div>
+		<div class="col-xs-6">
+			<label>Filtro de Turno:</label> 
+			<select class="form-control select_auto_completar" style="width: 100%;"
+			id="selectFiltrarHora">
+				<option value="-1">Nenhum</option>
+				<option value="0">Manhã</option>
+				<option value="1">Tarde</option>
+				<option value="2">Noite</option>
+			</select>
+		</div>
+		
+		
 	</div>
 	<div class="col-xs-12">
 		<div class='table-responsive espaco_cima'>
@@ -112,6 +126,9 @@
 		$("#selectFiltrarSalas").on("change", function(){
 			preencherTabela();
 		})
+		$("#selectFiltrarHora").on("change", function(){
+			preencherTabela();
+		})
 		var renovarLista = function(){
 			$.when(listar()).done(function(){
 				preencherTabela();
@@ -120,7 +137,9 @@
 		var preencherTabela = function(){
 			$("#corpoTabelaAulas").find('tr').remove().end();
 			$(aulasLiape).each(function(indice_sala, sala){
-				if (sala.ativo && sala.sala.indexOf($("#selectFiltrarSalas").val()) != -1) {
+				if (sala.ativo 
+					&& sala.sala.indexOf($("#selectFiltrarSalas").val()) != -1
+					&& filtrarPeriodo(sala)) {
 					var texto = "<tr><td>";
 					texto += sala.sala+"</td><td>";
 					texto += sala.descricao+"</td><td>";
@@ -133,7 +152,51 @@
 				}
 			});
 		};
-		
+		var filtrarPeriodo = function(sala){
+			var valor = $("#selectFiltrarHora").val();
+			if (valor != -1) {
+				var dataCi = new Date();
+				var dataAi = new Date();
+				var dataCf = new Date();
+				var dataAf = new Date();
+				dataAi.setHours(sala.horaInicio.hour);
+				dataAi.setMinutes(sala.horaInicio.minute);
+				dataAf.setHours(sala.horaFim.hour);
+				dataAf.setMinutes(sala.horaFim.minute);
+				switch (valor) {
+				case "1":
+					dataCi.setHours("12");
+					dataCi.setMinutes("30");
+					dataCf.setHours("18");
+					dataCf.setMinutes("00");
+					break;
+				case "2":
+					dataCi.setHours("18");
+					dataCi.setMinutes("00");
+					dataCf.setHours("22");
+					dataCf.setMinutes("35");
+					break;
+
+				default:
+					dataCi.setHours("07");
+					dataCi.setMinutes("00");
+					dataCf.setHours("12");
+					dataCf.setMinutes("30");
+					break;
+				}
+				if (dataCf.getTime() > dataAf.getTime() && dataAi.getTime() >= dataCi.getTime() ||
+						dataCf.getTime() > dataAf.getTime() &&
+					(dataAf.getTime() - dataAi.getTime()) > (dataCf.getTime() - dataCi.getTime()) ||
+					dataAi.getTime() >= dataCi.getTime() &&
+					(dataAf.getTime() - dataAi.getTime()) > (dataCf.getTime() - dataCi.getTime())) {
+					return true;
+				}else{
+					return false;
+				}
+			}
+			return true;
+
+		}
 		var retornarHora = function(hora)
 		{
 			return retornarComZero(hora.hour)+":"+retornarComZero(hora.minute);
@@ -174,13 +237,13 @@
 		$("#selecionarFlag").on("change", function(){
 			if ($(this).val() == "1") {
 				$("#descricao").val("Sala Livre");
-				$("#descricao").prop('disabled', true);
+				$("#descricao").attr('readonly', true);
 			}else if ($(this).val() == "2"){
 				$("#descricao").val("Manutenção");
-				$("#descricao").prop('disabled', true);
+				$("#descricao").attr('readonly', true);
 			}else{
-				$("#descricao").val("");
-				$("#descricao").prop('disabled', false);
+				//$("#descricao").val("");
+				$("#descricao").attr('readonly', false);
 				
 			}
 		});
@@ -241,6 +304,7 @@
 				beforeSend : function(xhr, settings) {
 				},
 				success : function(data, textStatus, xhr) {
+					mensagemSucesso();
 					aulasLiape = data;
 					preencherTabela();
 				}, // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
@@ -273,6 +337,7 @@
 				beforeSend : function(xhr, settings) {
 				},
 				success : function(data, textStatus, xhr) {
+					mensagemSucesso();
 					renovarLista();
 				}, // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
 				error : function(xhr, textStatus, errorThrown) {

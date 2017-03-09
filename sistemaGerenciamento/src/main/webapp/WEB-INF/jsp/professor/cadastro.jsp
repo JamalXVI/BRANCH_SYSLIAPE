@@ -100,7 +100,7 @@ var conteudoTabelaProf = [];
 var numeroElementos = 10;
 //Listar Professores via Ajax
 var listarProfessores = function(){
-	$.ajax({  
+	return $.ajax({  
 	    type:"post",  
 	    url: "${linkTo[ProfessorController].listar() }", 
 	    dataType: "json",  // Isso diz que você espera um JSON do servidor
@@ -267,8 +267,16 @@ var clicarExluirProfessor = function(){
 $("#excluirProfessorSim").on("click", function(){
 	clicarExluirProfessor();
 });
+$(document).ready(function(){
+	carregarProfessor();
+})
 
-listarProfessores();
+var carregarProfessor = function(){
+	carregando();
+	$.when(listarProfessores()).done(function(){
+		carregar();
+	});
+}
 </script>
 <!-- Validação Jquery -->
 <script type="text/javascript" >
@@ -387,7 +395,7 @@ var cadastrarProfessor = function(){
 		    	if (data.mensagem.indexOf("Erro") !== -1) {
 		    		formularErro(data.mensagem);
 				}else{
-					listarProfessores();
+					carregarProfessor();
 				}
 		    	
 		    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON

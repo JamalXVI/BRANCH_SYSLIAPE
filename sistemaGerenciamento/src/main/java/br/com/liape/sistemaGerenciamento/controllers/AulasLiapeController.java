@@ -21,6 +21,7 @@ import br.com.liape.sistemaGerenciamento.dao.ProfessorDao;
 import br.com.liape.sistemaGerenciamento.dao.ReservaDao;
 import br.com.liape.sistemaGerenciamento.dao.SalaDao;
 import br.com.liape.sistemaGerenciamento.dao.SemestralDao;
+import br.com.liape.sistemaGerenciamento.infra.Configuracoes;
 import br.com.liape.sistemaGerenciamento.model.AnoSemestre;
 import br.com.liape.sistemaGerenciamento.model.AulasLiape;
 import br.com.liape.sistemaGerenciamento.model.Exporadico;
@@ -102,12 +103,13 @@ public class AulasLiapeController {
 	@LoginFuncionario
 	public void listarEsp() {
 		LocalTime now = LocalTime.now();
-		now = now.plusMinutes(8);
-		List<AulasLiape> listar = aulasLiapeDao.listarEsp(LocalDate.now(), now, LocalTime.now());
+		int minutos = Configuracoes.configuracao.getTempoAntesDaAula();
+		now = now.plusMinutes(minutos);
+		List<AulasLiape> listar = aulasLiapeDao.listarEsp(LocalDate.now(), now);
 		List<AulasLiape> novaLista = aulasLiapeDao.listar(LocalDate.now());
 		if (novaLista.size() <= 0) {
 			fazerRenovacao();
-			listar = aulasLiapeDao.listarEsp(LocalDate.now(), now, LocalTime.now());
+			listar = aulasLiapeDao.listarEsp(LocalDate.now(), now);
 		}
 		result.use(Results.json()).withoutRoot().from(listar).include("horaInicio").include("horaFim").serialize();
 	}

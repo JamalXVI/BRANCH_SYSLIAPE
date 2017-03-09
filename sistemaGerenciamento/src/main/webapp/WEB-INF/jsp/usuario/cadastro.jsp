@@ -108,6 +108,7 @@ body {
 		    success: function(data, textStatus, xhr){
 		    	popularSelectGrupo(data);
 		    	$("#restoPermissao").html("");
+		    	mensagemSucesso();
 		    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
 		    error: function(xhr, textStatus, errorThrown){ 
 		    	tratarErroAjax(xhr, textStatus, errorThrown);
@@ -316,11 +317,11 @@ var clicarExluirUsuario = function(){
 	    beforeSend: function(xhr, settings){},  
 	    success: function(data, textStatus, xhr){
 	    	$("#mensagemErro").fadeIn(0);
-	    	debugger;	
 	    	//limparFormularioErro();
 	    	if (data.mensagem.indexOf("Erro") != -1) {
 	    		formularErro(data.mensagem);
 			}else{
+				mensagemSucesso();
 				$(".usuarioSis").each(function(){
 		    		   if($(this).html() == $("#excluirUsuarioId").val())
 		    		   {
@@ -509,6 +510,7 @@ var cadastrarUsuario = function(){
 		    	if (data.mensagem.indexOf("Erro") != -1) {
 		    		formularErro(data.mensagem);
 				}else{
+					mensagemSucesso();
 					listarUsuarios();
 				}
 		    	

@@ -10,6 +10,14 @@ public class EnviarEscala implements Serializable{
 	private String dataInicio;
 	private String dataFim;
 	private List<String> usuarios;
+	private int id;
+	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
 	public String getHoraInicio() {
 		return horaInicio;
 	}

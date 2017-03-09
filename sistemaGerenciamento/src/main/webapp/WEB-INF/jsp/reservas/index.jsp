@@ -128,7 +128,6 @@ float:right;
 			
 			<t:centralizarDiv divCol="12" divColmd="8" classes="row container-fluid text-center">
 
-			
 				<div class="col-xs-4">
 					<label for="calendarioReserva">Data:</label>
 					<input type="date" value="${agora }" max="2050-01-01" min="2001-01-01" name="calendarioReserva"
@@ -246,6 +245,7 @@ var cadastrarSala = function(){
 		    dataType: "json",  // Isso diz que você espera um JSON do servidor
 		    beforeSend: function(xhr, settings){},  
 		    success: function(data, textStatus, xhr){
+				mensagemSucesso();
 		    	popularSala(data);
 		    	//popularSelectAnoSemestre(data);
 		    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
@@ -346,6 +346,7 @@ var cadastrarDisciplina = function(){
 		    dataType: "json",  // Isso diz que você espera um JSON do servidor
 		    beforeSend: function(xhr, settings){},  
 		    success: function(data, textStatus, xhr){
+				mensagemSucesso();
 		    	popularDisciplina(data);
 		    	//popularSala(data);
 		    	//popularSelectAnoSemestre(data);
@@ -481,6 +482,7 @@ var cadastrarCurso = function(){
 		    contentType: "application/x-www-form-urlencoded;charset=UTF-8",
 		    beforeSend: function(xhr, settings){},  
 		    success: function(data, textStatus, xhr){
+				mensagemSucesso();
 		    	popularCurso(data);
 		    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
 		    error: function(xhr, textStatus, errorThrown){ 
@@ -569,6 +571,7 @@ var cadastrarAnoSemestre = function(){
 		    dataType: "json",  // Isso diz que você espera um JSON do servidor
 		    beforeSend: function(xhr, settings){},  
 		    success: function(data, textStatus, xhr){
+				mensagemSucesso();
 		    	popularSelectAnoSemestre(data);
 		    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
 		    error: function(xhr, textStatus, errorThrown){ 
@@ -634,7 +637,12 @@ var removerAnoSemestre = function(ano,semestre){
 	    dataType: "json",  // Isso diz que você espera um JSON do servidor
 	    beforeSend: function(xhr, settings){},  
 	    success: function(data, textStatus, xhr){
-	    	
+	    	if (data.mensagem.indexOf("Erro") !== -1) {
+	    		formularErro(data.mensagem);
+	    		reservaErro = true;
+			}else{
+				mensagemSucesso();
+			}
 	    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
 	    error: function(xhr, textStatus, errorThrown){ 
 	    	tratarErroAjax(xhr, textStatus, errorThrown);
@@ -800,7 +808,7 @@ var retornarReservasExporadica = function(dia){
 //POPULAR SALAS	
 var listarSalasAjax = function(){
 	
-	$.ajax({  
+	return $.ajax({  
 	    type:"post",  
 	    url: "${linkTo[SalaController].listar() }", 
 	    dataType: "json",  // Isso diz que você espera um JSON do servidor
@@ -958,8 +966,10 @@ var verificarSeTemReserva = function(sala, hashReserva){
 	return retornar;
 }
 //Script de Populamento das Salas
+
 var popularSala = function(data)
 {
+	carregando();
 	//Esperar Requisições Ajax das Salas Terminarem para poder Preencher a Tabela
 	$.when(retornarReservasSemestral(retornarDiaSemana()), retornarReservasExporadica($("#calendarioReserva").val())).done(function(){
 	//Remover Reservas Anteriores
@@ -1001,6 +1011,7 @@ var realIndice = 0;
 		
 	});
 	formartarCaixas();
+	carregar();
 });
 }
 //POPULAR SALAS COM LINHAS E RESERVAS
@@ -1272,13 +1283,12 @@ var inserirReserva = function(){
 		    dataType: "json",  // Isso diz que você espera um JSON do servidor
 		    beforeSend: function(xhr, settings){},  
 		    success: function(data, textStatus, xhr){
-		    	if (data.mensagem.indexOf("Erro") !== -1) {
-		    		formularErro(data.mensagem);
-		    		reservaErro = true;
-				}
-		    	var valSala = $("#selecionarSala").val();
-		    	listarSalasAjax();
-		    	$("#selecionarSala").val(valSala).trigger("change");
+		    	inserirMensagemReserva = true;
+		    	tipoMensagemReserva = data.mensagem;
+		    	var valSala = $("#selecionarSala").val();	
+		    	$.when(listarSalasAjax()).done(function(){
+			    	$("#selecionarSala").val(valSala).trigger("change");
+		    	});
 //	 	    	popularSelectAnoSemestre(data);
 		    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
 		    error: function(xhr, textStatus, errorThrown){ 
@@ -1289,12 +1299,6 @@ var inserirReserva = function(){
 		formularErro("Formulário Inválido!");
 	}
 }
-</script>
-<!-- Script de Select com Pesquisa -->
-<script type="text/javascript">
-			$(document).ready(function() {
-			  $(".select_auto_completar").select2();
-			});
 </script>
 
 <!-- Atualizar Salas -->
@@ -1338,6 +1342,8 @@ var cadastrarDeletarReserva = function(idResSem){
 	    success: function(data, textStatus, xhr){
 	    	if (data.mensagem.indexOf("Erro") !== -1) {
 	    		formularErro(data.mensagem);
+			}else{
+		    	mensagemSucesso();
 			}
 	    	listarSalasAjax();
 // 	    	popularSelectAnoSemestre(data);
@@ -1359,6 +1365,8 @@ var cadastrarDeletarReservaExp = function(idResExp, dataMaraca, horaIni, horaFim
 	    success: function(data, textStatus, xhr){
 	    	if (data.mensagem.indexOf("Erro") !== -1) {
 	    		formularErro(data.mensagem);
+			}else{
+				mensagemSucesso();
 			}
 	    	listarSalasAjax();
 // 	    	popularSelectAnoSemestre(data);
@@ -1499,10 +1507,13 @@ $("#opcaoExtra").on("select2:close", function(){
 	</script>
 <script type="text/javascript">
 $(document).ready(function(){
+	carregando();
+	$(".select_auto_completar").select2();
 	atualizarCabecalho();
 	$.when(listarAnoSemestreAjax(), listarProfessorAjax(), listarDisciplinaAjax(),
 			listarCursoAjax()).done(function(){
 		listarSalasAjax();
+		carregar();
 	});
 });
 </script>
@@ -1572,6 +1583,7 @@ $(document).ready(function(){
 <script type="text/javascript">
 	var reservaErro = false;
 	$("#novaMensagemErro").on('hidden.bs.modal', function(){
+		debugger;
 		if (reservaErro) {
 			reservaErro = false;
 			$("#novaReserva").modal('show');
@@ -1588,9 +1600,7 @@ var acionarModalCurso = function(){
 	$("#novoCurso").modal('show');
 	return false;
 }
-$("#novaReserva").draggable({
-    handle: ".modal-header"
-});
+
 </script>
 <script type="text/javascript">
 
@@ -1612,6 +1622,24 @@ var atualizarCabecalho = function(){
     else if (offset < tableOffset) {
         $fixedHeader.hide();
     }
+}
+</script>
+<script type="text/javascript">
+var inserirMensagemReserva = false;
+var tipoMensagemReserva = "";
+var cancelouCarregar = function(valor){
+	if (!valor) {
+		return;
+	}
+	if (inserirMensagemReserva) {
+		if (tipoMensagemReserva.indexOf("Erro") !== -1) {
+    		formularErro(tipoMensagemReserva);
+    		reservaErro = true;
+		}else{
+			mensagemSucesso();
+		}
+		inserirMensagemReserva = false;
+	}
 }
 </script>
 </t:rodape>

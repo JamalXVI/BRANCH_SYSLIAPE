@@ -13,6 +13,9 @@
 		        <input type="hidden" id="formGrupoId" name="grupo.id" value="0" />
 		        <t:input valorPadrao="" divCol="col-xs-12" nomeLabel="Nome do Grupo"
 		         nome="grupo.nome" tipo="text" id="nomeGrupo"></t:input>
+		        <t:input valorPadrao="0" divCol="col-xs-12" nomeLabel="Hierarquia do Grupo"
+		         nome="grupo.hierarquia" tipo="number" id="hierarquiaGrupo"
+		          placeholder="Valor"></t:input>
 		        <div class="col-xs-12">
 		        	<label>Permissões</label>
 		        </div>

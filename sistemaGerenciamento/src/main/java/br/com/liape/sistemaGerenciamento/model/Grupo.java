@@ -18,6 +18,8 @@ public class Grupo implements Serializable {
 	private String nome;
 	@Coluna(nome = "ATIVO_GRP")
 	private boolean ativo;
+	@Coluna(nome="HIERARQUIA_GRP")
+	private int hierarquia;
 	/*
 	 * Modelagem de Negócio
 	 */
@@ -64,4 +66,12 @@ public class Grupo implements Serializable {
 		this.nome = nome;
 	}
 
+	public int getHierarquia() {
+		return hierarquia;
+	}
+
+	public void setHierarquia(int hierarquia) {
+		this.hierarquia = hierarquia;
+	}
+	
 }

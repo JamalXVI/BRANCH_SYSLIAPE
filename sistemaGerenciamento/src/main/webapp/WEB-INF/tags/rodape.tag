@@ -1,6 +1,7 @@
 <%@ tag language="java" pageEncoding="ISO-8859-1"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <c:import url="/WEB-INF/jsp/comum/modal/modal_erro.jsp" />
+<c:import url="/WEB-INF/jsp/comum/modal/modal_sucesso.jsp" />
 <form action="${linkTo[MensagemController].visualizar()}" method="POST" id="verMensagem">
 	<input type='hidden' name='idRec' id='idRecEnviar' />
 </form>
@@ -11,7 +12,7 @@
 	<footer style="margin-top:0px;">
 		<div class="row">
 			<div class="col-lg-12 text-center">
-				<p class="text-center">Copyright &copy; SISGER 2016</p>
+				<p class="text-center">Copyright &copy; SYSLIAPE 2017</p>
 			</div>
 		</div>
 	</footer>
@@ -22,6 +23,7 @@
 <script type="text/javascript">
 <!--
 	//-->
+	
 	iniMensagemAlerta = "<p style='color: #EF5350;'>"//'<div class="alert alert-danger" role="alert">';
 	fimMensagemAlerta = "</p>"//'</div>';
 	var formularErro = function(mensagem)
@@ -33,7 +35,8 @@
 		
 	};
 </script>
-
+<!-- Watch Js -->
+<script src="<c:url value='/assets/js/object-watch.js' />"></script>
 <!-- jQuery -->
 <script src="<c:url value='/assets/js/jquery-1.9.1.min.js' />"></script>
 <!-- Bootstrap -->
@@ -75,6 +78,9 @@
 <script type="text/javascript">
 	$('#file').change(function() {
 		$('#fotoPerfilForm').submit();
+	});
+	$(".modal").draggable({
+	    handle: ".modal-header"
 	});
 </script>
 <!-- Correção Bug Modal Bootstrap -->
@@ -138,6 +144,93 @@ $('.formData').datetimepicker({
 	 timepicker:false,
 	 mask:true, // '9999/19/39 29:59' - digit is the maximum possible for a cell
 	});
+
+</script>
+<!-- Script de Carregando e Carregar -->
+<script type="text/javascript">
+var cancelouCarregar = function(valor){
+	
+}
+var carregando = function(){
+	
+	carregar(false);
+	waitingDialog.show();
+	//$("#carregar").append("<div><div class='loader'></div><p>Carregando</p></div>");
+};
+var carregar = function(terminou){
+	terminou = (terminou == undefined ? true : terminou);
+	//$("#carregar").find("div").remove().end();
+	waitingDialog.hide();	
+	cancelouCarregar(terminou);
+};
+var mensagemSucesso =  function(){
+	$("#mensagemSucessoModal").html("<div class='col-lg-4'><i class='fa fa-2x fa-check-circle-o'></i>"
+	+"</div><div class='col-lg-8'<p class='bg-success'>Ação Efetivada com Sucesso!</p></div>");
+	$("#novaMensagemSucesso").modal("show");
+}
+var waitingDialog = waitingDialog || (function ($) {
+    'use strict';
+
+	// Creating modal dialog's DOM
+	var $dialog = $(
+		'<div class="modal " id="carrengadoModal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true" style="padding-top:15%; overflow-y:visible;">' +
+		'<div class="modal-dialog modal-m">' +
+		'<div class="modal-content">' +
+			'<div class="modal-header"><h3 style="margin:0;"></h3></div>' +
+			'<div class="modal-body">' +
+				'<div class="progress progress-striped active" style="margin-bottom:0;"><div class="progress-bar" style="width: 100%"></div></div>' +
+			'</div>' +
+		'</div></div></div>');
+
+	return {
+		/**
+		 * Opens our dialog
+		 * @param message Custom message
+		 * @param options Custom options:
+		 * 				  options.dialogSize - bootstrap postfix for dialog size, e.g. "sm", "m";
+		 * 				  options.progressType - bootstrap postfix for progress bar type, e.g. "success", "warning".
+		 */
+		show: function (message, options) {
+			// Assigning defaults
+			if (typeof options === 'undefined') {
+				options = {};
+			}
+			if (typeof message === 'undefined') {
+				message = 'Carregando';
+			}
+			var settings = $.extend({
+				dialogSize: 'm',
+				progressType: '',
+				onHide: null // This callback runs after the dialog was hidden
+			}, options);
+
+			// Configuring dialog
+			$dialog.find('.modal-dialog').attr('class', 'modal-dialog').addClass('modal-' + settings.dialogSize);
+			$dialog.find('.progress-bar').attr('class', 'progress-bar');
+			if (settings.progressType) {
+				$dialog.find('.progress-bar').addClass('progress-bar-' + settings.progressType);
+			}
+			$dialog.find('h3').text(message);
+			// Adding callbacks
+			if (typeof settings.onHide === 'function') {
+				$dialog.off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
+					settings.onHide.call($dialog);
+				});
+			}
+			// Opening dialog
+			$dialog.modal();
+		},
+		/**
+		 * Closes dialog
+		 */
+		hide: function () {
+			$dialog.modal('hide');
+			$('body').removeClass('modal-open');
+			$('.modal-backdrop').remove();
+		}
+	};
+
+})(jQuery);
 
 </script>
 <!-- Validações Customizadas -->

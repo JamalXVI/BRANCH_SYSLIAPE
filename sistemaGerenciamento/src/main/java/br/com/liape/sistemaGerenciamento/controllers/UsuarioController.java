@@ -104,7 +104,25 @@ public class UsuarioController {
 		}
 		result.use(Results.json()).withoutRoot().from(sistema).serialize();
 	}
+	@Path("/Listar/Usuario/Aniversario")
+	public void aniversario()
+	{
+		List<Usuario> usuarios = new ArrayList<>();
+		List<Pessoa> pessoas = pessoaDao.listar_aniversario();
+		for (Pessoa pessoa : pessoas) {
+			if (usuarioDao.listarIdPessoa(pessoa.getId()).size() > 0) {
+				pessoa.setTelefones(telefoneDao.listarPorId(pessoa.getId()));
+				// pessoa.setFotoPerfil(fotoPerfilDao.listarPorIdPes(pessoa.getId()).get(0));
+				Usuario usuario = usuarioDao.listarIdPessoa(pessoa.getId()).get(0);
+				usuario.setGrupo(grupoDao.listarPorId(usuario.getIdGrupo()).get(0));
+				usuario.setPessoa(pessoa);
+				usuarios.add(usuario);
+			}
 
+		}
+		result.use(Results.json()).withoutRoot().from(usuarios).include("pessoa").include("grupo")
+				.include("pessoa.datanascimento").include("pessoa.telefones").exclude("senha").serialize();
+	}
 	@Path("/Listar/Usuario/")
 	public void listar() {
 		List<Usuario> usuarios = new ArrayList<>();
@@ -204,26 +222,16 @@ public class UsuarioController {
 	}
 
 	private boolean verPermissoesIguais(int idGrupo) {
-		if (verificarSePodeAtualizar()) {
-			return true;
-		}else{
-			List<GrupoPermissao> listarPermissoesGrupo 
-			= grupoPermissaoDao.listarPermissoesGrupo(idGrupo);
-			int contadorNumeroPermissoes = 0;
-			for (GrupoPermissao grupoPermissao : listarPermissoesGrupo) {
-				for (Permissao permissao : usr.pegarAutorizacao()) {
-					if (permissao.getId() == grupoPermissao.getIdPer()) {
-						contadorNumeroPermissoes++;
-					}
-				}
-			}
-			if (contadorNumeroPermissoes >= listarPermissoesGrupo.size()) {
+		List<Grupo> listarPorId = grupoDao.listarPorId(idGrupo);
+		if (listarPorId.size() > 0) {
+			Grupo grupo = listarPorId.get(0);
+			Grupo grpUsr = grupoDao.listarPorId(usr.getUsuario().getIdGrupo()).get(0);
+			if (grupo.getHierarquia() >= grpUsr.getHierarquia()) {
 				return true;
 			}
-			
 		}
-		
 		return false;
+		
 	}
 
 	/*

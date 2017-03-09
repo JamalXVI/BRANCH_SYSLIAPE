@@ -47,11 +47,33 @@
 	<div class="panel-body">
 		<div class="list-group" id='listaNotificacoes'>
 		</div>
+		<div id="carregarnot">
+		</div>
 	</div>
 	<!-- /.panel-body -->
 </div>
 </div>
+<div class="col-lg-8">
+<div class="panel panel-default">
+	<div class="panel-heading">
+		Aniversáriantes do Mês <i class="fa fa-birthday-cake" aria-hidden="true"></i>
+	</div>
+	<div class="panel-body">
+<!-- 		<div class="list-group" id=> -->
+<!-- 		</div> -->
+		<table class='table table-striped table-bordered table-hover'>
+			<thead>
+				<th>Nome:</th>
+				<th>Aniversário:</th>
+			</thead>
+			<tbody id="aniversariantes">
+			</tbody>
+		</table>
+	</div>
 </div>
+</div>
+</div>
+
 <form action="${linkTo[MuralController].visualizar()}" method="POST" id="verMural">
 	<input type='hidden' name='idMur' id='idMurEnviar' />
 </form>
@@ -111,9 +133,12 @@ var novoMurais = function(){
 }
 var adicionarNotificacoes = function(){
 	agora = new Date();
+	$("#listaNotificacoes").find("a").remove().end();
+	carregando();
 	notificacaoMensagem(agora);
 	notificacaoOrdem(agora);
 	notificacaoMural(agora);
+	carregar();
 }
 var notificacaoMural = function(agora){
 	$.when(novoMurais()).done(function(){
@@ -177,7 +202,39 @@ var notificacaoMensagem = function(agora){
 		});
 	});
 }
+var aniversariantes;
+var listar_aniversariantes = function(){
+	return $.ajax({  
+	    type:"post",  
+	    url: "${linkTo[UsuarioController].aniversario() }", 
+//	    data: $("#formReserva").serialize(),
+	    dataType: "json",  // Isso diz que você espera um JSON do servidor
+	    beforeSend: function(xhr, settings){},  
+	    success: function(data, textStatus, xhr){
+				
+	    	aniversariantes = data;
+	    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
+	    error: function(xhr, textStatus, errorThrown){ 
+	    	tratarErroAjax(xhr, textStatus, errorThrown);
+	    }
+	});		
+}
+var preencher_aniversariantes = function(){
+	$.when(listar_aniversariantes()).done(function(){
+		$("#aniversariantes").find("tr").remove().end();
+		$(aniversariantes).each(function(indice_aniversariantes, aniversariante){
+			var texto = "<tr><td>"+aniversariante.pessoa.nome+" "+aniversariante.pessoa.sobrenome;
+			texto += "</td><td>"+retornarComZero(aniversariante.pessoa.datanascimento.day)+"/"+
+			retornarComZero(aniversariante.pessoa.datanascimento.month);
+			texto += "</td></tr>";
+			$("#aniversariantes").append(texto);
+		});
+	});
+}
 $(document).ready(function(){
+	debugger;
+	preencher_aniversariantes();
+	adicionarProximas();
 	adicionarNotificacoes();
 });
 </script>
@@ -278,8 +335,9 @@ var adicionarExporadicos = function(reserva){
 }
 var adicionarProximas = function(){
 // 	$("#proximaAulas")
+	carregando();
 	$.when(buscarReservas(), buscarProfessores(), buscarSalas()).done(function(){
-		
+		$("#proximaAulas").find('tr').remove().end();
 		$(todasReservas).each(function(indiceReserva, reserva){
 			if(reserva.semestrais.length > 0)
 			{
@@ -290,9 +348,15 @@ var adicionarProximas = function(){
 				adicionarExporadicos(reserva);
 			}
 		});
+		carregar();
 	});
 }
-adicionarProximas();
+
+window.setInterval(function(){
+	adicionarProximas();
+	adicionarNotificacoes();
+}, 60000);
+
 </script>
 <script type="text/javascript">
 		var visualizarMensagem = function(indice){

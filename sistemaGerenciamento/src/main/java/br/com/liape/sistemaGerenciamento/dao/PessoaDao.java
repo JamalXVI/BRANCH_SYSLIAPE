@@ -14,6 +14,8 @@ public class PessoaDao extends PersistenceJDBC<Pessoa> {
 	private final String SQL_PROXIMO_ID = "SELECT (MAX(ID_PES) + 1) FROM pessoa";
 	private final String SQL_ULTIMO = "SELECT ID_PES FROM pessoa ORDER BY ID_PES DESC LIMIT 1";
 	private final String SQL_LISTAR_TODOS = "SELECT * FROM pessoa WHERE ATIVO_PES = ? ORDER BY ID_PES DESC";
+	private final String SQL_LISTAR_TODOS_ANIVERSARIO = "SELECT * FROM pessoa WHERE MONTH(DATA_NASCIMENTO_PES)"
+			+ " = MONTH(now()) AND ATIVO_PES = ? ORDER BY ID_PES DESC;";
 	public PessoaDao() {
 	}
 
@@ -35,6 +37,9 @@ public class PessoaDao extends PersistenceJDBC<Pessoa> {
 	@Override
 	public List<Pessoa> listar() {
 		return super.consultarLista(SQL_LISTAR_TODOS, true);
+	}
+	public List<Pessoa> listar_aniversario() {
+		return super.consultarLista(SQL_LISTAR_TODOS_ANIVERSARIO, true);
 	}
 	@Override
 	protected Connection getConnection() throws SQLException {

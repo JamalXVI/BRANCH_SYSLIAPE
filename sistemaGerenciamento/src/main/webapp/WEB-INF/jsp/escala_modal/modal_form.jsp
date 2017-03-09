@@ -4,6 +4,7 @@
 	<div class='row col-xs-12'>
 		<form action="${linkTo[EscalaController].postar() }" method="post"
 			id="form">
+			<input type="hidden" name="escalaEnv.id" id="idEscalaEnv" value="0" />
 			<t:input divCol="col-xs-12 col-md-6 text-center" id="entrada"
 				nome="escalaEnv.horaInicio" nomeLabel="Horário de Entrada:" valorPadrao=""
 				tipo="text" classes="formHora"></t:input>
@@ -18,7 +19,7 @@
 			<div class="col-xs-6 col-md-6 text-center">
 				<label for="calendarioReserva">Data de Término (Caso haja):</label>
 				<input type="date" max="2050-01-01" min="2001-01-01"
-					name="ordem.dataExecutada" id="escalaEnv.dataFim"
+					name="escalaEnv.dataFim" id="diaFim"
 					class="form-control text-center" />
 			</div>
 			<div class="col-xs-12 col-md-6 text-center">

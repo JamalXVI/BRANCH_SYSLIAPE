@@ -13,10 +13,10 @@ import br.com.unaerp.jdbc.persistence.PersistenceJDBC;
 public class AulasLiapeDao extends PersistenceJDBC<AulasLiape> {
 	
 	private static String SQL_DELETAR_ID = "DELETE FROM AULAS_LIAPE WHERE ID_AUL = ?";
-	private static String SQL_LISTA = "SELECT * FROM AULAS_LIAPE WHERE DATA_AUL = ?";
+	private static String SQL_LISTA = "SELECT * FROM AULAS_LIAPE WHERE DATA_AUL = ?  ORDER BY SALA_AUL";
 	
 	private static String SQL_LISTA_ESP = "SELECT * FROM AULAS_LIAPE WHERE DATA_AUL = ? AND"
-			+ " HORA_INICIO_AUL <= ? AND HORA_FIM_AUL >= ? ";
+			+ " HORA_INICIO_AUL <= ? AND HORA_FIM_AUL >= ? ORDER BY SALA_AUL";
 	@Override
 	protected Connection getConnection() throws SQLException {
 		return ConnectionFactory.getConnections();
@@ -29,7 +29,7 @@ public class AulasLiapeDao extends PersistenceJDBC<AulasLiape> {
 	public List<AulasLiape> listar(LocalDate data) {
 		return consultarLista(SQL_LISTA, data);
 	}
-	public List<AulasLiape> listarEsp(LocalDate data, LocalTime horaInicial, LocalTime horaFinal) {
-		return consultarLista(SQL_LISTA_ESP, data, horaInicial, horaFinal);
+	public List<AulasLiape> listarEsp(LocalDate data, LocalTime hora) {
+		return consultarLista(SQL_LISTA_ESP, data, hora, hora);
 	}
 }

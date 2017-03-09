@@ -80,13 +80,33 @@ public class EscalaController {
 		} catch (Exception e) {
 			escala.setDataFim(escala.getDataIni());
 		}
-		boolean inserir = escalaDao.inserir(escala);
-		if (inserir) {
-			inserirUsuarioEscala(escalaEnv, mensagemSistema);
+		if (escalaEnv.getId() == 0) {
+			boolean inserir = escalaDao.inserir(escala);
+			if (inserir) {
+				inserirUsuarioEscala(escalaEnv, mensagemSistema);
+			}else{
+			}
 		}else{
+			escala.setId(escalaEnv.getId());
+			boolean atualizar = escalaDao.atualizar(escala);
+			if (atualizar) {
+				atualizarUsuarioEscala(escalaEnv, mensagemSistema);
+			}else{
+			}
+		}
+		
+	}
+	private void atualizarUsuarioEscala(EnviarEscala escalaEnv, MensagemSistema mensagemSistema) {
+		usuarioEscalaDao.deletar_id(escalaEnv.getId());
+		int id = escalaEnv.getId();
+		for (String usuario : escalaEnv.getUsuarios()) {
+			UsuarioEscala usuarioEscala = new UsuarioEscala();
+			usuarioEscala.setIdEsc(id);
+			usuarioEscala.setLoginUsr(usuario);
+			usuarioEscalaDao.inserir(usuarioEscala);
+			mensagemSistema.setMensagem("Sucesso!");
 		}
 	}
-	
 	private void inserirUsuarioEscala(EnviarEscala escalaEnv, MensagemSistema mensagemSistema) {
 		int id = escalaDao.listarUltimo();
 		for (String usuario : escalaEnv.getUsuarios()) {
