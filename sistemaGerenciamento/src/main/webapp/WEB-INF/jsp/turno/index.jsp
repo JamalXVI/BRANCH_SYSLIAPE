@@ -8,7 +8,11 @@
 <t:cabecalho>
 
 	<!-- Estilização da TAG select -->
-	<style>
+<style>
+	.img-escala{
+		width:4%;
+		margin-right:6px;
+	}
 </style>
 </t:cabecalho>
 <!-- Importação do Menu Lateral e Superior -->
@@ -174,6 +178,7 @@ var preencherTabela = function(){
 	$.when(listarTurnos()).done(function(){
 		$(turnos).each(function(i,turno){
 			$.when(listarUsuariosTurnos(turno.id)).done(function(){
+				
 				var entrada = montarHorario(turno.horaInicio);
 				var saida = montarHorario(turno.horaFim);
 				var excluir = "<a href='' onclick='return excluirTurno(\""+i
@@ -182,7 +187,9 @@ var preencherTabela = function(){
 				"<i class='fa fa-plus'></i></a>"; 
 				var textUsuarios = "";
 				$(usuariosDoTurno).each(function(i, usrTur){
-					textUsuarios += usrTur.usuario.pessoa.nome+" "
+					textUsuarios += "<img "+
+					"class='fotoPerfil"+usrTur.usuario.idPes+" img-escala imagemFotoUsuario img-circle'"+
+						"></img>"+usrTur.usuario.pessoa.nome+" "
 					+usrTur.usuario.pessoa.sobrenome+" / ";
 				});
 				$("#corpoTabelaTurno").append("<tr><td class='my-table-label-body'>"+
@@ -192,13 +199,30 @@ var preencherTabela = function(){
 				addMembros+textUsuarios+"</td><td class='my-table-label-body'>"+
 				excluir+
 				"</td></tr>");
+				atualizarFotosPerfilUsuario(usuariosDoTurno);
 			})
 			
 		});
 		
 	});
 }
-$(preencherTabela());
+/*
+ * Função que vai atualizar as imagens de perfil dos usuários
+ */
+var atualizarFotosPerfilUsuario = function(usuariosDoTurno){
+	$(usuariosDoTurno).each(function(i, usrTur){
+		if (!fotos_perfil[usrTur.usuario.idPes]) {
+			$.when(guardarFotoPerfil(usrTur.usuario)).done(function(){
+				atualizarImgUsr(usrTur.usuario);
+			});
+		}else{
+			atualizarImgUsr(usrTur.usuario);
+		}
+	});
+};
+var atualizarImgUsr = function(usuario){
+	$(".fotoPerfil"+usuario.idPes).attr("src", "data:image/png;base64," + fotos_perfil[usuario.idPes]);
+}
 </script>
 <script type="text/javascript">
 var excluirTurnoSelecionado = function(id){
@@ -277,7 +301,7 @@ var listarUsuariosTurnos = function(idTurno){
 <script type="text/javascript">
 var usuarios;
 var listarUsuarios = function(){
-	$.ajax({  
+	return $.ajax({  
 	    type:"post",  
 	    url: "${linkTo[UsuarioController].listar() }", 
 	    dataType: "json",  // Isso diz que você espera um JSON do servidor
@@ -301,6 +325,24 @@ var adicionarUsuariosLista = function(){
 		+ " "+ usuario.pessoa.sobrenome}).appendTo($("#selecionarUsuarioTurnoUsuario"));
 	});
 }
-$(listarUsuarios());
+$(document).ready(function(){
+	$.when(listarUsuarios()).done(function(){
+		preencherTabela()
+	});
+});
+</script>
+
+<script type="text/javascript">
+fotos_perfil = [];
+var guardarFotoPerfil = function(usuario){
+	return $.ajax({
+		type : "post",
+		url : urlFoto + usuario.idPes,
+		processData : false
+	}).success(function(b64data) {
+		fotos_perfil[usuario.idPes] = b64data;
+		
+	});
+}
 </script>
 </t:rodape>

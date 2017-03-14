@@ -1,5 +1,8 @@
 package br.com.liape.sistemaGerenciamento.controllers;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 
@@ -51,10 +54,12 @@ public class CursoController {
 		
 	}
 
-	// LISTA TODOS OS ANOS/SEMESTRES
+	// LISTA TODOS OS CURSOS
 	@Post("/Listar/Curso/")
 	public void listar() {
-		result.use(Results.json()).withoutRoot().from(cursoDao.listar()).serialize();
+		List<Curso> cursos = cursoDao.listar();
+		Collections.sort(cursos);
+		result.use(Results.json()).withoutRoot().from(cursos).serialize();
 
 	}
 }

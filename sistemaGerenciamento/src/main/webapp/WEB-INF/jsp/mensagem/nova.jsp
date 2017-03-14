@@ -36,9 +36,7 @@
 			 <label for="mensagem.texto">Texto:</label>
 			 <textarea rows="5" cols="" name="mensagem.mensagem" class="form-control"></textarea>
 			 </div>
-			 <t:centralizarDiv divCol="6" divColmd="4">
-			 	<button type="submit" class="btn btn-lg btn-success" id="enviarMensagem">Enviar</button>
-			 </t:centralizarDiv>
+			 <button type="submit" class="btn btn-primary btn-enviar" id="enviarMensagem">Enviar</button>
 		</form>
 </div>
 	

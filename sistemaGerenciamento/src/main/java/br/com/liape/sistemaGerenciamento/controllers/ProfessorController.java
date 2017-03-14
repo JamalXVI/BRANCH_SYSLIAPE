@@ -1,6 +1,8 @@
 package br.com.liape.sistemaGerenciamento.controllers;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
@@ -126,6 +128,7 @@ public class ProfessorController {
 					professores.add(professor);
 				}
 			}
+			Collections.sort(professores);
 			result.use(Results.json()).withoutRoot().from(professores).include("pessoa")
 			.include("pessoa.datanascimento").include("pessoa.telefones").serialize();
 

@@ -38,10 +38,8 @@
 				<textarea rows="5" cols="" name="mensagem.mensagem"
 					class="form-control"></textarea>
 			</div>
-			<t:centralizarDiv divCol="6" divColmd="4">
-				<button type="submit" class="btn btn-lg btn-success"
+			<button type="submit" class="btn btn-primary btn-enviar"
 					id="enviarMensagem">Enviar</button>
-			</t:centralizarDiv>
 		</form>
 	</div>
 

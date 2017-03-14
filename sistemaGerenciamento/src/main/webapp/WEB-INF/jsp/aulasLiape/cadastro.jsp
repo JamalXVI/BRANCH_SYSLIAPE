@@ -15,18 +15,19 @@
 <c:import url="../menuSuperior.jsp"></c:import>
 
 <!-- Seção Principal -->
-<div class="row" role="main">
-	<div class="col-xs-12">
-		<h1 id="tituloForm">Inserir Aula</h1>
+<div class="row col-xs-12" role="main">
+	<div class="container-fluid">
+		<h1 id="tituloForm">Painel de Informação</h1>
+	</div>
 		<form action="${linkTo[AulasLiapeController].postar() }" method="post" id="form">
 			<input id="idAula" name="aula.id" type="hidden" value="0" />
-			<div class="col-lg-2" id="divSelectSalas" >
+			<div class="col-lg-2 col-md-4 col-xs-6" id="divSelectSalas" >
 			<label>Salas:</label> 
 				<select class="form-control select_auto_completar" style="width: 100%;"
 					id="selecionarSala" name="aula.sala">
 				</select>
 			</div>
-			<div class="col-lg-2" id="divSelectFlag" >
+			<div class="col-lg-2 col-md-4 col-xs-6" id="divSelectFlag" >
 			<label>Status:</label> 
 				<select class="form-control select_auto_completar" style="width: 100%;"
 					id="selecionarFlag" name="aula.status">
@@ -35,28 +36,26 @@
 					<option value="2">Manutenção</option>
 				</select>
 			</div>
-			<t:input divCol="col-md-4"
+			<t:input divCol="col-lg-3 col-md-4 col-xs-6"
 			 id="descricao" nome="aula.descricao" nomeLabel="Descrição" valorPadrao="" 
 			 tipo="text" placeholder="Nome Professor"></t:input>
-			 <t:input divCol="col-md-4 col-lg-2 text-center" id="entrada"
-				nome="horaInicio" nomeLabel="Horário de Entrada:" valorPadrao=""
+			 <t:input divCol="col-lg-2 col-md-4 col-xs-6" id="entrada"
+				nome="horaInicio" nomeLabel="Início:" valorPadrao=""
 				tipo="text" classes="formHora"></t:input>
-			<t:input divCol="col-md-4 col-lg-2 text-center" id="saida"
-				nome="horaFim" nomeLabel="Horário de Saída:" valorPadrao=""
+			<t:input divCol="col-lg-2 col-md-4 col-xs-6" id="saida"
+				nome="horaFim" nomeLabel="Termino:" valorPadrao=""
 				tipo="text" classes="formHora"></t:input>
-			<div class="col-xs-12 text-center">
-				<button class="btn btn-success" type="submit">Enviar</button>
+			<div class="col-lg-1 col-md-4 col-xs-6 text-center">
+				<button class="btn btn-primary" style="margin-top:25px;" type="submit">Cadastrar</button>
 			</div>
 		</form>
-	</div>
-	<div class="col-lg-4 col-xs-offset-4" id="divFiltrarSalas" >
-		<div class="col-xs-6">
+		<div class="col-lg-2 col-md-4 col-xs-6">
 			<label>Filtro de Salas:</label> 
 			<select class="form-control select_auto_completar" style="width: 100%;"
 			id="selectFiltrarSalas">
 			</select>
 		</div>
-		<div class="col-xs-6">
+		<div class="col-lg-2 col-md-4 col-xs-6">
 			<label>Filtro de Turno:</label> 
 			<select class="form-control select_auto_completar" style="width: 100%;"
 			id="selectFiltrarHora">
@@ -66,9 +65,6 @@
 				<option value="2">Noite</option>
 			</select>
 		</div>
-		
-		
-	</div>
 	<div class="col-xs-12">
 		<div class='table-responsive espaco_cima'>
 			<table id='TabelaAulas'
@@ -93,7 +89,6 @@
 		<a href="" onclick="return renovando();" class="btn btn-primary">Renovar</a>
 		<a href="" onclick="return nova();" class="btn btn-primary">Nova</a>
 	</div>
-
 </div>
 <c:import url="/WEB-INF/jsp/aulasLiape_modal/modal_excluir.jsp" />
 <!-- Scripts Específicos e Importação do Rodapé -->
@@ -173,12 +168,12 @@
 				case "2":
 					dataCi.setHours("18");
 					dataCi.setMinutes("00");
-					dataCf.setHours("22");
-					dataCf.setMinutes("35");
+					dataCf.setHours("23");
+					dataCf.setMinutes("55");
 					break;
 
 				default:
-					dataCi.setHours("07");
+					dataCi.setHours("06");
 					dataCi.setMinutes("00");
 					dataCf.setHours("12");
 					dataCf.setMinutes("30");

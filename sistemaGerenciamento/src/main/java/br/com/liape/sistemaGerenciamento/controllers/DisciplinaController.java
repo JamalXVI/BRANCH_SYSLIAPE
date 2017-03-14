@@ -1,5 +1,8 @@
 package br.com.liape.sistemaGerenciamento.controllers;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 
@@ -66,7 +69,9 @@ public class DisciplinaController {
 	// LISTA TODOS OS ANOS/SEMESTRES
 	@Post("/Listar/Disciplina/")
 	public void listar() {
-		result.use(Results.json()).withoutRoot().from(disciplinaDao.listar()).serialize();
+		List<Disciplina> disciplinas = disciplinaDao.listar();
+		Collections.sort(disciplinas);
+		result.use(Results.json()).withoutRoot().from(disciplinas).serialize();
 
 	}
 }

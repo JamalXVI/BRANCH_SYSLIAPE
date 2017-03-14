@@ -12,7 +12,7 @@ import br.com.unaerp.jdbc.anotation.Coluna;
 import br.com.unaerp.jdbc.anotation.Tabela;
 
 @Tabela(nome = "usuario")
-public class Usuario implements Serializable {
+public class Usuario implements Serializable, Comparable<Usuario> {
 	private static final long serialVersionUID = 1L;
 	@Length(min = 5)
 	@NotNull
@@ -82,5 +82,10 @@ public class Usuario implements Serializable {
 
 	public void setIdGrupo(int idGrupo) {
 		this.idGrupo = idGrupo;
+	}
+
+	@Override
+	public int compareTo(Usuario usr) {
+		return this.getPessoa().getNome().compareTo(usr.getPessoa().getNome());
 	}
 }

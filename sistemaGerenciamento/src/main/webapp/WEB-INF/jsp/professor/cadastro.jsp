@@ -188,8 +188,8 @@ var adicionarProfessorTabela = function(professor, i){
 	$("#corpotabelaListaProfessores").append("<tr><td><img id='fotoPerfilprofessor"
 			+professor.idPes+"' class='imagemFotoprofessor'"+
 			"></img></td><td class='my-table-label-body'>"
-			+professor.pessoa.nome+" "+professor.pessoa.sobrenome+"</td><td class='my-table-label-body'>"+
-			""+professor.pessoa.email 
+			+professor.pessoa.nome+" "+professor.pessoa.sobrenome+"</td>"
+			+"<td class='my-table-label-body' style='text-transform:none;'>"+professor.pessoa.email 
 //				'my-table-label-body'
 			+"</td><td class='my-table-label-body'>"+telefone
 			+"</td><td style='display:none;' class='professoresis'>"+professor.codigo

@@ -1,6 +1,7 @@
 package br.com.liape.sistemaGerenciamento.controllers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
@@ -138,6 +139,7 @@ public class UsuarioController {
 			}
 
 		}
+		Collections.sort(usuarios);
 		result.use(Results.json()).withoutRoot().from(usuarios).include("pessoa").include("grupo")
 				.include("pessoa.datanascimento").include("pessoa.telefones").exclude("senha").serialize();
 

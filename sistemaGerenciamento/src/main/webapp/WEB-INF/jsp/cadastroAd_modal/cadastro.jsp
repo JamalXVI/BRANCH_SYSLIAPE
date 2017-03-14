@@ -6,7 +6,7 @@
 		<form id="form">
 			<input type='hidden' id="tipoUsr" name="tipo" value=""/>
 			<t:input divCol="col-xs-12 col-md-6 col-lg-4"
-		 	id="codUsr" nome="codigo" nomeLabel="Código:" valorPadrao="" tipo="text"></t:input>
+		 	id="codUsr" nome="codigo" nomeLabel="Código:" editavel="1" valorPadrao="" tipo="text"></t:input>
 			<t:input divCol="col-xs-12 col-md-6 col-lg-4"
 		 	id="nomeUsr" nome="nome" nomeLabel="Nome:" valorPadrao="" tipo="text"></t:input>
 			<t:input divCol="col-xs-12 col-md-6 col-lg-4"

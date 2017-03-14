@@ -61,10 +61,8 @@ rel="stylesheet">
 				<label>Descrição da Ordem:</label>
 				<textarea rows="5" class="form-control" name="ordem.descricao" id="descricaoOrdem"></textarea>
 			</div>
-			<t:centralizarDiv divCol="6" divColmd="4">
-				<button type="submit" class="btn btn-lg btn-success"
+			<button type="submit" class="btn btn-primary btn-enviar"
 					id="enviarMensagem">Enviar</button>
-			</t:centralizarDiv>
 		</form>
 		
 	</div>

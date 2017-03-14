@@ -1,6 +1,6 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib prefix="t" tagdir="/WEB-INF/tags"%>
-<t:modal_geral nomeLabel="Informação de Reserva" nome="InfoReserva" genero="a" semSalvar="1">
+<t:modal_sem_save nomeLabel="Informação de Reserva" nome="InfoReserva" genero="a">
 	<t:input divCol="col-xs-12 col-sm-6" id="reservaLerDisciplina"
 		nome="reservaLerDisciplina" nomeLabel="Disciplina:" valorPadrao=""
 		tipo="text" editavel="1"></t:input>
@@ -38,4 +38,4 @@
 			</tbody>
 		</table>
 	</div>
-</t:modal_geral>
+</t:modal_sem_save>

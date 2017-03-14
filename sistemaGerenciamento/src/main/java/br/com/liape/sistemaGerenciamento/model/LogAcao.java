@@ -13,14 +13,28 @@ import br.com.unaerp.jdbc.anotation.Tabela;
 
 @Tabela(nome = "LOG_ACAO")
 public class LogAcao implements Serializable{
-	private static final long serialVersionUID = -4330611508514036886L;
+	private static final long serialVersionUID = 414164799346909192L;
 	@Coluna(nome="ID_LOA")
 	@NotNull
 	@Chave
 	@AutoIncrement
 	private int id;
-	@Coluna(nome="DESCRICAO_LOA")
-	private String descricao;
+	@Coluna(nome="TIPO_LOA")
+	private int tipo;
+	@Coluna(nome="LOGIN_USR")
+	private int usuario;
+	public int getTipo() {
+		return tipo;
+	}
+	public void setTipo(int tipo) {
+		this.tipo = tipo;
+	}
+	public int getUsuario() {
+		return usuario;
+	}
+	public void setUsuario(int usuario) {
+		this.usuario = usuario;
+	}
 	@Coluna(nome="DATA_LOA")
 	@DateTime
 	private LocalDateTime data;
@@ -30,12 +44,7 @@ public class LogAcao implements Serializable{
 	public void setId(int id) {
 		this.id = id;
 	}
-	public String getDescricao() {
-		return descricao;
-	}
-	public void setDescricao(String descricao) {
-		this.descricao = descricao;
-	}
+
 	public LocalDateTime getData() {
 		return data;
 	}

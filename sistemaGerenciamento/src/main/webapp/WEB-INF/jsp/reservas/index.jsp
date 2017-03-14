@@ -1,5 +1,4 @@
 <!-- Importação JSTLs -->
-<%@page import="org.apache.jasper.tagplugins.jstl.core.If"%>
 <%@page import="java.util.Calendar"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -35,7 +34,13 @@ text-transform:uppercase;
 .modal-noscrollbar {
 	margin-right: 0 !important;
 }
-
+.formulario_inicial{
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+#calendarioReserva{
+	height: 30px;
+}
 #tabelaGrade>tbody>tr>td {
 	height: 12px;
 	padding: 0px;
@@ -125,19 +130,23 @@ float:right;
 			</div>
 			<img src="<c:url value='/assets/img/config.png' />" alt="Fechar" style="display:none"
 			id="fecharBase" />
-			
-			<t:centralizarDiv divCol="12" divColmd="8" classes="row container-fluid text-center">
-
-				<div class="col-xs-4">
+			<div class="">
+				<div class="col-lg-3 col-md-4 col-sm-6" style="padding-right:0px;">
 					<label for="calendarioReserva">Data:</label>
-					<input type="date" value="${agora }" max="2050-01-01" min="2001-01-01" name="calendarioReserva"
+					<div class="input-group">
+					  <span class="input-group-addon glyphicon glyphicon-search" id="basic-addon1"></span>
+					  <input type="date" value="${agora }" max="2050-01-01" min="2001-01-01" name="calendarioReserva"
 					id="calendarioReserva" class="dataCalendario form-control text-center" />
+					</div>
+					
 				</div>
-				<div class="col-xs-3">
-					<button class="btn btn-info" style='margin-top:25px'
+				<!-- 
+				<div class="col-lg-1 col-md-2 col-sm-3 text-center" style="padding-left:15px;">
+					<button class="btn btn-primary formulario_inicial" style='margin-top:25px'
 					 id="pesquisarDataEscolhida">Pesquisar</button>
 				</div>
-				<div class="col-xs-5">
+				 -->
+				<div class="col-lg-3 col-md-4 col-sm-6 text-center">
 <!-- 					<label>Outras:</label> -->
 <!-- 					<a class="btn btn-info" href="" onclick="return mostrarOpcoes();"><i class="fa fa-cog" aria-hidden="true"></i>Opções</a> -->
 					<label>Opções:</label> 
@@ -154,38 +163,38 @@ float:right;
 					
 					</select>
 				</div>
-			</t:centralizarDiv>
-			<div>
-				<table id="header-fixed"
-				class="table table-striped table-hover table-bordered"></table>
-				<table class="table table-striped table-hover table-bordered"
-					id="tabelaGrade">
-					<thead id="tabelaGradeThead">
-						<tr>
-							<th class="novaHora">HH</th>
-							<th class="minuto" style="background-color: #f7f7f7;">MM</th>
-	
-						</tr>
-					</thead>
-	
-					<c:forEach var="i" begin="6" end="22">
-						<tr id="linha_Aula_00_${i }">
-							<td rowspan="2" class="hora"><c:if test="${i < 10 }">
-				0${i}
-			</c:if> <c:if test="${i > 9 }">
-				${i}
-			</c:if></td>
-							<td class="min00 minSize">00</td>
-	
-	
-						</tr>
-						<tr id="linha_Aula_30_${i }">
-							<td class="min30 minSize" onclick="">30</td>
-	
-						</tr>
-					</c:forEach>
-	
-				</table>
+			</div>
+			<div  class="col-xs-12 container-fluid">
+					<table id="header-fixed"
+					class="table table-striped table-hover table-bordered"></table>
+					<table class="table table-striped table-hover table-bordered"
+						id="tabelaGrade">
+						<thead id="tabelaGradeThead">
+							<tr>
+								<th class="novaHora">HH</th>
+								<th class="minuto" style="background-color: #f7f7f7;">MM</th>
+		
+							</tr>
+						</thead>
+		
+						<c:forEach var="i" begin="6" end="22">
+							<tr id="linha_Aula_00_${i }">
+								<td rowspan="2" class="hora"><c:if test="${i < 10 }">
+					0${i}
+				</c:if> <c:if test="${i > 9 }">
+					${i}
+				</c:if></td>
+								<td class="min00 minSize">00</td>
+		
+		
+							</tr>
+							<tr id="linha_Aula_30_${i }">
+								<td class="min30 minSize" onclick="">30</td>
+		
+							</tr>
+						</c:forEach>
+		
+					</table>
 			</div>
 			<!-- Importar Modals -->
 			<c:import url="/WEB-INF/jsp/reservas_modal/modal_ano_semestre.jsp" />

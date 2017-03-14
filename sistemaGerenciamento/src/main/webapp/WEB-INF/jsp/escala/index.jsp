@@ -126,34 +126,62 @@
 				var mesAtual = new Date(montarDataVal(escala.dataIni)).getMonth();
 				
 				if (mesAtual == $("#selectFiltrarHora").val()) {
-					var texto = "<tr><td>";
-					if (escala.dataFim.day == escala.dataIni.day &&
-						escala.dataFim.month == escala.dataIni.month &&
-						escala.dataFim.year == escala.dataIni.year) {
-						texto += montarData(escala.dataIni)+"</td><td>";
-					}else{
-						texto += montarData(escala.dataIni)+" - "
-						+montarData(escala.dataFim)+"</td><td>";
-						
-					}
-					texto += montarHora(escala.horaInicio)+"</td><td>";
-					texto += montarHora(escala.horaFim)+"</td><td>";
+					
 					$.when(coletarUsuariosEscala(escala.id, indice_escala)).done(function(){
 						$(usuariosEscalas[indice_escala]).each(function(indice_usr_escala,usr_escala){
 							$(usuarios).each(function(indice_usuario, usuario){
 								if (usr_escala.loginUsr == usuario.login) {
-									texto += usuario.pessoa.nome+" "+usuario.pessoa.sobrenome+" / ";
+									if (!fotos_perfil[usuario.idPes]) {
+										$.when(guardarFotoPerfil(usuario)).done(function(){
+											var texto = "<tr><td>";
+											if (escala.dataFim.day == escala.dataIni.day &&
+												escala.dataFim.month == escala.dataIni.month &&
+												escala.dataFim.year == escala.dataIni.year) {
+												texto += montarData(escala.dataIni)+"</td><td>";
+											}else{
+												texto += montarData(escala.dataIni)+" - "
+												+montarData(escala.dataFim)+"</td><td>";
+												
+											}
+											texto += montarHora(escala.horaInicio)+"</td><td>";
+											texto += montarHora(escala.horaFim)+"</td><td>";
+											texto += texto_usuario(texto, usuario);
+											texto += "</td><td>";
+											texto += criarTextoAcao("removerEscala",
+													"fa fa-trash", indice_escala);
+											texto += criarTextoAcao("editarEscala",
+												"fa fa-pencil", indice_escala)+"</td>";
+											textos[indice_escala] = texto;
+											acrescentarTextos(textos, numeroSelecionados);	
+										})
+									}else{
+										var texto = "<tr><td>";
+										if (escala.dataFim.day == escala.dataIni.day &&
+											escala.dataFim.month == escala.dataIni.month &&
+											escala.dataFim.year == escala.dataIni.year) {
+											texto += montarData(escala.dataIni)+"</td><td>";
+										}else{
+											texto += montarData(escala.dataIni)+" - "
+											+montarData(escala.dataFim)+"</td><td>";
+											
+										}
+										texto += montarHora(escala.horaInicio)+"</td><td>";
+										texto += montarHora(escala.horaFim)+"</td><td>";
+										texto += texto_usuario(texto, usuario);
+										texto += "</td><td>";
+										texto += criarTextoAcao("removerEscala",
+												"fa fa-trash", indice_escala);
+										texto += criarTextoAcao("editarEscala",
+											"fa fa-pencil", indice_escala)+"</td>";
+										textos[indice_escala] = texto;
+										acrescentarTextos(textos, numeroSelecionados);	
+									}
+									
 									
 								};
 							});
 						});
-						texto += "</td><td>";
-						texto += criarTextoAcao("removerEscala",
-								"fa fa-trash", indice_escala);
-						texto += criarTextoAcao("editarEscala",
-							"fa fa-pencil", indice_escala)+"</td>";
-						textos[indice_escala] = texto;
-						acrescentarTextos(textos, numeroSelecionados);	
+						
 						
 					});
 				}
@@ -429,5 +457,22 @@
 				formularErro("Formulário Inválido!");
 			}
 		}
+	</script>
+	<script type="text/javascript">
+	fotos_perfil = [];
+	var guardarFotoPerfil = function(usuario){
+		return $.ajax({
+			type : "post",
+			url : urlFoto + usuario.idPes,
+			processData : false
+		}).success(function(b64data) {
+			fotos_perfil[usuario.idPes] = b64data;
+			
+		});
+	}
+	var texto_usuario = function(texto, usuario){
+		return "<img style='width:6%;margin-right:10px;' class='img-circle' src='data:image/png;base64," + fotos_perfil[usuario.idPes]+"'></img>"
+		+usuario.pessoa.nome+" "+usuario.pessoa.sobrenome+" / ";
+	}
 	</script>
 </t:rodape>	

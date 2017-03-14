@@ -396,12 +396,6 @@ public class OrdemServicoController {
 	 *******************************************************
 	 */
 
-	private void registrarLogAcao(String mensagem) {
-		LogAcao logAcao = new LogAcao();
-		logAcao.setDescricao(mensagem);
-		logAcao.setData(LocalDateTime.now());
-		logAcaoDao.inserir(logAcao);
-	}
 
 	// ADICIONAR SUBORDEM NA VIEW COM UMA OUTRA CLASSE
 	private void adicionarView(List<SubOrdemView> view, SubOrdem subOrdem) {
@@ -485,8 +479,6 @@ public class OrdemServicoController {
 					inserir = inserirSubOrdemUsuario(ordem, idSubOrdem);
 				}
 				if (inserir) {
-					registrarLogAcao("O usuário " + usuarioLogado.getUsuario().getLogin() + " cadastrou"
-							+ " uma ordem de serviço ");
 					result.redirectTo(HomeController.class).index();
 				} else {
 					result.redirectTo(ErrosController.class).erro_operacao();
@@ -530,8 +522,6 @@ public class OrdemServicoController {
 		boolean atualizou = ordemServicoDao.atualizar(ordemServico);
 		if (atualizou) {
 
-			registrarLogAcao("O usuário " + usuarioLogado.getUsuario().getLogin() + " excluiu"
-					+ " a ordem de serviço de id " + idOrs);
 		}
 		return atualizou;
 	}
@@ -582,8 +572,6 @@ public class OrdemServicoController {
 		ordemServico.setAtivo(true);
 		ordemServico.setExecutada(true);
 		if (ordemServicoDao.atualizar(ordemServico) && subOrdemDao.atualizar(subOrdem)) {
-			registrarLogAcao("O usuário " + usuarioLogado.getUsuario().getLogin() + " finalizou"
-					+ " a subordem de serviço de id " + idSor);
 			sistema.setMensagem("Sucesso ao Excluir Ordem de Serviço!");
 
 		} else {

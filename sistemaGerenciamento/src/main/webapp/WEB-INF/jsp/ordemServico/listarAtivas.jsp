@@ -213,7 +213,7 @@ rel="stylesheet">
 		});
  }
  var atualizarValoresTabela = function(){
-	 $.when(listarOrdem()).done(function(){
+	return $.when(listarOrdem()).done(function(){
 			$(ordems).each(function(indice_ordem, ordem){
 				$.when(listarOrdemSala(ordem.id, indice_ordem),
 				listarOrdemComputador(ordem.id, indice_ordem), listarSubOrdem(ordem.id, indice_ordem))
@@ -314,12 +314,13 @@ rel="stylesheet">
  }
 
  $(document).ready(function(){
+	 carregando();
 	 $.when(atualizarValoresTabela()).done(function(){
 		 verificarPermissao();
 		 regrasRepassar();
 		 mudarDataExecutada();
 		 verficarDestino();
-		 
+		 carregar();
 	 });
 	 
 	 
@@ -342,7 +343,7 @@ var retornarTurno = function(turno) {
 }
 var criarTextoAcao = function(funcao, icone, indice_ordem)
 {
-	return "<a href='' onclick='return "+funcao+"("+indice_ordem+")'><i class='"+icone+"'></i></a>";
+	return "<a href='' onclick='return "+funcao+"("+indice_ordem+")'><i class='fa-2x "+icone+"' style='padding-right:5px;'></i></a>";
 }
 var verificarDataRepasse = function(dataHj, dataOr){
 	if(dataHj.getYear() > dataOr.getYear() || 

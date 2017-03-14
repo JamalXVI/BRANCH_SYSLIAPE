@@ -3,6 +3,7 @@ package br.com.liape.sistemaGerenciamento.model;
 import java.io.Serializable;
 
 import javax.validation.constraints.NotNull;
+
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -11,7 +12,7 @@ import br.com.unaerp.jdbc.anotation.Coluna;
 import br.com.unaerp.jdbc.anotation.Tabela;
 
 @Tabela(nome = "professor")
-public class Professor implements Serializable{
+public class Professor implements Serializable, Comparable<Professor> {
 	/**
 	 * 
 	 */
@@ -28,6 +29,7 @@ public class Professor implements Serializable{
 	 * Modelagem de Negócio
 	 */
 	private Pessoa pessoa;
+
 	public Pessoa getPessoa() {
 		return pessoa;
 	}
@@ -50,5 +52,10 @@ public class Professor implements Serializable{
 
 	public void setCodigo(String codigo) {
 		this.codigo = codigo;
+	}
+
+	@Override
+	public int compareTo(Professor profNov) {
+		return profNov.getCodigo().compareTo(this.getCodigo());
 	}
 }

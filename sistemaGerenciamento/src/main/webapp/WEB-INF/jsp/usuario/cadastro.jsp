@@ -50,11 +50,12 @@ body {
 				class="fa fa-plus-square fa-2x botao_confirmar cor_verde permissao"
 				onclick="return novoUsuarioForm();"></a>
 		</div>
-	</t:centralizarDiv>
 	<div class="container">
-	<div id="listaUsuarios" class="col-xs-12"></div>
+	<div id="listaUsuarios" class=""></div>
 	
 	</div>
+	
+	</t:centralizarDiv>
 	<c:import url="/WEB-INF/jsp/usuario_modal/modal_form.jsp" />
 
 	<c:import url="/WEB-INF/jsp/usuario_modal/modal_grupo.jsp" />
@@ -138,7 +139,7 @@ body {
 <script type="text/javascript">
 var listarGrupoAjax = function(){
 	
-	$.ajax({  
+	return $.ajax({  
 	    type:"post",  
 	    url: "${linkTo[GrupoController].listar() }", 
 	    dataType: "json",  // Isso diz que você espera um JSON do servidor
@@ -151,8 +152,7 @@ var listarGrupoAjax = function(){
 		 }
 	});
 }
-// Listar todos os Grupos e Permissões via Ajax
-listarGrupoAjax();
+
 var permissoes;
 $.ajax({  
     type:"post",  
@@ -194,7 +194,7 @@ var guardarFotoPerfil = function(usuario){
 var usuarios;
 //Listar Todos os Usuários e fazer Requisição Ajax da Lista
 var listarUsuarios = function(){
-	$.ajax({  
+	return $.ajax({  
 	    type:"post",  
 	    url: "${linkTo[UsuarioController].listar() }", 
 	    dataType: "json",  // Isso diz que você espera um JSON do servidor
@@ -246,8 +246,8 @@ var fazerListaUsuarios = function(){
 			$("#corpoTabelaListaUsuarios").append("<tr><td><img id='fotoPerfilUsuario"
 					+usuario.idPes+"' class='imagemFotoUsuario'"+
 					"></img></td><td class='my-table-label-body'>"
-					+usuario.pessoa.nome+" "+usuario.pessoa.sobrenome+"</td><td class='my-table-label-body'>"+
-					""+usuario.pessoa.email 
+					+usuario.pessoa.nome+" "+usuario.pessoa.sobrenome+"</td>"+
+					"<td class='my-table-label-body' style='text-transform:none;'>"+usuario.pessoa.email 
 // 					'my-table-label-body'
 					+"</td><td class='my-table-label-body'>"+telefone
 					+"</td><td class='my-table-label-body'>"+usuario.grupo.nome
@@ -341,8 +341,7 @@ var clicarExluirUsuario = function(){
 $("#excluirUsuarioSim").on("click", function(){
 	clicarExluirUsuario();
 });
-//Chamar Listar Usuário
-listarUsuarios();
+
 </script>
 <!-- Validação Jquery -->
 <script type="text/javascript" >
@@ -555,8 +554,18 @@ var verificarPermissao = function(){
 		$(".permissaoGrupo").remove().end();
 	}
 }
-$(verificarPermissao());
-
+$(document).ready(function(){
+	
+	verificarPermissao();
+	//Listar todos os Grupos e Permissões via Ajax
+	carregando();
+	$.when(listarGrupoAjax()).done(function(){
+		//Chamar Listar Usuário
+		$.when(listarUsuarios()).done(function(){
+			carregar();
+		});
+	});
+});
 </script>
 <!-- Importação do Script de Telefone -->
 <c:import url="../scripts/AdicionarTelefoneScript.jsp"></c:import>

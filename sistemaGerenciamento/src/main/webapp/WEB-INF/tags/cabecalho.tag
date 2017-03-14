@@ -51,7 +51,11 @@
 .col-center {
 	margin: 0 auto;
 }
-
+.btn-enviar{
+	margin-left: 15px !important; 
+	width: 160px !important; 
+	margin-top: 6px;
+}
 <!--
 -->
 body.modal-open-noscroll {
