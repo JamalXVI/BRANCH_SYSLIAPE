@@ -9,31 +9,23 @@ import javax.validation.Valid;
 import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
-import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.validator.Validator;
 import br.com.caelum.vraptor.view.Results;
-import br.com.liape.sistemaGerenciamento.dao.AnoSemestreDao;
+import br.com.liape.sistemaGerenciamento.constantes.FlagsLogAcao;
 import br.com.liape.sistemaGerenciamento.dao.DisciplinaDao;
-import br.com.liape.sistemaGerenciamento.model.AnoSemestre;
 import br.com.liape.sistemaGerenciamento.model.Disciplina;
-import br.com.liape.sistemaGerenciamento.outros.Conversor;
 import br.com.liape.sistemaGerenciamento.seguranca.NivelPermissao;
 
 @Controller
-public class DisciplinaController {
-	private Validator validator;
-	private Result result;
+public class DisciplinaController extends AbstractController {
 	private DisciplinaDao disciplinaDao;
 
 	@Inject
-	public DisciplinaController(Validator validator, Result result, DisciplinaDao disciplinaDao) {
-		this.validator = validator;
-		this.result = result;
+	public DisciplinaController(DisciplinaDao disciplinaDao) {
 		this.disciplinaDao = disciplinaDao;
 	}
 
 	public DisciplinaController() {
-		this(null, null, null);
+		this(null);
 	}
 	@Path("/Disciplina/")
 	public void index()
@@ -56,10 +48,12 @@ public class DisciplinaController {
 	public void postar(@Valid Disciplina disciplina) {
 		if (disciplinaDao.pesquisarDisciplinaCod(disciplina.getCodigo()).size() <= 0) {
 			if (disciplinaDao.inserir(disciplina)) {
+				registrarLog(FlagsLogAcao.CADASTRAR_DISCIPLINA.getCodigo(), disciplina.getCodigo());
 				result.use(Results.json()).withoutRoot().from(disciplinaDao.listar()).serialize();
 			}
 		}else{
 			if (disciplinaDao.atualizar(disciplina)) {
+				registrarLog(FlagsLogAcao.ATUALIZAR_DISCIPLINA.getCodigo(), disciplina.getCodigo());
 				result.use(Results.json()).withoutRoot().from(disciplinaDao.listar()).serialize();
 			}
 		}

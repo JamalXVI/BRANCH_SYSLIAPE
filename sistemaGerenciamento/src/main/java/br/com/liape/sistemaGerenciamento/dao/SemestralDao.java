@@ -23,7 +23,7 @@ public class SemestralDao extends PersistenceJDBC<Semestral> {
 	private static String SQL_LISTAR_DIA_SEMANA_PROX = "SELECT * FROM SEMESTRAL WHERE"
 			+ " DIA_SEMANA_SEM = ((DAYOFWEEK(?) + 5) % 7) AND ATIVO_SEM = TRUE";
 			
-
+	private static String LISTAR_ULTIMO = "SELECT ID_SEM FROM SEMESTRAL ORDER BY ID_SEM DESC LIMIT 1";
 	public SemestralDao() {
 	}
 	public List<Semestral> listarHora(LocalTime horaAtu, LocalTime horaLim, int idRes, LocalDate data) {
@@ -47,6 +47,10 @@ public class SemestralDao extends PersistenceJDBC<Semestral> {
 	@Override
 	public List<Semestral> listar() {
 		return super.consultarLista(SQL_LISTAR, true);
+	}
+	
+	public int listarUltimo(){
+		return (int)super.consultarParametros(LISTAR_ULTIMO);
 	}
 
 	@Override

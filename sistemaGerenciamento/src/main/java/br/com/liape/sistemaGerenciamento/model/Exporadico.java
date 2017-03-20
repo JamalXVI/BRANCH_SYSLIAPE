@@ -11,11 +11,9 @@ import br.com.unaerp.jdbc.anotation.Coluna;
 import br.com.unaerp.jdbc.anotation.Date;
 import br.com.unaerp.jdbc.anotation.Tabela;
 import br.com.unaerp.jdbc.anotation.Time;
+
 @Tabela(nome="exporadico")
 public class Exporadico implements Serializable{
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2625958902238421677L;
 	@Coluna(nome="ID_RES")
 	@NotNull
@@ -94,5 +92,9 @@ public class Exporadico implements Serializable{
 	public void setObservacao(String observacao) {
 		this.observacao = observacao;
 	}
-
+	@Override
+	public String toString() {
+		return getData().toString()+" "+getHoraInicio().toString()+" - "+getHoraFim().toString()
+				+" Reserva:"+getIdRes();
+	}
 }

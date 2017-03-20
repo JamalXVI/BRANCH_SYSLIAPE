@@ -9,8 +9,8 @@ import javax.inject.Inject;
 import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.view.Results;
+import br.com.liape.sistemaGerenciamento.constantes.FlagsLogAcao;
 import br.com.liape.sistemaGerenciamento.dao.RecadoDao;
 import br.com.liape.sistemaGerenciamento.dao.RecadoUsuarioAlvoDao;
 import br.com.liape.sistemaGerenciamento.dao.UsuarioDao;
@@ -21,29 +21,24 @@ import br.com.liape.sistemaGerenciamento.modelView.Mensagem;
 import br.com.liape.sistemaGerenciamento.modelView.RecadoUsuario;
 import br.com.liape.sistemaGerenciamento.outros.Conversor;
 import br.com.liape.sistemaGerenciamento.outros.MensagemSistema;
-import br.com.liape.sistemaGerenciamento.seguranca.UsuarioLogado;
 
 @Controller
-public class MensagemController {
+public class MensagemController extends AbstractController{
 
-	private Result result;
 	private RecadoDao recadoDao;
 	private RecadoUsuarioAlvoDao recadoUsuarioAlvoDao;
 	private UsuarioDao usuarioDao;
-	private UsuarioLogado usuarioLogado;
 
 	@Inject
-	public MensagemController(Result result, RecadoDao recadoDao, RecadoUsuarioAlvoDao recadoUsuarioAlvoDao,
-			UsuarioDao usuarioDao, UsuarioLogado usuarioLogado) {
-		this.result = result;
+	public MensagemController(RecadoDao recadoDao, RecadoUsuarioAlvoDao recadoUsuarioAlvoDao,
+			UsuarioDao usuarioDao) {
 		this.recadoDao = recadoDao;
 		this.recadoUsuarioAlvoDao = recadoUsuarioAlvoDao;
 		this.usuarioDao = usuarioDao;
-		this.usuarioLogado = usuarioLogado;
 	}
 
 	public MensagemController() {
-		this(null, null, null, null, null);
+		this(null, null, null);
 	}
 
 	/*
@@ -70,6 +65,7 @@ public class MensagemController {
 	public void visualizar(int idRec) {
 		List<RecadoUsuarioAlvo> recadosUsuario = recadoUsuarioAlvoDao.listarRecadosUsuario(idRec);
 		if (recadosUsuario.size() > 0) {
+			registrarLog(FlagsLogAcao.VISUALIZAR_MENSAGEM.getCodigo(), String.valueOf(idRec));
 			for (RecadoUsuarioAlvo recadoUsuarioAlvo : recadosUsuario) {
 				if (recadoUsuarioAlvo.getLogin().equals(usuarioLogado.getUsuario().getLogin())) {
 					Recado recado = recadoDao.listaId(idRec).get(0);
@@ -145,6 +141,7 @@ public class MensagemController {
 			if (recadoUsuarioAlvo.getLogin().equals(usuarioLogado.getUsuario().getLogin())) {
 				recadoUsuarioAlvo.setApagado(true);
 				recadoUsuarioAlvoDao.atualizar(recadoUsuarioAlvo);
+				registrarLog(FlagsLogAcao.REMOVER_ENTRADA_MENSAGEM.getCodigo(), String.valueOf(idRec));
 				msg.setMensagem("Sucesso!");
 			}
 		}
@@ -159,6 +156,7 @@ public class MensagemController {
 			Recado recado = listaId.get(0);
 			recado.setAtivo(false);
 			recadoDao.atualizar(recado);
+			registrarLog(FlagsLogAcao.REMOVER_ENVIADO_MENSAGEM.getCodigo(), String.valueOf(idRec));
 			msg.setMensagem("Sucesso!");
 		}
 		result.use(Results.json()).withoutRoot().from(msg).serialize();
@@ -176,6 +174,7 @@ public class MensagemController {
 			boolean inserir = recadoDao.inserir(recado);
 			if (inserir) {
 				int idRecado = recadoDao.listarUltimo();
+				registrarLog(FlagsLogAcao.CADASTRAR_MENSAGEM.getCodigo(), String.valueOf(idRecado));
 				String[] paraRecados = mensagem.getPara().split(", |,");
 				List<String> usuariosEnviados = new ArrayList<>();
 				for (String paraRecado : paraRecados) {

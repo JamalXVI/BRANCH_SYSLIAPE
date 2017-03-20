@@ -5,11 +5,12 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
+import org.hibernate.sql.ANSICaseFragment;
+
 import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Post;
-import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.validator.Validator;
 import br.com.caelum.vraptor.view.Results;
+import br.com.liape.sistemaGerenciamento.constantes.FlagsLogAcao;
 import br.com.liape.sistemaGerenciamento.dao.AnoSemestreDao;
 import br.com.liape.sistemaGerenciamento.model.AnoSemestre;
 import br.com.liape.sistemaGerenciamento.outros.Conversor;
@@ -17,20 +18,16 @@ import br.com.liape.sistemaGerenciamento.outros.MensagemSistema;
 import br.com.liape.sistemaGerenciamento.seguranca.NivelPermissao;
 
 @Controller
-public class AnoSemestreController {
-	private Validator validator;
-	private Result result;
+public class AnoSemestreController extends AbstractController{
 	private AnoSemestreDao anoSemestreDao;
 
 	@Inject
-	public AnoSemestreController(Validator validator, Result result, AnoSemestreDao anoSemestreDao) {
-		this.validator = validator;
-		this.result = result;
+	public AnoSemestreController(AnoSemestreDao anoSemestreDao) {
 		this.anoSemestreDao = anoSemestreDao;
 	}
 
 	public AnoSemestreController() {
-		this(null, null, null);
+		this(null);
 	}
 
 	/*
@@ -51,10 +48,13 @@ public class AnoSemestreController {
 		ans.setDataFim(Conversor.converterLocalDate(fim));
 		ans.setAtivo(true);
 		if (anoSemestreDao.pesquisarPorChave(ans.getAno(), ans.getSemestre()).size() <= 0) {
+			registrarLog(FlagsLogAcao.CADASTRO_ANO_SEMESTRE.getCodigo(), ans.toString());
 			anoSemestreDao.inserir(ans);
 		}else{
+			registrarLog(FlagsLogAcao.ATUALIZAR_ANO_SEMESTRE.getCodigo(), ans.toString());
 			anoSemestreDao.atualizar(ans);
 		};
+		
 		result.use(Results.json()).withoutRoot().from(anoSemestreDao.listarAnoSemestre()).serialize();
 	}
 	@NivelPermissao(idPermissao=7)
@@ -67,6 +67,7 @@ public class AnoSemestreController {
 			AnoSemestre anoSemestre = pesquisarPorChave.get(0);
 			anoSemestre.setAtivo(false);
 			anoSemestreDao.atualizar(anoSemestre);
+			registrarLog(FlagsLogAcao.REMOVER_ANO_SEMESTRE.getCodigo(), anoSemestre.toString());
 			msg.setMensagem("Sucesso!!");
 		}
 	}

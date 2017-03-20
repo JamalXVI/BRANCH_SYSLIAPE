@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.view.Results;
 import br.com.liape.sistemaGerenciamento.dao.MuralDao;
 import br.com.liape.sistemaGerenciamento.dao.MuralTurnoDao;
@@ -17,7 +16,6 @@ import br.com.liape.sistemaGerenciamento.dao.MuralVisualizadoDao;
 import br.com.liape.sistemaGerenciamento.dao.RecadoDao;
 import br.com.liape.sistemaGerenciamento.dao.RecadoUsuarioAlvoDao;
 import br.com.liape.sistemaGerenciamento.dao.TurnoDao;
-import br.com.liape.sistemaGerenciamento.dao.UsuarioDao;
 import br.com.liape.sistemaGerenciamento.dao.UsuarioTurnoDao;
 import br.com.liape.sistemaGerenciamento.model.Mural;
 import br.com.liape.sistemaGerenciamento.model.MuralTurno;
@@ -32,16 +30,12 @@ import br.com.liape.sistemaGerenciamento.modelView.RecadoUsuario;
 import br.com.liape.sistemaGerenciamento.outros.Conversor;
 import br.com.liape.sistemaGerenciamento.outros.MensagemSistema;
 import br.com.liape.sistemaGerenciamento.seguranca.NivelPermissao;
-import br.com.liape.sistemaGerenciamento.seguranca.UsuarioLogado;
 
 @Controller
-public class MuralController {
+public class MuralController extends AbstractController{
 
-	private Result result;
 	private RecadoDao recadoDao;
 	private RecadoUsuarioAlvoDao recadoUsuarioAlvoDao;
-	private UsuarioDao usuarioDao;
-	private UsuarioLogado usuarioLogado;
 	private TurnoDao turnoDao;
 	private MuralDao muralDao;
 	private UsuarioTurnoDao usuarioTurnoDao;
@@ -49,13 +43,10 @@ public class MuralController {
 	private MuralVisualizadoDao muralVisualizadoDao;
 
 	@Inject
-	public MuralController(Result result, RecadoUsuarioAlvoDao recadoUsuarioAlvoDao, UsuarioDao usuarioDao,
-			UsuarioLogado usuarioLogado, TurnoDao turnoDao, MuralDao muralDao, UsuarioTurnoDao usuarioTurnoDao,
+	public MuralController(RecadoUsuarioAlvoDao recadoUsuarioAlvoDao,
+			TurnoDao turnoDao, MuralDao muralDao, UsuarioTurnoDao usuarioTurnoDao,
 			MuralTurnoDao muralTurnoDao, MuralVisualizadoDao muralVisualizadoDao) {
-		this.result = result;
 		this.recadoUsuarioAlvoDao = recadoUsuarioAlvoDao;
-		this.usuarioDao = usuarioDao;
-		this.usuarioLogado = usuarioLogado;
 		this.turnoDao = turnoDao;
 		this.muralDao = muralDao;
 		this.usuarioTurnoDao = usuarioTurnoDao;
@@ -64,7 +55,7 @@ public class MuralController {
 	}
 
 	public MuralController() {
-		this(null, null, null, null, null, null, null, null, null);
+		this(null, null, null, null, null, null);
 	}
 
 	/*
@@ -191,7 +182,6 @@ public class MuralController {
 
 			}
 		}
-
 		result.use(Results.json()).withoutRoot().from(recados).include("data").serialize();
 	}
 
@@ -289,7 +279,6 @@ public class MuralController {
 		} else {
 			result.redirectTo(ErrosController.class).erro_operacao();
 		}
-		// result.include("msg", "Message from your controller");
 	}
 
 	private String retornarNomeTurno(int turno) {

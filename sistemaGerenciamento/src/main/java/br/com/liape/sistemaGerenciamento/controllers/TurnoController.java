@@ -10,8 +10,8 @@ import javax.inject.Inject;
 import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.view.Results;
+import br.com.liape.sistemaGerenciamento.constantes.FlagsLogAcao;
 import br.com.liape.sistemaGerenciamento.dao.FimTurnoDao;
 import br.com.liape.sistemaGerenciamento.dao.PessoaDao;
 import br.com.liape.sistemaGerenciamento.dao.TurnoDao;
@@ -27,8 +27,7 @@ import br.com.liape.sistemaGerenciamento.outros.MensagemSistema;
 import br.com.liape.sistemaGerenciamento.seguranca.NivelPermissao;
 
 @Controller
-public class TurnoController {
-	private Result result;
+public class TurnoController extends AbstractController {
 	private TurnoDao turnoDao;
 	private FimTurnoDao fimTurnoDao;
 	private UsuarioTurnoDao usuarioTurnoDao;
@@ -36,9 +35,8 @@ public class TurnoController {
 	private PessoaDao pessoaDao;
 
 	@Inject
-	public TurnoController(Result result, TurnoDao turnoDao, FimTurnoDao fimTurnoDao,
+	public TurnoController(TurnoDao turnoDao, FimTurnoDao fimTurnoDao,
 			UsuarioTurnoDao usuarioTurnoDao, UsuarioDao usuarioDao, PessoaDao pessoaDao) {
-		this.result = result;
 		this.turnoDao = turnoDao;
 		this.fimTurnoDao = fimTurnoDao;
 		this.usuarioTurnoDao = usuarioTurnoDao;
@@ -47,7 +45,7 @@ public class TurnoController {
 	}
 
 	public TurnoController() {
-		this(null, null, null, null, null, null);
+		this(null, null, null, null, null);
 	}
 
 	/*
@@ -97,8 +95,11 @@ public class TurnoController {
 			FimTurno fimTurno = new FimTurno();
 			fimTurno.setIdTur(id);
 			fimTurno.setRegistro(LocalDate.now());
-			fimTurnoDao.inserir(fimTurno);
-			turnoDao.atualizar(turno);
+			boolean inserir = fimTurnoDao.inserir(fimTurno);
+			boolean atualizar = turnoDao.atualizar(turno);
+			if (atualizar || inserir) {
+				registrarLog(FlagsLogAcao.REMOVER_TURNO.getCodigo(), String.valueOf(id));
+			}
 		}else{
 			mensagemSistema.setMensagem("Erro: ID inválido");
 		}
@@ -128,6 +129,8 @@ public class TurnoController {
 				if (!usuarioTurnoDao.inserir(turno)) {
 					mensagemSistema.setMensagem("Erro: Cadastro!");
 					
+				}else{
+					registrarLog(FlagsLogAcao.CADASTRAR_USUARIO_TURNO.getCodigo(), turno.toString());
 				}
 			}else{
 				mensagemSistema.setMensagem("Erro: Login de Usuário Inválido!");
@@ -140,9 +143,6 @@ public class TurnoController {
 	public void postar(Turno turno, String horaInicio, String horaFim) {
 		MensagemSistema mensagemSistema = new MensagemSistema("Sucesso!");
 
-		System.out.println(horaInicio);
-		System.out.println(horaFim);
-		System.out.println(turno.getPeriodo());
 		if (turno.getPeriodo() != 0) {
 			criarTurno(turno, horaInicio, horaFim, mensagemSistema);
 		}else{
@@ -163,6 +163,9 @@ public class TurnoController {
 			turno.setRegistro(LocalDate.now());
 			if(!turnoDao.inserir(turno)){
 				mensagemSistema.setMensagem("Erro: Cadastro!");
+			}else{
+				int idTur = turnoDao.listarUltimo();
+				registrarLog(FlagsLogAcao.CADASTRAR_TURNO.getCodigo(), String.valueOf(idTur));
 			};
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

@@ -12,6 +12,7 @@ public class TurnoDao extends PersistenceJDBC<Turno> {
 	private static String SQL_LISTAR = "SELECT * FROM turno WHERE ATIVO_TUR = ?";
 	private static String SQL_ID = "SELECT * FROM turno WHERE ID_TUR = ?";
 	private static String SQL_PERIODO = "SELECT * FROM turno WHERE PERIODO_TUR = ? AND ATIVO_TUR = TRUE";
+	private static String SQL_ULTIMO = "SELECT ID_TUR FROM turno ORDER BY ID_TUR DESC LIMIT 1";
 	public TurnoDao() {
 	}
 
@@ -28,5 +29,8 @@ public class TurnoDao extends PersistenceJDBC<Turno> {
 	}
 	public List<Turno> listarPeriodo(int periodo) {
 		return super.consultarLista(SQL_PERIODO, periodo);
+	}
+	public int listarUltimo(){
+		return (int)consultarParametros(SQL_ULTIMO);
 	}
 }

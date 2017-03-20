@@ -326,8 +326,10 @@ var adicionarUsuariosLista = function(){
 	});
 }
 $(document).ready(function(){
+	carregando();
 	$.when(listarUsuarios()).done(function(){
-		preencherTabela()
+		preencherTabela();
+		carregar();
 	});
 });
 </script>

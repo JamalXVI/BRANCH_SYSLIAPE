@@ -12,12 +12,11 @@ import javax.validation.Valid;
 import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.view.Results;
+import br.com.liape.sistemaGerenciamento.constantes.FlagsLogAcao;
 import br.com.liape.sistemaGerenciamento.dao.ComputadorDao;
 import br.com.liape.sistemaGerenciamento.dao.GrupoDao;
 import br.com.liape.sistemaGerenciamento.dao.GrupoPermissaoDao;
-import br.com.liape.sistemaGerenciamento.dao.LogAcaoDao;
 import br.com.liape.sistemaGerenciamento.dao.OrdemServicoComputadorDao;
 import br.com.liape.sistemaGerenciamento.dao.OrdemServicoDao;
 import br.com.liape.sistemaGerenciamento.dao.OrdemServicoSalaDao;
@@ -31,7 +30,6 @@ import br.com.liape.sistemaGerenciamento.dao.UsuarioTurnoDao;
 import br.com.liape.sistemaGerenciamento.model.Computador;
 import br.com.liape.sistemaGerenciamento.model.Grupo;
 import br.com.liape.sistemaGerenciamento.model.GrupoPermissao;
-import br.com.liape.sistemaGerenciamento.model.LogAcao;
 import br.com.liape.sistemaGerenciamento.model.OrdemServico;
 import br.com.liape.sistemaGerenciamento.model.OrdemServicoComputador;
 import br.com.liape.sistemaGerenciamento.model.OrdemServicoSala;
@@ -46,22 +44,20 @@ import br.com.liape.sistemaGerenciamento.modelView.EditarOrdemView;
 import br.com.liape.sistemaGerenciamento.modelView.NovaOrdem;
 import br.com.liape.sistemaGerenciamento.modelView.NovaOrdemRedirecionada;
 import br.com.liape.sistemaGerenciamento.modelView.SubOrdemView;
+import br.com.liape.sistemaGerenciamento.modelView.VisualizarSubOrdem;
 import br.com.liape.sistemaGerenciamento.outros.Conversor;
 import br.com.liape.sistemaGerenciamento.outros.MensagemSistema;
 import br.com.liape.sistemaGerenciamento.seguranca.NivelPermissao;
-import br.com.liape.sistemaGerenciamento.seguranca.UsuarioLogado;
 
 @Controller
-public class OrdemServicoController {
+public class OrdemServicoController extends AbstractController {
 
-	private Result result;
 	private OrdemServicoDao ordemServicoDao;
 	private SubOrdemDao subOrdemDao;
 	private SalaDao salaDao;
 	private ComputadorDao computadorDao;
 	private OrdemServicoComputadorDao ordemServicoComputadorDao;
 	private OrdemServicoSalaDao ordemServicoSalaDao;
-	private UsuarioLogado usuarioLogado;
 	private SubOrdemTurnoDao subOrdemTurnoDao;
 	private SubOrdemUsuarioDao subOrdemUsuarioDao;
 	private TurnoDao turnoDao;
@@ -69,23 +65,19 @@ public class OrdemServicoController {
 	private UsuarioTurnoDao usuarioTurnoDao;
 	private GrupoDao grupoDao;
 	private GrupoPermissaoDao grupoPermissaoDao;
-	private LogAcaoDao logAcaoDao;
 
 	@Inject
-	public OrdemServicoController(Result result, OrdemServicoDao ordemServicoDao, SubOrdemDao subOrdemDao,
+	public OrdemServicoController(OrdemServicoDao ordemServicoDao, SubOrdemDao subOrdemDao,
 			SalaDao salaDao, ComputadorDao computadorDao, OrdemServicoComputadorDao ordemServicoComputadorDao,
-			OrdemServicoSalaDao ordemServicoSalaDao, UsuarioLogado usuarioLogado, SubOrdemTurnoDao subOrdemTurnoDao,
+			OrdemServicoSalaDao ordemServicoSalaDao, SubOrdemTurnoDao subOrdemTurnoDao,
 			SubOrdemUsuarioDao subOrdemUsuarioDao, TurnoDao turnoDao, SubOrdemVisualizadaDao ordemVisualizadaDao,
-			UsuarioTurnoDao usuarioTurnoDao, GrupoDao grupoDao, GrupoPermissaoDao grupoPermissaoDao,
-			LogAcaoDao logAcaoDao) {
-		this.result = result;
+			UsuarioTurnoDao usuarioTurnoDao, GrupoDao grupoDao, GrupoPermissaoDao grupoPermissaoDao) {
 		this.ordemServicoDao = ordemServicoDao;
 		this.subOrdemDao = subOrdemDao;
 		this.salaDao = salaDao;
 		this.computadorDao = computadorDao;
 		this.ordemServicoComputadorDao = ordemServicoComputadorDao;
 		this.ordemServicoSalaDao = ordemServicoSalaDao;
-		this.usuarioLogado = usuarioLogado;
 		this.subOrdemTurnoDao = subOrdemTurnoDao;
 		this.subOrdemUsuarioDao = subOrdemUsuarioDao;
 		this.turnoDao = turnoDao;
@@ -93,11 +85,10 @@ public class OrdemServicoController {
 		this.usuarioTurnoDao = usuarioTurnoDao;
 		this.grupoDao = grupoDao;
 		this.grupoPermissaoDao = grupoPermissaoDao;
-		this.logAcaoDao = logAcaoDao;
 	}
 
 	public OrdemServicoController() {
-		this(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+		this(null, null, null, null, null, null, null, null, null, null, null, null, null);
 	}
 
 	// CADASTRAR NOVA ORDEM DE SERVIÇO
@@ -114,7 +105,8 @@ public class OrdemServicoController {
 	// LISTAR TODAS AS ORDEMS ATIVAS E NÃO EXECUTAS E SERIALIZAR EM JSON
 	@Post("/Listar/Ordem/")
 	public void listar() {
-		result.use(Results.json()).withoutRoot().from(ordemServicoDao.listarExecucao(false)).serialize();
+		result.use(Results.json()).withoutRoot().from(ordemServicoDao.listarExecucao(false))
+		.exclude("descricao").serialize();
 
 	}
 
@@ -142,7 +134,6 @@ public class OrdemServicoController {
 			subOrdemView.setDataGerada(Conversor.converterLocalDateTimeParaTimeStamp(subOrdem.getDataGerada()));
 			subOrdemView.setDataParaSerExecutada(
 					Conversor.converterLocalDateTimeParaTimeStamp(subOrdem.getDataParaSerExecutada()));
-			subOrdemView.setJustificativa(subOrdem.getJustificativa());
 			subOrdemView.setLoginUsr(subOrdem.getLogin());
 			view.add(subOrdemView);
 		}
@@ -246,6 +237,7 @@ public class OrdemServicoController {
 	public void excluir(int idOrs) {
 		MensagemSistema sistema = new MensagemSistema("");
 		if (excluirOrdemServico(idOrs)) {
+			registrarLog(FlagsLogAcao.REMOVER_ORDEM.getCodigo(), String.valueOf(idOrs));
 			sistema.setMensagem("Sucesso ao Excluir Ordem de Serviço!");
 
 		} else {
@@ -295,9 +287,27 @@ public class OrdemServicoController {
 			SubOrdemVisualizada subOrdemVisualizada = new SubOrdemVisualizada();
 			subOrdemVisualizada.setIdSor(idSor);
 			subOrdemVisualizada.setLoginUsr(usuarioLogado.getUsuario().getLogin());
-			ordemVisualizadaDao.inserir(subOrdemVisualizada);
+			boolean inserir = ordemVisualizadaDao.inserir(subOrdemVisualizada);
+			if (inserir) {
+				registrarLog(FlagsLogAcao.VISUALIZAR_SUBORDEM.getCodigo(), String.valueOf(idSor));
+			}
+			
+			
 		}
-		result.use(Results.json()).withoutRoot().from(msg).serialize();
+		List<SubOrdem> listarIdSub = subOrdemDao.listarIdSub(idSor);
+		if (listarIdSub.size() > 0) {
+			SubOrdem subOrdem = listarIdSub.get(0);
+			OrdemServico ordemServico = ordemServicoDao.listarId(subOrdem.getIdOrs()).get(0);
+			VisualizarSubOrdem visualizarSubOrdem = new VisualizarSubOrdem();
+			visualizarSubOrdem.setDescricao(ordemServico.getDescricao());
+			visualizarSubOrdem.setJustificativa(subOrdem.getJustificativa());
+			visualizarSubOrdem.setLogin(subOrdem.getLogin());
+			result.include("ordem", visualizarSubOrdem);
+			
+		}else{
+			result.redirectTo(ErrosController.class).erro_operacao();
+		}
+		
 	}
 
 	/*
@@ -443,6 +453,9 @@ public class OrdemServicoController {
 		ordemServicoSala.setIdOrs(idOrdemServico);
 		ordemServicoSala.setIdSala(ordem.getIdTipo());
 		inserir = ordemServicoSalaDao.inserir(ordemServicoSala);
+		if (inserir) {
+			registrarLog(FlagsLogAcao.CADASTRAR_ORDEM_SALA.getCodigo(), String.valueOf(idOrdemServico));
+		}
 		return inserir;
 	}
 
@@ -455,6 +468,9 @@ public class OrdemServicoController {
 		ordemServicoComputador.setIdSala(ordem.getIdTipo());
 		ordemServicoComputador.setNumeroPc(ordem.getIdComputador());
 		inserir = ordemServicoComputadorDao.inserir(ordemServicoComputador);
+		if (inserir) {
+			registrarLog(FlagsLogAcao.CADASTRAR_ORDEM_COMPUTADOR.getCodigo(), String.valueOf(idOrdemServico));
+		}
 		return inserir;
 	}
 
@@ -477,6 +493,7 @@ public class OrdemServicoController {
 					inserir = inserirSubOrdemTurno(ordem, idSubOrdem);
 				} else {
 					inserir = inserirSubOrdemUsuario(ordem, idSubOrdem);
+					
 				}
 				if (inserir) {
 					result.redirectTo(HomeController.class).index();
@@ -498,6 +515,9 @@ public class OrdemServicoController {
 		subOrdemUsuario.setIdSor(idSubOrdem);
 		subOrdemUsuario.setLoginUsr(ordem.getIdDestino());
 		inserir = subOrdemUsuarioDao.inserir(subOrdemUsuario);
+		if (inserir) {
+			registrarLog(FlagsLogAcao.CADASTRAR_SUBORDEM_USUARIO.getCodigo(), String.valueOf(idSubOrdem));
+		}
 		return inserir;
 	}
 
@@ -510,6 +530,9 @@ public class OrdemServicoController {
 		if (listarPeriodo.size() > 0) {
 			subOrdemTurno.setIdTur(listarPeriodo.get(0).getId());
 			inserir = subOrdemTurnoDao.inserir(subOrdemTurno);
+			if (inserir) {
+				registrarLog(FlagsLogAcao.CADASTRAR_SUBORDEM_TURNO.getCodigo(), String.valueOf(idSubOrdem));
+			}
 		} else {
 			inserir = false;
 		}
@@ -572,6 +595,7 @@ public class OrdemServicoController {
 		ordemServico.setAtivo(true);
 		ordemServico.setExecutada(true);
 		if (ordemServicoDao.atualizar(ordemServico) && subOrdemDao.atualizar(subOrdem)) {
+			registrarLog(FlagsLogAcao.FINAlIZAR_ORDEM.getCodigo(), String.valueOf(ordemServico.getId()));
 			sistema.setMensagem("Sucesso ao Excluir Ordem de Serviço!");
 
 		} else {
@@ -632,7 +656,12 @@ public class OrdemServicoController {
 		SubOrdem subOrdem = subOrdemDao.listarIdSub(redirecionada.getIdSubOrsAntiga()).get(0);
 		if (usuarioAutorizadoRepassar(subOrdem)) {
 			subOrdem.setDataExecutada(LocalDateTime.now());
-			return subOrdemDao.atualizar(subOrdem);
+			
+			boolean atualizar = subOrdemDao.atualizar(subOrdem);
+			if (atualizar) {
+				registrarLog(FlagsLogAcao.FINALIZAR_SUBORDEM.getCodigo(), String.valueOf(subOrdem.getId()));
+			}
+			return atualizar;
 		}
 		return false;
 

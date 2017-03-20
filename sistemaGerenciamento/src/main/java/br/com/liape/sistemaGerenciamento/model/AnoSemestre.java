@@ -8,25 +8,23 @@ import br.com.unaerp.jdbc.anotation.Coluna;
 import br.com.unaerp.jdbc.anotation.Date;
 import br.com.unaerp.jdbc.anotation.Tabela;
 
-@Tabela(nome="anosemestre")
+@Tabela(nome = "anosemestre")
 public class AnoSemestre implements Serializable {
 	private static final long serialVersionUID = 1L;
-	@Coluna(nome="ANO_ANS")
+	@Coluna(nome = "ANO_ANS")
 	@Chave
 	private int ano;
 	@Chave
-	@Coluna(nome="SEMESTRE_ANS")
+	@Coluna(nome = "SEMESTRE_ANS")
 	private int semestre;
 	@Date
-	@Coluna(nome="DATAINI_ANS")
+	@Coluna(nome = "DATAINI_ANS")
 	private LocalDate DataIni;
 	@Date
-	@Coluna(nome="DATAFIM_ANS")
+	@Coluna(nome = "DATAFIM_ANS")
 	private LocalDate DataFim;
-	@Coluna(nome="ATIVO_ANS")
+	@Coluna(nome = "ATIVO_ANS")
 	private boolean ativo;
-	
-	
 
 	public boolean isAtivo() {
 		return ativo;
@@ -68,4 +66,8 @@ public class AnoSemestre implements Serializable {
 		DataFim = dataFim;
 	}
 
+	@Override
+	public String toString() {
+		return this.getAno() + "/" + this.getSemestre();
+	}
 }

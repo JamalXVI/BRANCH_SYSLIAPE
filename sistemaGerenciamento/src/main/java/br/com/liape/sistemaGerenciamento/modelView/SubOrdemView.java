@@ -13,7 +13,6 @@ public class SubOrdemView implements Serializable {
 	private String login;
 	private Timestamp dataGerada;
 	private Timestamp dataParaSerExecutada;
-	private String justificativa;
 	private String loginUsr;
 	
 
@@ -23,14 +22,6 @@ public class SubOrdemView implements Serializable {
 
 	public void setLoginUsr(String loginUsr) {
 		this.loginUsr = loginUsr;
-	}
-
-	public String getJustificativa() {
-		return justificativa;
-	}
-
-	public void setJustificativa(String justificativa) {
-		this.justificativa = justificativa;
 	}
 
 	public int getId() {

@@ -7,37 +7,28 @@ import javax.validation.Valid;
 
 import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Post;
-import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.validator.Validator;
 import br.com.caelum.vraptor.view.Results;
+import br.com.liape.sistemaGerenciamento.constantes.FlagsLogAcao;
 import br.com.liape.sistemaGerenciamento.dao.GrupoDao;
 import br.com.liape.sistemaGerenciamento.dao.GrupoPermissaoDao;
 import br.com.liape.sistemaGerenciamento.model.Grupo;
 import br.com.liape.sistemaGerenciamento.model.GrupoPermissao;
 import br.com.liape.sistemaGerenciamento.model.Permissao;
 import br.com.liape.sistemaGerenciamento.seguranca.NivelPermissao;
-import br.com.liape.sistemaGerenciamento.seguranca.UsuarioLogado;
 
 @Controller
-public class GrupoController {
-	private Validator validator;
+public class GrupoController extends AbstractController {
 	private GrupoDao grupoDAO;
-	private Result result;
 	private GrupoPermissaoDao grupoPermissaoDao;
-	private UsuarioLogado usr;
 
 	@Inject
-	public GrupoController(Validator validator, GrupoDao grupoDAO,
-			GrupoPermissaoDao grupoPermissaoDao, Result result, UsuarioLogado usr) {
-		this.validator = validator;
+	public GrupoController(GrupoDao grupoDAO, GrupoPermissaoDao grupoPermissaoDao) {
 		this.grupoDAO = grupoDAO;
 		this.grupoPermissaoDao = grupoPermissaoDao;
-		this.result = result;
-		this.usr = usr;
 	}
 
 	public GrupoController() {
-		this(null, null, null, null, null);
+		this(null, null);
 	}
 
 	/*
@@ -62,6 +53,7 @@ public class GrupoController {
 			boolean inserir = grupoDAO.inserir(grupo);
 			if (inserir) {
 				int idGrp = grupoDAO.ultimoId();
+				registrarLog(FlagsLogAcao.CADASTRAR_GRUPO.getCodigo(), String.valueOf(idGrp));
 
 				grupo.setId(idGrp);
 				inserirPermissoes(grupo, permissoes);
@@ -69,6 +61,7 @@ public class GrupoController {
 		}else{
 			boolean atualizar = grupoDAO.atualizar(grupo);
 			if (atualizar) {
+				registrarLog(FlagsLogAcao.ATUALIZAR_GRUPO.getCodigo(), String.valueOf(grupo.getId()));
 				removerPermissoes(grupo);
 				inserirPermissoes(grupo, permissoes);
 			}
@@ -91,15 +84,16 @@ public class GrupoController {
 	}
 	private boolean verificarSeAdministrador()
 	{
-		for (Permissao permissao : usr.pegarAutorizacao()) {
+		for (Permissao permissao : usuarioLogado.pegarAutorizacao()) {
 			if (permissao.getId() == 1) {
 				return true;
 			}
 		}
 		return false;
 	}
-	private void removerPermissoes(Grupo grupo) {
+	private boolean removerPermissoes(Grupo grupo) {
 		boolean deletar = grupoPermissaoDao.deletar(grupo.getId());
+		return deletar;
 	}
 
 }

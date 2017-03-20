@@ -13,8 +13,8 @@ import javax.validation.Valid;
 import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.view.Results;
+import br.com.liape.sistemaGerenciamento.constantes.FlagsLogAcao;
 import br.com.liape.sistemaGerenciamento.dao.AnoSemestreDao;
 import br.com.liape.sistemaGerenciamento.dao.ExporadicaDao;
 import br.com.liape.sistemaGerenciamento.dao.ReservaDao;
@@ -28,30 +28,25 @@ import br.com.liape.sistemaGerenciamento.modelView.TodasDaReserva;
 import br.com.liape.sistemaGerenciamento.outros.Conversor;
 import br.com.liape.sistemaGerenciamento.outros.MensagemSistema;
 import br.com.liape.sistemaGerenciamento.seguranca.NivelPermissao;
-import br.com.liape.sistemaGerenciamento.seguranca.UsuarioLogado;
 
 @Controller
-public class ReservasController {
-	private Result result;
+public class ReservasController  extends AbstractController{
 	private ReservaDao reservaDao;
 	private SemestralDao semestralDao;
 	private ExporadicaDao exporadicoDao;
-	private UsuarioLogado usuarioLogado;
 	private AnoSemestreDao anoSemestreDao;
 
 	@Inject
-	public ReservasController(Result result, ReservaDao reservaDao, SemestralDao semestralDao,
-			ExporadicaDao exporadicoDao, UsuarioLogado usuarioLogado, AnoSemestreDao anoSemestreDao) {
-		this.result = result;
+	public ReservasController(ReservaDao reservaDao, SemestralDao semestralDao,
+			ExporadicaDao exporadicoDao, AnoSemestreDao anoSemestreDao) {
 		this.reservaDao = reservaDao;
 		this.semestralDao = semestralDao;
 		this.exporadicoDao = exporadicoDao;
-		this.usuarioLogado = usuarioLogado;
 		this.anoSemestreDao = anoSemestreDao;
 	}
 
 	public ReservasController() {
-		this(null, null, null, null, null, null);
+		this(null, null, null, null);
 	}
 
 	/*
@@ -367,9 +362,12 @@ public class ReservasController {
 					exporadico.setAtivo(true);
 					if (exporadicoDao.verSeExite(exporadico.getIdRes(), exporadico.getData(),
 							exporadico.getHoraInicio(), exporadico.getHoraFim()).size() > 0) {
+						
 						exporadicoDao.atualizar(exporadico);
+						registrarLog(FlagsLogAcao.ATUALIZAR_EXPORADICO.getCodigo(), exporadico.toString());
 					} else {
 						exporadicoDao.inserir(exporadico);
+						registrarLog(FlagsLogAcao.CADASTRAR_EXPORADICO.getCodigo(), exporadico.toString());
 					}
 
 				} else {
@@ -381,7 +379,11 @@ public class ReservasController {
 					semestral.setIdRes(reserva.getId());
 					semestral.setIdSal(tipoReserva.getIdSala());
 					semestral.setAtivo(true);
-					semestralDao.inserir(semestral);
+					if (semestralDao.inserir(semestral)) {
+						mensagemSistema = new MensagemSistema("Erro: ao Cadastrar Reserva!");
+						int idSem = semestralDao.listarUltimo();
+						registrarLog(FlagsLogAcao.CADASTRAR_SEMESTRAL.getCodigo(), String.valueOf(idSem));
+					}
 				}
 			}
 			mensagemSistema = new MensagemSistema("Sucesso!");
@@ -424,6 +426,7 @@ public class ReservasController {
 		exporadico.setAtivo(false);
 		if (exporadicoDao.atualizar(exporadico)) {
 			msg = new MensagemSistema("Sucesso!");
+			registrarLog(FlagsLogAcao.REMOVER_EXPORADICO.getCodigo(), exporadico.toString());
 		} else {
 			msg = new MensagemSistema("Erro!");
 		}
@@ -443,6 +446,7 @@ public class ReservasController {
 		semestral.setAtivo(false);
 		if (semestralDao.atualizar(semestral)) {
 			msg = new MensagemSistema("Sucesso!");
+			registrarLog(FlagsLogAcao.REMOVER_SEMESTRAL.getCodigo(), String.valueOf(semestral.getId()));
 		} else {
 			msg = new MensagemSistema("Erro!");
 		}

@@ -7,9 +7,8 @@ import javax.inject.Inject;
 import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
-import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.validator.Validator;
 import br.com.caelum.vraptor.view.Results;
+import br.com.liape.sistemaGerenciamento.constantes.FlagsLogAcao;
 import br.com.liape.sistemaGerenciamento.dao.EscalaDao;
 import br.com.liape.sistemaGerenciamento.dao.UsuarioEscalaDao;
 import br.com.liape.sistemaGerenciamento.model.Escala;
@@ -20,23 +19,19 @@ import br.com.liape.sistemaGerenciamento.outros.MensagemSistema;
 import br.com.liape.sistemaGerenciamento.seguranca.NivelPermissao;
 
 @Controller
-public class EscalaController {
-	private Validator validator;
-	private Result result;
+public class EscalaController extends AbstractController{
 	private UsuarioEscalaDao usuarioEscalaDao;
 	private EscalaDao escalaDao;
 
 	@Inject
-	public EscalaController(Validator validator, Result result, EscalaDao escalaDao,
+	public EscalaController(EscalaDao escalaDao,
 			UsuarioEscalaDao usuarioEscalaDao) {
-		this.validator = validator;
-		this.result = result;
 		this.escalaDao = escalaDao;
 		this.usuarioEscalaDao = usuarioEscalaDao;
 	}
 
 	public EscalaController() {
-		this(null, null, null, null);
+		this(null, null);
 	}
 	@Path("/Escala/")
 	public void index(){
@@ -83,6 +78,7 @@ public class EscalaController {
 		if (escalaEnv.getId() == 0) {
 			boolean inserir = escalaDao.inserir(escala);
 			if (inserir) {
+				
 				inserirUsuarioEscala(escalaEnv, mensagemSistema);
 			}else{
 			}
@@ -99,6 +95,7 @@ public class EscalaController {
 	private void atualizarUsuarioEscala(EnviarEscala escalaEnv, MensagemSistema mensagemSistema) {
 		usuarioEscalaDao.deletar_id(escalaEnv.getId());
 		int id = escalaEnv.getId();
+		registrarLog(FlagsLogAcao.ATUALIZAR_ESCALA.getCodigo(), String.valueOf(id));
 		for (String usuario : escalaEnv.getUsuarios()) {
 			UsuarioEscala usuarioEscala = new UsuarioEscala();
 			usuarioEscala.setIdEsc(id);
@@ -109,6 +106,7 @@ public class EscalaController {
 	}
 	private void inserirUsuarioEscala(EnviarEscala escalaEnv, MensagemSistema mensagemSistema) {
 		int id = escalaDao.listarUltimo();
+		registrarLog(FlagsLogAcao.CADASTRAR_ESCALA.getCodigo(), String.valueOf(id));
 		for (String usuario : escalaEnv.getUsuarios()) {
 			UsuarioEscala usuarioEscala = new UsuarioEscala();
 			usuarioEscala.setIdEsc(id);
@@ -126,6 +124,7 @@ public class EscalaController {
 			Escala escala = escalas.get(0);
 			escala.setAtivo(false);
 			escalaDao.atualizar(escala);
+			registrarLog(FlagsLogAcao.REMOVER_ESCALA.getCodigo(), String.valueOf(escala.getId()));
 			mensagemSistema.setMensagem("Sucesso!");
 		}
 		result.use(Results.json()).withoutRoot().from(mensagemSistema).serialize();

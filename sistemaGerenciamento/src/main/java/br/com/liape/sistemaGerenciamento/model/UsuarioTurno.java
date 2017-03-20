@@ -30,5 +30,8 @@ public class UsuarioTurno implements Serializable{
 	public void setLoginUsr(String loginUsr) {
 		this.loginUsr = loginUsr;
 	}
-	
+	@Override
+	public String toString() {
+		return String.valueOf(getIdTur()) + " / " + getLoginUsr();
+	}
 }

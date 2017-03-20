@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.validator.SimpleMessage;
 import br.com.caelum.vraptor.validator.Validator;
 import br.com.liape.sistemaGerenciamento.dao.GrupoDao;
@@ -23,13 +22,10 @@ import br.com.liape.sistemaGerenciamento.model.Login;
 import br.com.liape.sistemaGerenciamento.model.Permissao;
 import br.com.liape.sistemaGerenciamento.model.Usuario;
 import br.com.liape.sistemaGerenciamento.seguranca.LoginFuncionario;
-import br.com.liape.sistemaGerenciamento.seguranca.UsuarioLogado;
 
 @Controller
-public class LoginController {
+public class LoginController extends AbstractController{
 
-	private UsuarioLogado usuarioLogado;
-	private Result result;
 	private Validator validator;
 	private UsuarioDao usuarioDao;
 	private LogLoginDao logLoginDao;
@@ -39,11 +35,9 @@ public class LoginController {
 	private PermissaoDao permissaoDao;
 
 	@Inject
-	public LoginController(UsuarioLogado usuarioLogado, Result result, Validator validator, UsuarioDao usuarioDao,
+	public LoginController(Validator validator, UsuarioDao usuarioDao,
 			LogLoginDao logLoginDao, PessoaDao pessoaDao, GrupoDao grupoDao,
 			GrupoPermissaoDao grupoPermissaoDao, PermissaoDao permissaoDao) {
-		this.usuarioLogado = usuarioLogado;
-		this.result = result;
 		this.validator = validator;
 		this.usuarioDao = usuarioDao;
 		this.logLoginDao = logLoginDao;
@@ -54,7 +48,7 @@ public class LoginController {
 	}
 
 	public LoginController() {
-		this(null, null, null, null, null, null, null, null,null);
+		this(null, null, null, null, null, null, null);
 	}
 
 	/*

@@ -2,7 +2,7 @@
 <a href="#" class="dropdown-toggle"
 	style="padding-top: 0px; padding-bottom: 0px;"
 					data-toggle="dropdown">
-	<form action="${linkTo[FotoPerfilController].postar(null, null) }"
+	<form action="${linkTo[FotoPerfilController].postar(null) }"
 		method="post" id="fotoPerfilForm" enctype="multipart/form-data"
 		class="form_imagem_perfil">
 		<div class="image-upload">
@@ -13,8 +13,6 @@
 
 			</label> <input id="file" name="foto" type="file" />
 		</div>
-		<input type="hidden" name="idPessoa"
-			value="${usuarioLogado.usuario.pessoa.id }" />
 	</form> <label class="my-profile-label">${usuarioLogado.usuario.pessoa.nome}
 </label> <b class="caret"></b>
 </a>

@@ -25,7 +25,7 @@ body {
 <c:import url="../menuSuperior.jsp"></c:import>
 <div class="col-lg-12">
 		<h1 class="page-header" style="margin-top: 0px;">
-			Controle <small>Usuário</small>
+			Controle <small>Professor</small>
 		</h1>
 		<ol class="breadcrumb">
 			<li><a href="${linkTo[HomeController].index()}">Página Inicial</a></li>
@@ -169,20 +169,23 @@ var mudarPagina = function(k){
 	});
 	return false;
 }
+var criarTextoAcao = function(funcao, icone, id) {
+	return "<a href='' style='margin-left:10px;' onclick='return "
+			+ funcao + "(\"" + id
+			+ "\")'><i class='fa fa-2x "+icone+"'></i></a>";
+}
 var adicionarProfessorTabela = function(professor, i){
 	var telefone = "--- Não Possuí ---";
 	if (professor.pessoa.telefones.length > 0) {
 		var tel = professor.pessoa.telefones[0];
 		telefone = "("+tel.ddd+")"+tel.numero+" - Op:"+tel.operadora;	
 	};
+	
 	var acoesProfessores = "";
 	//Verificar se Tem permissão, caso sim, adicionar ações
 	if (temPermissao) {
-		acoesProfessores = "<a href='' onclick='return editarProfessor(\""+i+"\")'>"+
-		"<i class='permissao fa fa-2x fa-pencil-square espaco_direita'"
-		+" aria-hidden='true'></i><a href='' onclick='return "
-		+"excluirProfessor(\""+professor.codigo+"\")'>"+
-		"<i class='permissao fa fa-2x fa-minus-square espaco_direita' aria-hidden='true'></i>";
+		acoesProfessores = criarTextoAcao("editarProfessor", "fa fa-pencil", i)+
+		criarTextoAcao("excluirProfessor", "fa fa-trash", professor.codigo)
 	}
 	//Adicionar professor na tabela correta.
 	$("#corpotabelaListaProfessores").append("<tr><td><img id='fotoPerfilprofessor"
@@ -193,9 +196,7 @@ var adicionarProfessorTabela = function(professor, i){
 //				'my-table-label-body'
 			+"</td><td class='my-table-label-body'>"+telefone
 			+"</td><td style='display:none;' class='professoresis'>"+professor.codigo
-			+"</td><td class='my-table-label-body'>"+"<a href='' onclick='return"+
-			" verProfessor(\""+i+"\")'><i class='fa fa-2x fa-search"+
-			" espaco_direita permissao' aria-hidden='true'></i></a>"
+			+"</td><td class='my-table-label-body'>"+criarTextoAcao("verProfessor", "fa fa-search", i)
 			+acoesProfessores+"</td></tr>");
 	posicionarImagemFotoPerfil(professor);
 }

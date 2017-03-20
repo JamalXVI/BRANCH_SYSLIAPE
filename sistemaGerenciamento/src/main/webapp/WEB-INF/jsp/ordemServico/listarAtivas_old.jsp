@@ -40,9 +40,7 @@ rel="stylesheet">
 				</div>
 			</div>
 		</div>
-		<form action="${linkTo[OrdemServicoController].visualizar() }" method="post" id="formVisualizar">
-			<input type="hidden" name="idSor" id="visualizarOrdemId" />
-		</form>
+		
 	</div>
 </div>
 <c:import url="/WEB-INF/jsp/ordemServico_modal/modal_ver.jsp" />
@@ -267,22 +265,20 @@ rel="stylesheet">
 		});
 		var dataEsc = new Date(subOrdems[indice_ordem][0].dataParaSerExecutada);
 		var paraUsuario = false;
-		texto += adicionarZero(dataEsc.getDate())+"/"+adicionarZero(dataEsc.getMonth()+1)+
+		texto += adicionarZero(dataEsc.getDay())+"/"+adicionarZero(dataEsc.getMonth()+1)+
 		"/"+adicionarZero(dataEsc.getFullYear())+" "+
 		adicionarZero(dataEsc.getHours())+":"+adicionarZero(dataEsc.getMinutes())+"</td><td>";
 		if (subOrdemsTurno[indice_ordem].length > 0) {
 			$(turnos).each(function(indice_turno, turno){
 				if (turno.id == subOrdemsTurno[indice_ordem][0].idTur) {
-					texto += "Turno: <a href='' onclick='return detalhesOrdem(\""+indice_ordem+"\")'>"
-					+retornarTurno(turno.periodo)+"</a></td><td>";
+					texto += "Turno: "+retornarTurno(turno.periodo)+"</td><td>";
 				}
 			});
 		}else{
 			$(usuarios).each(function(indice_usuario, usuario){
 				if (usuario.login == subOrdemsUsuario[indice_ordem][0].loginUsr) {
 					paraUsuario = true;
-					texto += "Usuário: <a href='' onclick='return detalhesOrdem(\""+indice_ordem+"\")'>"
-					+usuario.pessoa.nome+" "+usuario.pessoa.sobrenome+"</a></td><td>";
+					texto += "Usuário: "+usuario.pessoa.nome+" "+usuario.pessoa.sobrenome+"</td><td>";
 				}
 			});
 		}
@@ -362,6 +358,7 @@ var verificarDataRepasse = function(dataHj, dataOr){
 	return false;
 };
 var editarOrdem = function(indice_ordem){
+	debugger;
 	var ordem = ordems[indice_ordem];
 	 $.redirectPost("${linkTo[OrdemServicoController].editarOrdem() }",
 				{"idOrs" : ordem.id});
@@ -389,16 +386,40 @@ $.extend(
 });
 var detalhesOrdem = function(indice_ordem)
 {
+	var ordem = ordems[indice_ordem];
 	var subOrdem = subOrdems[indice_ordem][0];
 	visualizarOrdem(subOrdem.id);
-	return false;;
-}
-
-var visualizarOrdem = function(idSor) {
-	$("#visualizarOrdemId").val(idSor);
-	$("#formVisualizar").submit();
+	$(usuarios).each(function(indice_usuario, usuario){
+		if (usuario.login == subOrdem.loginUsr) {
+			$("#pessoaRepasse").val(usuario.pessoa.nome+" "+usuario.pessoa.sobrenome);
+		}
+	});
+	if (ordem.descricao) {
+		$("#descricao").val(ordem.descricao);
+	}
+	if (subOrdem.justificativa) {
+		$("#justificativa").val(subOrdem.justificativa);
+	}
+	$("#novoDetalhesOrdem").modal('show');
 	return false;
-};
+}
+var visualizarOrdem = function(id)
+{
+	var enviar = {"idSor" : id};
+	 return $.ajax({  
+		    type:"post",  
+		    url: "${linkTo[OrdemServicoController].visualizar() }",
+		    data: enviar,
+		    dataType: "json",  // Isso diz que você espera um JSON do servidor
+		    beforeSend: function(xhr, settings){},  
+		    success: function(data, textStatus, xhr){
+		    	
+		    },
+		    error: function(xhr, textStatus, errorThrown){
+		    	tratarErroAjax(xhr, textStatus, errorThrown);
+		    }
+		});
+}
 var excluirOrdem = function(indice_ordem){
 	$("#excluirOrdemId").val(ordems[indice_ordem].id)
 	$("#novoExcluirOrdem").modal('show');

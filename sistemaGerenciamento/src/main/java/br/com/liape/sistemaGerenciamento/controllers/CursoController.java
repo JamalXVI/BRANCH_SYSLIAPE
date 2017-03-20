@@ -11,13 +11,14 @@ import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.validator.Validator;
 import br.com.caelum.vraptor.view.Results;
+import br.com.liape.sistemaGerenciamento.constantes.FlagsLogAcao;
 import br.com.liape.sistemaGerenciamento.dao.CursoDao;
 import br.com.liape.sistemaGerenciamento.dao.DisciplinaDao;
 import br.com.liape.sistemaGerenciamento.model.Curso;
 import br.com.liape.sistemaGerenciamento.seguranca.NivelPermissao;
 
 @Controller
-public class CursoController {
+public class CursoController extends AbstractController {
 	private Validator validator;
 	private Result result;
 	private CursoDao cursoDao;
@@ -47,8 +48,8 @@ public class CursoController {
 	 */
 	@NivelPermissao(idPermissao=6)
 	public void postar(@Valid Curso curso) {
-		System.out.println(curso.getNome());
 		if (cursoDao.inserir(curso)) {
+			registrarLog(FlagsLogAcao.CADASTRAR_CURSO.getCodigo(), curso.getCodigo());
 			result.use(Results.json()).withoutRoot().from(cursoDao.listar()).serialize();
 		}
 		

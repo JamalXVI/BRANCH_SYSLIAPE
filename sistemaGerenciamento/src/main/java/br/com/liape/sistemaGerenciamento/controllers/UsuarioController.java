@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.swing.plaf.synth.SynthSplitPaneUI;
 import javax.validation.Valid;
 
 import org.hibernate.validator.constraints.NotEmpty;
@@ -14,18 +13,14 @@ import org.hibernate.validator.constraints.NotEmpty;
 import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.validator.Validator;
 import br.com.caelum.vraptor.view.Results;
-import br.com.liape.sistemaGerenciamento.dao.FotoPerfilDao;
+import br.com.liape.sistemaGerenciamento.constantes.FlagsLogAcao;
 import br.com.liape.sistemaGerenciamento.dao.GrupoDao;
-import br.com.liape.sistemaGerenciamento.dao.GrupoPermissaoDao;
-import br.com.liape.sistemaGerenciamento.dao.PermissaoDao;
 import br.com.liape.sistemaGerenciamento.dao.PessoaDao;
 import br.com.liape.sistemaGerenciamento.dao.TelefoneDao;
 import br.com.liape.sistemaGerenciamento.dao.UsuarioDao;
 import br.com.liape.sistemaGerenciamento.model.Grupo;
-import br.com.liape.sistemaGerenciamento.model.GrupoPermissao;
 import br.com.liape.sistemaGerenciamento.model.Permissao;
 import br.com.liape.sistemaGerenciamento.model.Pessoa;
 import br.com.liape.sistemaGerenciamento.model.Telefone;
@@ -33,42 +28,28 @@ import br.com.liape.sistemaGerenciamento.model.Usuario;
 import br.com.liape.sistemaGerenciamento.outros.Conversor;
 import br.com.liape.sistemaGerenciamento.outros.MensagemSistema;
 import br.com.liape.sistemaGerenciamento.seguranca.NivelPermissao;
-import br.com.liape.sistemaGerenciamento.seguranca.UsuarioLogado;
 
 @Controller
 @RequestScoped
-public class UsuarioController {
-	private Result resultado;
+public class UsuarioController extends AbstractController{
 	private Validator validator;
 	private PessoaDao pessoaDao;
 	private UsuarioDao usuarioDao;
 	private TelefoneDao telefoneDao;
-	private Result result;
 	private GrupoDao grupoDao;
-	private FotoPerfilDao fotoPerfilDao;
-	private GrupoPermissaoDao grupoPermissaoDao;
-	private UsuarioLogado usr;
-	private PermissaoDao permissaoDao;
 
 	@Inject
-	public UsuarioController(Result resultado, Validator validator, PessoaDao pessoaDao, UsuarioDao usuarioDao,
-			TelefoneDao telefoneDao, Result result, GrupoDao grupoDao, FotoPerfilDao fotoPerfilDao,
-			GrupoPermissaoDao grupoPermissaoDao, UsuarioLogado usr, PermissaoDao permissaoDao) {
-		this.resultado = resultado;
+	public UsuarioController(Validator validator, PessoaDao pessoaDao, UsuarioDao usuarioDao,
+			TelefoneDao telefoneDao, GrupoDao grupoDao) {
 		this.validator = validator;
 		this.pessoaDao = pessoaDao;
 		this.usuarioDao = usuarioDao;
 		this.telefoneDao = telefoneDao;
-		this.result = result;
 		this.grupoDao = grupoDao;
-		this.fotoPerfilDao = fotoPerfilDao;
-		this.grupoPermissaoDao = grupoPermissaoDao;
-		this.usr = usr;
-		this.permissaoDao = permissaoDao;
 	}
 
 	public UsuarioController() {
-		this(null, null, null, null, null, null, null, null, null, null, null);
+		this(null, null, null, null, null);
 	}
 
 	/*
@@ -79,7 +60,7 @@ public class UsuarioController {
 		if (usuario == null) {
 			usuario = new Usuario();
 		}
-		resultado.include(usuario);
+		result.include(usuario);
 	}
 
 	@Path("/Excluir/Usuario/") /*
@@ -96,7 +77,7 @@ public class UsuarioController {
 		if (verPermissoesIguais(usuario.getIdGrupo())) {
 			if (pessoaDao.atualizar(usuario.getPessoa())) {
 				sistema.setMensagem("Sucesso: ao Excluir Usuário!");
-
+				registrarLog(FlagsLogAcao.REMOVER_USUARIO.getCodigo(), usuario.getLogin());
 			} else {
 				sistema.setMensagem("Erro: ao Excluir Usuário!");
 			}
@@ -188,6 +169,7 @@ public class UsuarioController {
 			pessoaDao.atualizar(pessoa);
 			usuarioDao.atualizarGrupo(usuario.getIdGrupo(), usuario.getLogin());
 			cadastrar_telefone(telefones, pessoa.getId());
+			registrarLog(FlagsLogAcao.ATUALIZAR_USUARIO.getCodigo(), usuario.getLogin());
 			msg.setMensagem("Atualizado com Sucesso!");
 		} else {
 			msg.setMensagem("Erro: Privilégio Insuficiente para Excluir Usuário!");
@@ -196,7 +178,7 @@ public class UsuarioController {
 	}
 
 	private boolean verificarSePodeAtualizar() {
-		for (Permissao permissao2 : usr.pegarAutorizacao()) {
+		for (Permissao permissao2 : usuarioLogado.pegarAutorizacao()) {
 			if (permissao2.getId() == 1) {
 				return true;
 			}
@@ -213,6 +195,7 @@ public class UsuarioController {
 				usuario.setIdPes(pessoaDao.ultimoId());
 				usuarioDao.inserir(usuario);
 				cadastrar_telefone(telefones, usuario.getIdPes());
+				registrarLog(FlagsLogAcao.CADASTRAR_USUARIO.getCodigo(), usuario.getLogin());
 				msg.setMensagem("Cadastro Sucesso!");
 			} else {
 				msg.setMensagem("Erro: Cadastramento Incorreto!");
@@ -227,7 +210,7 @@ public class UsuarioController {
 		List<Grupo> listarPorId = grupoDao.listarPorId(idGrupo);
 		if (listarPorId.size() > 0) {
 			Grupo grupo = listarPorId.get(0);
-			Grupo grpUsr = grupoDao.listarPorId(usr.getUsuario().getIdGrupo()).get(0);
+			Grupo grpUsr = grupoDao.listarPorId(usuarioLogado.getUsuario().getIdGrupo()).get(0);
 			if (grupo.getHierarquia() >= grpUsr.getHierarquia()) {
 				return true;
 			}
@@ -288,7 +271,7 @@ public class UsuarioController {
 
 	@Path("/Perfil/Telefones")
 	public void listarTelefones() {
-		List<Telefone> telefones = telefoneDao.listarPorId(usr.getUsuario().getPessoa().getId());
+		List<Telefone> telefones = telefoneDao.listarPorId(usuarioLogado.getUsuario().getPessoa().getId());
 		result.use(Results.json()).withoutRoot().from(telefones).serialize();
 	}
 }
