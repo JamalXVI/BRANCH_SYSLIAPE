@@ -18,6 +18,6 @@
 </a>
 <ul class="dropdown-menu">
 	<li><a href="${linkTo[UsuarioController].perfil()}"><i class="fa fa-fw fa-user"></i> Perfil</a></li>
-<!-- 	<li class="divider"></li> -->
+	<li><a href="${linkTo[HomeController].menu()}"><i class="fa fa-fw fa-sort"></i> Editar Menu</a></li>
 	<li><a href="${linkTo[LoginController].deslogar()}"><i class="fa fa-fw fa-power-off"></i> Log Out</a></li>
 </ul>

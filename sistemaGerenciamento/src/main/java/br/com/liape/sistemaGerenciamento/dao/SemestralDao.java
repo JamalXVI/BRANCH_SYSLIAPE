@@ -15,6 +15,7 @@ public class SemestralDao extends PersistenceJDBC<Semestral> {
 	private static String SQL_LISTAR = "SELECT * FROM SEMESTRAL WHERE ATIVO_SEM = ?";
 	private static String SQL_LISTAR_ID_RES = "SELECT * FROM SEMESTRAL WHERE ID_RES = ? AND ATIVO_SEM = TRUE";
 	private static String SQL_LISTAR_ID_SEM = "SELECT * FROM SEMESTRAL WHERE ID_SEM = ? AND ATIVO_SEM = TRUE";
+	private static String SQL_LISTAR_ID_SEM_F = "SELECT * FROM SEMESTRAL WHERE ID_SEM = ? AND ATIVO_SEM = FALSE";
 	private static String SQL_LISTAR_HORA = "SELECT * FROM SEMESTRAL"
 			+ " WHERE (HORA_INICIO_SEM >= ? AND HORA_INICIO_SEM <= ? "
 			+ "AND ID_RES = ? AND ((DAYOFWEEK(?) + 5) % 7) = DIA_SEMANA_SEM AND ATIVO_SEM = TRUE)"
@@ -43,7 +44,9 @@ public class SemestralDao extends PersistenceJDBC<Semestral> {
 	public List<Semestral> listaIdSem(int idSem) {
 		return super.consultarLista(SQL_LISTAR_ID_SEM, idSem);
 	}
-
+	public List<Semestral> listaIdSemF(int idSem) {
+		return super.consultarLista(SQL_LISTAR_ID_SEM_F, idSem);
+	}
 	@Override
 	public List<Semestral> listar() {
 		return super.consultarLista(SQL_LISTAR, true);

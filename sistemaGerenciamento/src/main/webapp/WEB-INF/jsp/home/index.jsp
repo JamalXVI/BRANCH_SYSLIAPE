@@ -77,6 +77,9 @@
 <form action="${linkTo[MuralController].visualizar()}" method="POST" id="verMural">
 	<input type='hidden' name='idMur' id='idMurEnviar' />
 </form>
+<form action="${linkTo[OrdemServicoController].visualizar() }" method="post" id="formVisualizar">
+			<input type="hidden" name="idSor" id="visualizarOrdemId" />
+</form>
 <!-- Scripts Específicos e Importação do Rodapé -->
 <t:rodape>
 <script type="text/javascript">
@@ -158,13 +161,18 @@ var notificacaoOrdem = function(agora){
 		$(ordens).each(function(indice_ordem, ordem){
 			var texto = adicionarTextoDiferenca(ordem.dataParaSerExecutada, agora);
 			var link = "${linkTo[OrdemServicoController].listarAtivas()}";
-			$("#listaNotificacoes").append("<a href='"+link+"' class='list-group-item'> <i"+
-					" class='fa fa-file-text fa-fw'></i>Ordem de Serviço <span"+
+			$("#listaNotificacoes").append("<a href='' onclick='return visualizarOrdem(\""+ordem.id+"\")' "
+					+" class='list-group-item'> <i class='fa fa-file-text fa-fw'></i>Ordem de Serviço <span"+
 					" class='pull-right text-muted small'><em>"+texto+"</em> </span>"+
 				"</a>");
 		});
 	});
 }
+var visualizarOrdem = function(idSor) {
+	$("#visualizarOrdemId").val(idSor);
+	$("#formVisualizar").submit();
+	return false;
+};
 var adicionarTextoDiferenca = function(dataEsc, agora){
 	dia = dataEsc.split("T")[0];
 	hora = dataEsc.split("T")[1].split("-")[0];
@@ -232,7 +240,6 @@ var preencher_aniversariantes = function(){
 	});
 }
 $(document).ready(function(){
-	debugger;
 	preencher_aniversariantes();
 	adicionarProximas();
 	adicionarNotificacoes();

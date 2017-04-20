@@ -1,6 +1,7 @@
 package br.com.liape.sistemaGerenciamento.seguranca;
 
 import javax.inject.Inject;
+
 import br.com.caelum.vraptor.Accepts;
 import br.com.caelum.vraptor.AroundCall;
 import br.com.caelum.vraptor.Intercepts;
@@ -35,6 +36,7 @@ public class AutorizacaoInterceptor {
 
 		if (usuarioLogado.isLogado()) {
 			result.include(usuarioLogado);
+			result.include("menu", usuarioLogado.getMenuViews());
 			stack.next();
 		} else {
 			result.redirectTo(LoginController.class).form();

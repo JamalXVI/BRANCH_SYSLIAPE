@@ -18,6 +18,11 @@ rel="stylesheet">
 		<h1 class="page-header" style="margin-top: 0px;">
 			Nova <small>Ordem de Serviço</small>
 		</h1>
+		<ol class="breadcrumb">
+			<li><a href="${linkTo[HomeController].index()}">Página
+					Inicial</a></li>
+			<li class="active">Nova OS</li>
+		</ol>
 		<form action="${linkTo[OrdemServicoController].enviar(null) }"
 			method="post" id="formOrdemServico">
 			<div class="col-xs-12">

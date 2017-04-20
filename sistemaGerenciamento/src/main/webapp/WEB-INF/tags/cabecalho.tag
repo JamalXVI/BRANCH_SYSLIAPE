@@ -10,8 +10,7 @@
 
 <!-- Bootstrap Core CSS -->
 <!-- Bootstrap -->
-<link href="<c:url value='/assets/css/bootstrap.min.css' />"
-	rel="stylesheet">
+<link href="<c:url value='/assets/css/bootstrap.min.css' />" rel="stylesheet" />
 <!-- Font Awesome -->
 <link href="<c:url value='/assets/css/font-awesome.min.css' />"
 	rel="stylesheet">
@@ -24,6 +23,8 @@
 	rel="stylesheet">
 <!-- Custom Fonts -->
 <link href="<c:url value="/assets/css/site.css"/>" rel="stylesheet">
+<!-- Custom Fonts -->
+<link href="<c:url value="/assets/css/dropzone.css"/>" rel="stylesheet">
 
 
 <link href="<c:url value="/assets/css/sb-admin.css"/>" rel="stylesheet">
@@ -117,7 +118,9 @@ body.modal-open-noscroll {
     height: 60px;
     animation: spin 2s linear infinite;
 }
-
+.panel-footer{
+	padding: 0px 15px;
+}
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -139,7 +142,7 @@ body.modal-open-noscroll {
 	#logoLiape{
 		padding-top : 0px;
 		padding-bottom : 0px;
-		color: white !important;
+		color: black !important; /* white */
 	}
 	#linkSysliape:hover, #linkSysliape:visited, #linkSysliape{
 	color: inherit; /* blue colors for links too */

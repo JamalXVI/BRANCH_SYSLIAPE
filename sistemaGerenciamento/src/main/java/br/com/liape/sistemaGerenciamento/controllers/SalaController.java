@@ -1,5 +1,7 @@
 package br.com.liape.sistemaGerenciamento.controllers;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import br.com.caelum.vraptor.Controller;
@@ -36,14 +38,24 @@ public class SalaController extends AbstractController {
 	@NivelPermissao(idPermissao=9)
 	@Post("/Cadastro/Sala/")
 	public void postar(Sala sala) {
-		boolean inserir = salaDao.inserir(sala);
-		if (inserir) {
-			int idSal = salaDao.listarUltimo();
-			registrarLog(FlagsLogAcao.CADASTRAR_SALA.getCodigo(), String.valueOf(idSal));
-			result.use(Results.json()).withoutRoot().from(salaDao.listarNome()).serialize();
+		if (verificarSeJaTemCadastroSala(sala)) {
+			boolean inserir = salaDao.inserir(sala);
+			if (inserir) {
+				int idSal = salaDao.listarUltimo();
+				registrarLog(FlagsLogAcao.CADASTRAR_SALA.getCodigo(), String.valueOf(idSal));
+			}
 		}
+		result.use(Results.json()).withoutRoot().from(salaDao.listarNome()).serialize();
 	}
-
+	private boolean verificarSeJaTemCadastroSala(Sala sala){
+		List<Sala> listar = salaDao.listar();
+		for (Sala sala2 : listar) {
+			if (sala2.getNome().contains(sala.getNome())) {
+				return false;
+			}
+		}
+		return true;
+	}
 	/*
 	 * LISTA TODOS AS SALAS
 	 */

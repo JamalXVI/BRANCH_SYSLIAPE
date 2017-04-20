@@ -13,7 +13,15 @@
 <link href="<c:url value='/assets/css/select2.min.css' />"
 		rel="stylesheet">
 <!-- Seção Principal -->
-<div class="row" role="main">
+<div class="row col-xs-12" role="main">
+	<h1 class="page-header" style="margin-top: 0px;">
+			Cadastro <small>Active Directory</small>
+		</h1>
+		<ol class="breadcrumb">
+			<li><a href="${linkTo[HomeController].index()}">Página
+					Inicial</a></li>
+			<li class="active">Cadastro AD</li>
+		</ol>
 	<div class="col-xs-4">
 		<div class="input-group">
 			<span class="input-group-addon"><i class="fa fa-search"
@@ -189,6 +197,7 @@
 					},
 					success : function(data, textStatus, xhr) {
 						$("#novaMensagemSucesso").modal('show');
+						//registroVerificar($("#excluirUsuarioCodigo").val());
 					}, // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
 					error : function(xhr, textStatus, errorThrown) {
 						tratarErroAjax(xhr, textStatus, errorThrown);
@@ -207,6 +216,7 @@
 					beforeSend : function(xhr, settings) {
 					},
 					success : function(data, textStatus, xhr) {
+						registroDeletar($("#excluirUsuarioCodigo").val());
 					}, // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
 					error : function(xhr, textStatus, errorThrown) {
 						tratarErroAjax(xhr, textStatus, errorThrown);
@@ -271,6 +281,7 @@
 							dataType : "json", // Isso diz que você espera um JSON do servidor
 							data: enviar,
 							beforeSend : function(xhr, settings) {
+								registroResetarSenha($("#codRes").val());
 							},
 							success : function(data, textStatus, xhr) {
 							}, // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
@@ -289,12 +300,80 @@
 							beforeSend : function(xhr, settings) {
 							},
 							success : function(data, textStatus, xhr) {
+								registroCadastrar($("#codUsr").val());
 
 							}, // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
 							error : function(xhr, textStatus, errorThrown) {
 								tratarErroAjax(xhr, textStatus, errorThrown);
 							}
 						});
+			}
+		</script>
+		<!--  REGISTRO DE LOG -->
+		<script type="text/javascript">
+			var registroDeletar = function(codigo){
+				return $.ajax({
+					type : "post",
+					url : "${linkTo[CadastroAdController].registroDeletar()}",
+					dataType : "json", // Isso diz que você espera um JSON do servidor
+					data: {"codigo" : codigo},
+					beforeSend : function(xhr, settings) {
+					},
+					success : function(data, textStatus, xhr) {
+
+					}, // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
+					error : function(xhr, textStatus, errorThrown) {
+						tratarErroAjax(xhr, textStatus, errorThrown);
+					}
+				});
+			}
+			var registroVerificar = function(codigo){
+				return $.ajax({
+					type : "post",
+					url : "${linkTo[CadastroAdController].registroVerificar()}",
+					dataType : "json", // Isso diz que você espera um JSON do servidor
+					data: {"codigo" : codigo},
+					beforeSend : function(xhr, settings) {
+					},
+					success : function(data, textStatus, xhr) {
+
+					}, // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
+					error : function(xhr, textStatus, errorThrown) {
+						tratarErroAjax(xhr, textStatus, errorThrown);
+					}
+				});
+			}
+			var registroCadastrar = function(codigo){
+				return $.ajax({
+					type : "post",
+					url : "${linkTo[CadastroAdController].registroCadastrar()}",
+					dataType : "json", // Isso diz que você espera um JSON do servidor
+					data: {"codigo" : codigo},
+					beforeSend : function(xhr, settings) {
+					},
+					success : function(data, textStatus, xhr) {
+
+					}, // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
+					error : function(xhr, textStatus, errorThrown) {
+						tratarErroAjax(xhr, textStatus, errorThrown);
+					}
+				});
+			}
+			var registroResetarSenha = function(codigo){
+				return $.ajax({
+					type : "post",
+					url : "${linkTo[CadastroAdController].registroResetarSenha()}",
+					dataType : "json", // Isso diz que você espera um JSON do servidor
+					data: {"codigo" : codigo},
+					beforeSend : function(xhr, settings) {
+					},
+					success : function(data, textStatus, xhr) {
+
+					}, // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
+					error : function(xhr, textStatus, errorThrown) {
+						tratarErroAjax(xhr, textStatus, errorThrown);
+					}
+				});
 			}
 		</script>
 		<script type="text/javascript">

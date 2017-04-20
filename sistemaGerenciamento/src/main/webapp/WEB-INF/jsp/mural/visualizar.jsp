@@ -24,7 +24,8 @@
 		<ol class="breadcrumb">
 			<li><a href="${linkTo[HomeController].index()}">Página
 					Inicial</a></li>
-			<li class="active">Mensagens</li>
+			<li><a href="${linkTo[MuralController].entrada()}">Entrada</a></li>
+			<li class="active">Mural</li>
 		</ol>
 		<div class="col-xs-12">
 			<t:input divCol="col-xs-12"

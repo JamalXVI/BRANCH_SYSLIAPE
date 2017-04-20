@@ -17,6 +17,8 @@ public class ExporadicaDao extends PersistenceJDBC<Exporadico> {
 	private static String SQL_LISTAR_ID_RES = "SELECT * FROM EXPORADICO WHERE ID_RES = ? AND ATIVO_EXP = TRUE";
 	private static String SQL_LISTAR_ESPECIFICO = "SELECT * FROM EXPORADICO WHERE ID_RES = ?"
 			+ " AND DATA_MARCADA_EXP = ? AND HORA_INICIO_EXP = ? AND HORA_FIM_EXP = ? AND ATIVO_EXP = TRUE";
+	private static String SQL_LISTAR_ESPECIFICO_F = "SELECT * FROM EXPORADICO WHERE ID_RES = ?"
+			+ " AND DATA_MARCADA_EXP = ? AND HORA_INICIO_EXP = ? AND HORA_FIM_EXP = ? AND ATIVO_EXP = FALSE";
 	private static String SQL_VER_SE_EXISTE = "SELECT * FROM EXPORADICO WHERE ID_RES = ?"
 			+ " AND DATA_MARCADA_EXP = ? AND HORA_INICIO_EXP = ? AND HORA_FIM_EXP = ?";
 	private static String SQL_POR_MES = "SELECT * FROM EXPORADICO WHERE MONTH(DATA_MARCADA_EXP) = "
@@ -54,6 +56,11 @@ public class ExporadicaDao extends PersistenceJDBC<Exporadico> {
 	public List<Exporadico> listarExporadico(int idResExp, LocalDate data, LocalTime horaIni,
 			LocalTime horaFim) {
 		return super.consultarLista(SQL_LISTAR_ESPECIFICO, idResExp, data, horaIni, horaFim);
+		
+	}
+	public List<Exporadico> listarExporadicof(int idResExp, LocalDate data, LocalTime horaIni,
+			LocalTime horaFim) {
+		return super.consultarLista(SQL_LISTAR_ESPECIFICO_F, idResExp, data, horaIni, horaFim);
 		
 	}
 	public List<Exporadico> verSeExite(int idResExp, LocalDate data, LocalTime horaIni,

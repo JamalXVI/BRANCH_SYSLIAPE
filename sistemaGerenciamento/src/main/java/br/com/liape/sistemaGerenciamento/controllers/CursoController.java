@@ -13,7 +13,6 @@ import br.com.caelum.vraptor.validator.Validator;
 import br.com.caelum.vraptor.view.Results;
 import br.com.liape.sistemaGerenciamento.constantes.FlagsLogAcao;
 import br.com.liape.sistemaGerenciamento.dao.CursoDao;
-import br.com.liape.sistemaGerenciamento.dao.DisciplinaDao;
 import br.com.liape.sistemaGerenciamento.model.Curso;
 import br.com.liape.sistemaGerenciamento.seguranca.NivelPermissao;
 
@@ -37,22 +36,28 @@ public class CursoController extends AbstractController {
 	/*
 	 * SEÇÃO DE REQUISIÇÕES AJAX
 	 */
-	
 
 	// ENVIO DE CADASTRO DE ANO/SEMESTRE
 	@Post("/Cadastro/Curso/")
 
 	/*
-	 * Impedir o Acesso à página caso o grupo não tenha acesso à permissão de id 6 
-	 * ou for administrador
+	 * Impedir o Acesso à página caso o grupo não tenha acesso à permissão de id
+	 * 6 ou for administrador
 	 */
-	@NivelPermissao(idPermissao=6)
+	@NivelPermissao(idPermissao = 6)
 	public void postar(@Valid Curso curso) {
-		if (cursoDao.inserir(curso)) {
-			registrarLog(FlagsLogAcao.CADASTRAR_CURSO.getCodigo(), curso.getCodigo());
-			result.use(Results.json()).withoutRoot().from(cursoDao.listar()).serialize();
+		if (cursoDao.pesquisarCodCurso(curso.getCodigo()).size() > 0) {
+			if (cursoDao.atualizar(curso)) {
+				registrarLog(FlagsLogAcao.ATUALIZAR_CURSO.getCodigo(), curso.getCodigo());
+				result.use(Results.json()).withoutRoot().from(cursoDao.listar()).serialize();
+			}
+		} else {
+			if (cursoDao.inserir(curso)) {
+				registrarLog(FlagsLogAcao.CADASTRAR_CURSO.getCodigo(), curso.getCodigo());
+				result.use(Results.json()).withoutRoot().from(cursoDao.listar()).serialize();
+			}
 		}
-		
+
 	}
 
 	// LISTA TODOS OS CURSOS

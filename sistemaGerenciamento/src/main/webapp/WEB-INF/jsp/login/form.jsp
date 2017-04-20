@@ -47,12 +47,14 @@
 .tamanho_fonte{
 	font-size:30px;
 }
-
+}
+#navbar{
+	background-color: #3faed9;
 }
 </style>
 </t:cabecalho><!-- Page Heading/Breadcrumbs -->
 <body>
-<nav class="navbar navbar-inverse navbar-fixed-top fundo-menu"
+<nav id="navbar" class="navbar navbar-inverse navbar-fixed-top fundo-menu"
 			role="navigation">
 			<div class="container teste">
 				<!-- Brand and toggle get grouped for better mobile display -->

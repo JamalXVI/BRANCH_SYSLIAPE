@@ -24,6 +24,7 @@
 		<ol class="breadcrumb">
 			<li><a href="${linkTo[HomeController].index()}">Página
 					Inicial</a></li>
+			<li><a href="${linkTo[MensagemController].entrada()}">Entrada</a></li>
 			<li class="active">Mensagens</li>
 		</ol>
 		<div class="col-xs-12">

@@ -190,11 +190,10 @@ public class ReservasController  extends AbstractController{
 
 		if ((saidaentrada < 0 && entradaentrada < 0) || (saidasaida > 0 && entradasaida > 0)
 				|| (entradaentrada < 0 && saidaentrada == 0) || (entradasaida == 0 && saidasaida > 0)) {
-
+			return false;
 		} else {
 			return true;
 		}
-		return false;
 	}
 
 	public String validar(TipoReserva tipoReserva, Reserva reserva) {
@@ -211,13 +210,17 @@ public class ReservasController  extends AbstractController{
 					List<Exporadico> listarDataMarcada = exporadicoDao.listarDataMarcada(dataEsc);
 
 					if (!listarDataMarcada.isEmpty()) {
-						listarDataMarcada.get(0)
-								.setReserva(reservaDao.listarPorId(listarDataMarcada.get(0).getIdRes()).get(0));
-						if (verficarValidadeReserva(listarDataMarcada.get(0).getReserva(), ans, reserva,
-								listarDataMarcada.get(0).getIdSal(), tipoReserva.getIdSala())) {
-							exporadicos.add(listarDataMarcada.get(0));
+						for (Exporadico exporadico : listarDataMarcada) {
+							exporadico
+							.setReserva(reservaDao.listarPorId(exporadico.getIdRes()).get(0));
+							if (verficarValidadeReserva(exporadico.getReserva(), ans, reserva,
+									exporadico.getIdSal(), tipoReserva.getIdSala())) {
+								exporadicos.add(exporadico);
 
+							}
 						}
+								
+						
 					}
 
 				}
@@ -230,12 +233,15 @@ public class ReservasController  extends AbstractController{
 			List<Exporadico> listarDataMarcada = exporadicoDao.listarDataMarcada(dataMarcadaEsc);
 
 			if (!listarDataMarcada.isEmpty()) {
-				listarDataMarcada.get(0).setReserva(reservaDao.listarPorId(listarDataMarcada.get(0).getIdRes()).get(0));
-				if (verficarValidadeReserva(listarDataMarcada.get(0).getReserva(), ans, reserva,
-						listarDataMarcada.get(0).getIdSal(), tipoReserva.getIdSala())) {
-					exporadicos.add(listarDataMarcada.get(0));
+				for (Exporadico exporadico : listarDataMarcada) {
+					exporadico.setReserva(reservaDao.listarPorId(exporadico.getIdRes()).get(0));
+					if (verficarValidadeReserva(exporadico.getReserva(), ans, reserva,
+							exporadico.getIdSal(), tipoReserva.getIdSala())) {
+						exporadicos.add(exporadico);
 
+					}
 				}
+				
 			}
 		}
 
@@ -421,14 +427,19 @@ public class ReservasController  extends AbstractController{
 		List<Exporadico> listarExporadico = exporadicoDao.listarExporadico(idResExp,
 				Conversor.converterLocalDate(dataMarcada), Conversor.converterLocalTime(horaIni),
 				Conversor.converterLocalTime(horaFim));
-		Exporadico exporadico = listarExporadico.get(0);
 		MensagemSistema msg;
-		exporadico.setAtivo(false);
-		if (exporadicoDao.atualizar(exporadico)) {
-			msg = new MensagemSistema("Sucesso!");
-			registrarLog(FlagsLogAcao.REMOVER_EXPORADICO.getCodigo(), exporadico.toString());
-		} else {
-			msg = new MensagemSistema("Erro!");
+		if (listarExporadico.size() > 0) {
+			Exporadico exporadico = listarExporadico.get(0);
+			exporadico.setAtivo(false);
+			if (exporadicoDao.atualizar(exporadico)) {
+				msg = new MensagemSistema("Sucesso!");
+				registrarLog(FlagsLogAcao.REMOVER_EXPORADICO.getCodigo(), exporadico.toString());
+			} else {
+				msg = new MensagemSistema("Erro: Deletar Reserva Exporádica");
+			}
+		}else{
+			msg = new MensagemSistema("Erro: Deletar Reserva Exporádica");
+			
 		}
 		result.use(Results.json()).withoutRoot().from(msg).serialize();
 	}
@@ -441,14 +452,57 @@ public class ReservasController  extends AbstractController{
 	// DELETAR RESERVA SEMESTRAL
 	@NivelPermissao(idPermissao = 4)
 	public void deletarSem(int idResSem) {
-		Semestral semestral = semestralDao.listaIdSem(idResSem).get(0);
+		List<Semestral> listaIdSem = semestralDao.listaIdSem(idResSem);
 		MensagemSistema msg;
-		semestral.setAtivo(false);
-		if (semestralDao.atualizar(semestral)) {
-			msg = new MensagemSistema("Sucesso!");
-			registrarLog(FlagsLogAcao.REMOVER_SEMESTRAL.getCodigo(), String.valueOf(semestral.getId()));
-		} else {
-			msg = new MensagemSistema("Erro!");
+		if (listaIdSem.size() > 0) {
+			Semestral semestral = listaIdSem.get(0);
+			semestral.setAtivo(false);
+			if (semestralDao.atualizar(semestral)) {
+				msg = new MensagemSistema("Sucesso!");
+				registrarLog(FlagsLogAcao.REMOVER_SEMESTRAL.getCodigo(), String.valueOf(semestral.getId()));
+			} else {
+				msg = new MensagemSistema("Erro: Deletar Reserva Semestral");
+			}
+		}else{
+			msg = new MensagemSistema("Erro: Deletar Reserva Semestral");
+		}
+		result.use(Results.json()).withoutRoot().from(msg).serialize();
+	}
+	@Post("/Retroceder/Reserva/Semestral")
+	@NivelPermissao(idPermissao = 4)
+	public void retrocederSem(int idResSem) {
+		List<Semestral> listaIdSemF = semestralDao.listaIdSemF(idResSem);
+		MensagemSistema msg;
+		if (listaIdSemF.size() > 0) {
+			Semestral semestral = listaIdSemF.get(0);
+			semestral.setAtivo(true);
+			if (semestralDao.atualizar(semestral)) {
+				msg = new MensagemSistema("Sucesso!");
+			} else {
+				msg = new MensagemSistema("Erro: Restroceder Reserva Semestral");
+			}
+		}else{
+			msg = new MensagemSistema("Erro: Restroceder Reserva Semestral");
+		}
+		result.use(Results.json()).withoutRoot().from(msg).serialize();
+	}
+	@Post("/Retroceder/Reserva/Exporadico")
+	@NivelPermissao(idPermissao = 4)
+	public void retrocederExp(int idResExp, String dataMarcada, String horaIni, String horaFim) {
+		List<Exporadico> listarExporadico = exporadicoDao.listarExporadicof(idResExp,
+				Conversor.converterLocalDate(dataMarcada), Conversor.converterLocalTime(horaIni),
+				Conversor.converterLocalTime(horaFim));
+		MensagemSistema msg;
+		if (listarExporadico.size() > 0) {
+			Exporadico exporadico = listarExporadico.get(0);
+			exporadico.setAtivo(true);
+			if (exporadicoDao.atualizar(exporadico)) {
+				msg = new MensagemSistema("Sucesso!");
+			} else {
+				msg = new MensagemSistema("Erro: Restroceder Reserva Exporádica");
+			}
+		}else{
+			msg = new MensagemSistema("Erro: Restroceder Reserva Exporádica");
 		}
 		result.use(Results.json()).withoutRoot().from(msg).serialize();
 	}

@@ -24,7 +24,7 @@
 		<ol class="breadcrumb">
 			<li><a href="${linkTo[HomeController].index()}">Página
 					Inicial</a></li>
-			<li class="active">Mensagens no Mural</li>
+			<li class="active">Nova</li>
 		</ol>
 		<form action="${linkTo[MuralController].enviar(null) }"
 			method="post" id="formReserva">
@@ -101,7 +101,10 @@
 										nome : retornarTurno(turno.periodo)
 									});
 								});
-
+						valoresPossiveis.push({
+							periodo : -1,
+							nome : "Todos"
+						});
 					});
 			$("#mensagemPara")
 					.on(

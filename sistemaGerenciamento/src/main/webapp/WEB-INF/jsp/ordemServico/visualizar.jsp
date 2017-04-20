@@ -24,7 +24,8 @@
 		<ol class="breadcrumb">
 			<li><a href="${linkTo[HomeController].index()}">Página
 					Inicial</a></li>
-			<li class="active">Ordem de Serviço</li>
+			<li><a href="${linkTo[OrdemServicoController].listarAtivas()}">Listar OS</a></li>
+			<li class="active">Visualizar</li>
 		</ol>
 		<div class="col-xs-12">
 			<div class="col-xs-12 text-center">

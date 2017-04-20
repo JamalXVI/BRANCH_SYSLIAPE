@@ -16,8 +16,13 @@ rel="stylesheet">
 <div class="col-lg-12 container-fluid">
 	<div class="row" role="main">
 		<h1 class="page-header" style="margin-top: 0px;">
-			Visualizar <small>Ordem de Serviço</small>
+			Listar <small>Ordem de Serviço</small>
 		</h1>
+		<ol class="breadcrumb">
+			<li><a href="${linkTo[HomeController].index()}">Página
+					Inicial</a></li>
+			<li class="active">Listar OS</li>
+		</ol>
 		<div class="col-xs-12">
 			<div class='panel panel-default' id='panel_paginacao_tabela'>
 				<div class='panel-body'>
@@ -252,16 +257,16 @@ rel="stylesheet">
  var atualizarTabela = function(){
 	 $("#corpoTabelaOrdemServicos").find('tr').remove().end();
 	 $(ordems).each(function(indice_ordem, ordem){
-		var texto = "<tr><td>";
+		var texto = "<tr><td>"+"<a href='' onclick='return detalhesOrdem(\""+indice_ordem+"\")'>";
 		$(salas).each(function(indice_sala, sala){
 			if (ordemsSalas[indice_ordem].length > 0) {
 				if (ordemsSalas[indice_ordem][0].idSala == sala.id) {
-					texto += "Sala: "+sala.nome+"</td><td>";
+					texto += "Sala: "+sala.nome+"</a></td><td>";
 				}
 			}else{
 				if (ordemsComputador[indice_ordem][0].idSala == sala.id) {
 					texto += "Computadora da Sala: "+sala.nome
-					+" Nº:"+ordemsComputador[indice_ordem][0].numeroPc+"</td><td>";
+					+" Nº:"+ordemsComputador[indice_ordem][0].numeroPc+"</a></td><td>";
 				}
 			}
 		});
@@ -273,16 +278,14 @@ rel="stylesheet">
 		if (subOrdemsTurno[indice_ordem].length > 0) {
 			$(turnos).each(function(indice_turno, turno){
 				if (turno.id == subOrdemsTurno[indice_ordem][0].idTur) {
-					texto += "Turno: <a href='' onclick='return detalhesOrdem(\""+indice_ordem+"\")'>"
-					+retornarTurno(turno.periodo)+"</a></td><td>";
+					texto += "Turno: "+retornarTurno(turno.periodo)+"</td><td>";
 				}
 			});
 		}else{
 			$(usuarios).each(function(indice_usuario, usuario){
 				if (usuario.login == subOrdemsUsuario[indice_ordem][0].loginUsr) {
 					paraUsuario = true;
-					texto += "Usuário: <a href='' onclick='return detalhesOrdem(\""+indice_ordem+"\")'>"
-					+usuario.pessoa.nome+" "+usuario.pessoa.sobrenome+"</a></td><td>";
+					texto += "Usuário:"+usuario.pessoa.nome+" "+usuario.pessoa.sobrenome+"</a></td><td>";
 				}
 			});
 		}

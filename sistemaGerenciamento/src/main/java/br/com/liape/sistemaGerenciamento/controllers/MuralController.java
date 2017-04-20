@@ -255,16 +255,21 @@ public class MuralController extends AbstractController{
 
 				if (muralDao.inserir(mural)) {
 					String[] paraRecados = mensagem.getPara().split(", |,");
+					int idMur = muralDao.listarUltimo();
 					for (String recado : paraRecados) {
-						List<Turno> turnosAlvo = turnoDao.listarPeriodo(retornarHorario(recado));
-						if (turnosAlvo.size() > 0) {
-							int idMur = muralDao.listarUltimo();
-							MuralTurno muralTurno = new MuralTurno();
-							muralTurno.setIdTur(turnosAlvo.get(0).getId());
-							muralTurno.setIdMur(idMur);
-							muralTurno.setAtivo(true);
-							muralTurnoDao.inserir(muralTurno);
+						if (!recado.toLowerCase().equals("todos")) {
+							List<Turno> turnosAlvo = turnoDao.listarPeriodo(retornarHorario(recado));
+							if (turnosAlvo.size() > 0) {
+								int idTur = turnosAlvo.get(0).getId();
+								cadastrarMuralParaTurno(idMur, idTur);
+							}
+						}else{
+							List<Turno> turnos = turnoDao.listar();
+							for (Turno turnoAlvo : turnos) {
+								cadastrarMuralParaTurno(idMur, turnoAlvo.getId());
+							}
 						}
+						
 
 					}
 					result.redirectTo(this).entrada();
@@ -279,6 +284,14 @@ public class MuralController extends AbstractController{
 		} else {
 			result.redirectTo(ErrosController.class).erro_operacao();
 		}
+	}
+
+	private void cadastrarMuralParaTurno(int idMur, int idTur) {
+		MuralTurno muralTurno = new MuralTurno();
+		muralTurno.setIdTur(idTur);
+		muralTurno.setIdMur(idMur);
+		muralTurno.setAtivo(true);
+		muralTurnoDao.inserir(muralTurno);
 	}
 
 	private String retornarNomeTurno(int turno) {

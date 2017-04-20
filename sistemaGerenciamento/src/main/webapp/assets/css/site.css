@@ -3,10 +3,21 @@
 }
 
 .fundo-menu{
-    background-color: #3faed9;
-    border-color: #1fd7ed;    
+    background-color: #F5F5F5; /* #3faed9; */
+    border-color: #3F51B5; /*#1fd7ed; */    
+    color:black;
 } 
-
+.top-nav>li>a{
+	color: black !important;
+}
+.top-nav>li>a:hover,
+.top-nav>li>a:focus,
+.top-nav>.open>a,
+.top-nav>.open>a:hover,
+.top-nav>.open>a:focus {
+    color: white; !important;
+    background-color: #BDBDBD !important;
+}
 .espaco_cima{
 	margin-top: 0.3em;
 }
@@ -65,6 +76,8 @@ width: 100%;
 }
 
 .my-table-label-body{
+	
+	
 	font-size: 14px;
 	margin-top: 16px;
 	text-transform: uppercase;	
@@ -113,4 +126,9 @@ width: 100%;
 	margin-left: auto; 
 	margin-right: auto;
 }
-
+.table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+   background-color: #FFF9C4;/* #f9f9f9 */
+}
+.side-nav{
+	background-color: #1e282c;
+}

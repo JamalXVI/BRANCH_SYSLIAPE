@@ -282,7 +282,8 @@ public class OrdemServicoController extends AbstractController {
 	@Post("/Visualizar/SubOrdem/")
 	public void visualizar(int idSor) {
 		MensagemSistema msg = new MensagemSistema("Sucesso");
-		List<SubOrdemVisualizada> listarId = ordemVisualizadaDao.listarId(idSor);
+		List<SubOrdemVisualizada> listarId = ordemVisualizadaDao.listarIdLogin(idSor
+				, usuarioLogado.getUsuario().getLogin());
 		if (listarId.size() <= 0) {
 			SubOrdemVisualizada subOrdemVisualizada = new SubOrdemVisualizada();
 			subOrdemVisualizada.setIdSor(idSor);

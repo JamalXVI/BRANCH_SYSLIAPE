@@ -178,19 +178,21 @@ public class MensagemController extends AbstractController{
 				String[] paraRecados = mensagem.getPara().split(", |,");
 				List<String> usuariosEnviados = new ArrayList<>();
 				for (String paraRecado : paraRecados) {
-					List<Usuario> logins = usuarioDao.listarPorLogin(paraRecado);
-					if (logins.size() > 0) {
-						Usuario usuario = logins.get(0);
-						if (!usuariosEnviados.contains(usuario.getLogin())) {
-							RecadoUsuarioAlvo recadoUsuarioAlvo = new RecadoUsuarioAlvo();
-							recadoUsuarioAlvo.setApagado(false);
-							recadoUsuarioAlvo.setVisualizado(false);
-							recadoUsuarioAlvo.setLogin(usuario.getLogin());
-							recadoUsuarioAlvo.setIdRec(idRecado);
-							usuariosEnviados.add(usuario.getLogin());
-							recadoUsuarioAlvoDao.inserir(recadoUsuarioAlvo);
-						}
+					if (!paraRecado.toLowerCase().equals("todos")) {
+						List<Usuario> logins = usuarioDao.listarPorLogin(paraRecado);
+						if (logins.size() > 0) {
+							Usuario usuario = logins.get(0);
+							if (!usuariosEnviados.contains(usuario.getLogin())) {
+								String login = usuario.getLogin();
+								novoRecadoUsuarioAlvo(idRecado, usuariosEnviados, login);
+							}
 
+						}
+					}else{
+						List<Usuario> usuarios = usuarioDao.listar();
+						for (Usuario usuario : usuarios) {
+							novoRecadoUsuarioAlvo(idRecado, usuariosEnviados, usuario.getLogin());
+						}
 					}
 				}
 				result.redirectTo(this).entrada();
@@ -203,6 +205,16 @@ public class MensagemController extends AbstractController{
 			result.redirectTo(ErrosController.class).erro_operacao();
 		}
 		// result.include("msg", "Message from your controller");
+	}
+
+	private void novoRecadoUsuarioAlvo(int idRecado, List<String> usuariosEnviados, String login) {
+		RecadoUsuarioAlvo recadoUsuarioAlvo = new RecadoUsuarioAlvo();
+		recadoUsuarioAlvo.setApagado(false);
+		recadoUsuarioAlvo.setVisualizado(false);
+		recadoUsuarioAlvo.setLogin(login);
+		recadoUsuarioAlvo.setIdRec(idRecado);
+		usuariosEnviados.add(login);
+		recadoUsuarioAlvoDao.inserir(recadoUsuarioAlvo);
 	}
 
 	private boolean verificarPreenchimento(Mensagem mensagem) {

@@ -24,7 +24,7 @@
 		<ol class="breadcrumb">
 			<li><a href="${linkTo[HomeController].index()}">Página
 					Inicial</a></li>
-			<li class="active">Mensagens</li>
+			<li class="active">Entrada</li>
 		</ol>
 		<div class="col-xs-12">
 			<div class='panel panel-default' id='panel_paginacao_tabela'>

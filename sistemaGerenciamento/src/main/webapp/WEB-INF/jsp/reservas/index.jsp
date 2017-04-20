@@ -60,11 +60,9 @@ text-transform:uppercase;
 	-moz-box-shadow: 3px 4px 11px -1px rgba(0, 0, 0, 0.51);
 	box-shadow: 3px 4px 11px -1px rgba(0, 0, 0, 0.51);
 }
-
 .colorido,  #tabelaGrade thead th:nth-of-type(2n) {
 	background: #ffffc8;
 }
-
 .caixaMaior {
 	position: relative;
 	width: 100%;
@@ -74,14 +72,12 @@ text-transform:uppercase;
 	vertical-align: top;
 }
 .novaHora, .minuto{
-
 	height: 20px;
 	width: 20px;
 }
 .cor_verde {
 	color: #8BC34A;
 }
-
 .cor_verde:hover {
 	color: #64B5F6;
 }
@@ -112,8 +108,11 @@ float:right;
     z-index: 10;
     background-color: white;
 }
+.table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+   background-color:  #f9f9f9;
+}
 .colorido,  #header-fixed thead th:nth-of-type(2n) {
-	background: #ffffc8;
+	background: #ffffc8 !important;
 }
 </style>
 
@@ -140,13 +139,11 @@ float:right;
 					</div>
 					
 				</div>
-				<!-- 
-				<div class="col-lg-1 col-md-2 col-sm-3 text-center" style="padding-left:15px;">
+				<div class="col-lg-1 col-md-2 col-sm-3 text-center" style="padding-left:10px;">
 					<button class="btn btn-primary formulario_inicial" style='margin-top:25px'
 					 id="pesquisarDataEscolhida">Pesquisar</button>
 				</div>
-				 -->
-				<div class="col-lg-3 col-md-4 col-sm-6 text-center">
+				<div class="col-lg-3 col-md-4 col-sm-6">
 <!-- 					<label>Outras:</label> -->
 <!-- 					<a class="btn btn-info" href="" onclick="return mostrarOpcoes();"><i class="fa fa-cog" aria-hidden="true"></i>Opções</a> -->
 					<label>Opções:</label> 
@@ -172,7 +169,7 @@ float:right;
 						<thead id="tabelaGradeThead">
 							<tr>
 								<th class="novaHora">HH</th>
-								<th class="minuto" style="background-color: #f7f7f7;">MM</th>
+								<th class="minuto" style="background-color: #f7f7f7 !important;">MM</th>
 		
 							</tr>
 						</thead>
@@ -210,6 +207,7 @@ float:right;
 			<c:import url="/WEB-INF/jsp/reservas_modal/modal_deletar_reserva_sem.jsp" />
 			<c:import url="/WEB-INF/jsp/reservas_modal/modal_deletar_ano_semestre.jsp" />
 			<c:import url="/WEB-INF/jsp/reservas_modal/modal_ver_exporadicas_mes.jsp" />
+			<c:import url="/WEB-INF/jsp/reservas_modal/modal_confirmar.jsp" />
 		</div>
 
 		<div style="clear: both"></div>
@@ -226,7 +224,6 @@ float:right;
 <!-- Importação do Javascript de Autocompletar Select-->
 <script src="<c:url value='/assets/js/select2.full.min.js' /> "></script>
 <script type="text/javascript" >
-
 var retornarMinuto = function(minuto)
 {
 	if (minuto < 10) {
@@ -313,29 +310,36 @@ function popularDisciplina(disciplinas){
 };
 var contagemDisciplinas = 0;
 var contagemDisciplinasMax = 5;
-$("#pesquisarDisciplina").on("keyup", function(){
+$("#codigoDisciplinaForm").on("keyup", function(){
 	atualizarPesquisaDisciplina();
 });
-$("#pesquisarDisciplina").on("keydown", function(){
+$("#codigoDisciplinaForm").on("keydown", function(){
 	atualizarPesquisaDisciplina();
 });
-$("#pesquisarDisciplina").on("tap", function(){
+$("#codigoDisciplinaForm").on("tap", function(){
+	atualizarPesquisaDisciplina();
+});
+$("#nomeDisciplinaForm").on("keyup", function(){
+	atualizarPesquisaDisciplina();
+});
+$("#nomeDisciplinaForm").on("keydown", function(){
+	atualizarPesquisaDisciplina();
+});
+$("#nomeDisciplinaForm").on("tap", function(){
 	atualizarPesquisaDisciplina();
 });
 var atualizarPesquisaDisciplina = function(){
-	var textoFiltro = $("#pesquisarDisciplina").val();
+	var textoFiltroCod = $("#codigoDisciplinaForm").val().toLowerCase();
 	contagemDisciplinas = 0;
 	$("#corpotabelaDisciplinas")
 	.find('tr')
 	.remove()
 	.end();
 	$.each(hashDisciplina, function (key, disciplina) {
-		if (disciplina.codigo.toLowerCase().indexOf(textoFiltro) != -1 ||
-				disciplina.nome.toLowerCase().indexOf(textoFiltro)  != -1) {
+		if (disciplina.codigo.toLowerCase().indexOf(textoFiltroCod) != -1) {
 				adicionarDisicplinaPesquisa(disciplina);
 			}
 	});
-
 }
 var adicionarDisicplinaPesquisa = function(disciplina){
 	contagemDisciplinas++;
@@ -346,6 +350,14 @@ var adicionarDisicplinaPesquisa = function(disciplina){
 }
 //Ajax de Cadastramento de Disciplina
 var cadastrarDisciplina = function(){
+	if ($("#corpotabelaDisciplinas").find('td').size() > 0) {
+		$("#tipoConfirmarAcao").val("0")
+		$("#novoConfirmarAcao").modal('show');	
+	}else{
+		disicplinaConfirmada();
+	}
+};
+var disicplinaConfirmada = function(){
 	if($("#formDisciplina").valid())
 	{
 		$.ajax({  
@@ -367,8 +379,7 @@ var cadastrarDisciplina = function(){
 	}else{
 		formularErro("Formulário Inválido!");
 	}
-	
-};
+}
 </script>
 <!-- Popular Professores -->
 <script type="text/javascript">
@@ -404,7 +415,6 @@ function popularProfessor(professores){
 	});
 	
 };
-
 </script>
 
 
@@ -448,29 +458,27 @@ function popularCurso(cursos){
 };
 var contagemCursos = 0;
 var contagemCursosMax = 5;
-$("#pesquisarCursos").on("keyup", function(){
+$("#codigoCursoForm").on("keyup", function(){
 	atualizarPesquisaCursos();
 });
-$("#pesquisarDisciplina").on("keydown", function(){
+$("#codigoCursoForm").on("keydown", function(){
 	atualizarPesquisaCursos();
 });
-$("#pesquisarDisciplina").on("tap", function(){
+$("#codigoCursoForm").on("tap", function(){
 	atualizarPesquisaCursos();
 });
 var atualizarPesquisaCursos = function(){
-	var textoFiltro = $("#pesquisarCursos").val();
+	var textoFiltro = $("#codigoCursoForm").val().toLowerCase();
 	contagemCursos = 0;
 	$("#corpotabelaCursos")
 	.find('tr')
 	.remove()
 	.end();
 	$.each(hashCurso, function (key, curso) {
-		if (curso.codigo.toLowerCase().indexOf(textoFiltro) != -1 ||
-				curso.nome.toLowerCase().indexOf(textoFiltro)  != -1) {
+		if (curso.codigo.toLowerCase().indexOf(textoFiltro) != -1) {
 				adicionarCursosPesquisa(curso);
 			}
 	});
-
 }
 var adicionarCursosPesquisa = function(curso){
 	contagemCursos++;
@@ -481,6 +489,15 @@ var adicionarCursosPesquisa = function(curso){
 }
 //Ajax de Cadastramento de Curso
 var cadastrarCurso = function(){
+	if($("#corpotabelaCursos").find('tr').size() > 0)
+	{
+		$("#tipoConfirmarAcao").val("1");
+		$("#novoConfirmarAcao").modal("show");
+	}else{
+		cursoConfirmado();
+	}
+}
+var cursoConfirmado = function(){
 	if($("#formCurso").valid())
 	{
 		$.ajax({  
@@ -501,8 +518,7 @@ var cadastrarCurso = function(){
 	}else{
 		formularErro("Formulário Inválido!");
 	}
-	
-};
+}
 </script>
 <!-- Aparecer Select de Ano Semestre -->
 <script type="text/javascript">
@@ -519,22 +535,13 @@ var aparecerModalReserva = function(){
 	$("#selecionarDiaSemanaSemestral").val(diaSemana).trigger("change");
 	return false;
 }
-
 </script>
 
 <!-- Script de Execução de Cadastro de AnoSemestre -->
 <script type="text/javascript">
 //Verificar Ano Semestre de Acordo com a Data
 $("#selecionarAnoSemestre").on("change", function(){
-	if(dataValida())
-	{
-		cadastrarSlctAnoSemestre();
-	}else{
-		
-		formularErro("Data Inválida! Por Favor Insira uma data Válida!");
-		restaurarDataInicial();
-	}
-	
+	cadastrarSlctAnoSemestre();
 })
 var anoSemestreSelecionado;
 var anoSemestres;
@@ -550,7 +557,13 @@ var alterarAnoSemestreSelecionado = function(){
 			+"-"+retornarMinuto(anoSemestreSelecionado.DataIni.month)+
 			"-"+retornarMinuto(anoSemestreSelecionado.DataIni.day)
 			});
+   
 	if (primeiraVezAlterarCalendario) {
+
+		restaurarDataInicial();
+		$.when(listarSalasAjax()).done(function(){
+			
+		});
 		restaurarDataInicial();
 	}else{
 		primeiraVezAlterarCalendario = true
@@ -592,7 +605,6 @@ var cadastrarAnoSemestre = function(){
 	}
 	
 };
-
 //POPULAR AnoSemestre
 var listarAnoSemestreAjax = function(){
 	
@@ -609,7 +621,19 @@ var listarAnoSemestreAjax = function(){
 		 }
 	});
 }
-
+var retornarData = function(dataE){
+	var dataR = new Date();
+	dataR.setMonth(dataE.month-1);
+	dataR.setDate(dataE.day);
+	dataR.setYear(dataE.year);
+	return dataR;
+}
+var compararDatas = function(d1, d2){
+	if (d1.getTime() >= d2.getTime()) {
+		return true;
+	}
+	return false;
+}
 //Script de População de Todos os Anos/Semestres na Lista de Ano/Semestre
 var popularSelectAnoSemestre = function(anoSemestre)
 {
@@ -619,8 +643,10 @@ var popularSelectAnoSemestre = function(anoSemestre)
 	    .remove()
 	    .end();
 	$("#selecionarAnoSemestre").append('<option value="">---Selecione um Ano/Semestre---</option>');
+	var diaAtual = new Date();	
 	$(anoSemestre).each(function(indice, elemento){
-		if (!anoSemestreSelecionado && indice == 0) {
+		if (!anoSemestreSelecionado && (compararDatas(diaAtual, retornarData(elemento.DataIni)) &&
+			compararDatas(retornarData(elemento.DataFim), diaAtual) || indice == anoSemestres.length-1 )) {
 			anoSemestreSelecionado = elemento;
 			alterarAnoSemestreSelecionado();
 		}
@@ -830,7 +856,6 @@ var listarSalasAjax = function(){
 		 }
 	});
 }
-
 //Escrever Observação na Reserva na caixa Caso tenha uma
 var escreverObservacao = function(observacao)
 {
@@ -975,7 +1000,6 @@ var verificarSeTemReserva = function(sala, hashReserva){
 	return retornar;
 }
 //Script de Populamento das Salas
-
 var popularSala = function(data)
 {
 	carregando();
@@ -1104,7 +1128,6 @@ var preencherSala = function(indiceSala, sala, hashReserva, realIndice){
 		});
 		
 	}
-
 };
 //Ajustar as Caixas de Reservas de Acordo com o Tamanho da Tela
 var formartarCaixas = function(){
@@ -1117,7 +1140,6 @@ var formartarCaixas = function(){
 $( window ).resize(function() {
 	formartarCaixas();
 });
-
 </script>
 
 <!-- Máscaras -->
@@ -1170,7 +1192,6 @@ $().ready(function(){
 		    (iniMensagemAlerta+"Por favor insira os {0} caracteres."+fimMensagemAlerta)
 		  }}
 		);
-
 	$("#nomeDisciplinaForm").rules("add",{
 		required: true,
 		  minlength: 2,
@@ -1223,7 +1244,6 @@ $().ready(function(){
 		  }
 	});
 });
-
 </script>
 <!-- Evento de acionar Reserva quando clicado no horário desejado -->
 <script type="text/javascript">
@@ -1271,14 +1291,12 @@ var cadastrarReserva = function(){
 	if (valoresAlterarReserva[0] == "sem") {
 		$.when(cancelarReservaAlterar(valoresAlterarReserva[1])).done(function(){
 			inserirReserva();
-			valoresAlterarReserva = [];
 		});
 	}
 	if (valoresAlterarReserva[0] == "exp") {
 		$.when(cancelarReservaAlterarExp(valoresAlterarReserva[1],valoresAlterarReserva[2],
 				valoresAlterarReserva[3], valoresAlterarReserva[4])).done(function(){
 			inserirReserva();
-			valoresAlterarReserva = [];
 		});
 	}
 };
@@ -1292,13 +1310,31 @@ var inserirReserva = function(){
 		    dataType: "json",  // Isso diz que você espera um JSON do servidor
 		    beforeSend: function(xhr, settings){},  
 		    success: function(data, textStatus, xhr){
-		    	inserirMensagemReserva = true;
-		    	tipoMensagemReserva = data.mensagem;
-		    	var valSala = $("#selecionarSala").val();	
-		    	$.when(listarSalasAjax()).done(function(){
-			    	$("#selecionarSala").val(valSala).trigger("change");
-		    	});
-//	 	    	popularSelectAnoSemestre(data);
+		    	if (data.mensagem.indexOf("Erro") !== -1) {
+		    		formularErro(data.mensagem);
+		    		if (valoresAlterarReserva.length > 0) {
+		    			if (valoresAlterarReserva[0] == "sem") {
+		    				var enviar = {"idResSem" : valoresAlterarReserva[1]};
+		    				retrocederReservaAlterar(enviar);
+		    			}else{
+		    				var enviar = {"idResExp" : valoresAlterarReserva[1],
+		    						"dataMarcada" : valoresAlterarReserva[2],
+		    						"horaIni" : valoresAlterarReserva[3], "horaFim" : valoresAlterarReserva[4]};
+		    				retrocederReservaAlterarExp(enviar);
+		    			}
+					}
+				}else{
+					inserirMensagemReserva = true;
+			    	tipoMensagemReserva = data.mensagem;
+			    	var valSala = $("#selecionarSala").val();	
+			    	$.when(listarSalasAjax()).done(function(){
+				    	$("#selecionarSala").val(valSala).trigger("change");
+			    	});
+//		 	    	popularSelectAnoSemestre(data);
+				}
+		    	if (valoresAlterarReserva.length > 0) {
+		    		valoresAlterarReserva = [];
+				}
 		    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
 		    error: function(xhr, textStatus, errorThrown){ 
 		    	tratarErroAjax(xhr, textStatus, errorThrown);
@@ -1342,19 +1378,25 @@ var inserirReserva = function(){
 <script type="text/javascript">
 //Deletar Reserva Semestral
 var cadastrarDeletarReserva = function(idResSem){
+	var enviar = {"idResSem" : idResSem};
 	return $.ajax({  
 	    type:"post",  
 	    url: "${linkTo[ReservasController].deletarSem() }", 
-	    data: {"idResSem" : idResSem},
+	    data: enviar,
 	    dataType: "json",  // Isso diz que você espera um JSON do servidor
 	    beforeSend: function(xhr, settings){},  
 	    success: function(data, textStatus, xhr){
 	    	if (data.mensagem.indexOf("Erro") !== -1) {
 	    		formularErro(data.mensagem);
+	    		retrocederReservaAlterar(enviar);
 			}else{
-		    	mensagemSucesso();
+				if (valoresAlterarReserva.length <= 0) {
+		    		mensagemSucesso();
+				}
 			}
-	    	listarSalasAjax();
+	    	if (valoresAlterarReserva.length <= 0) {
+		    	listarSalasAjax();
+			}
 // 	    	popularSelectAnoSemestre(data);
 	    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
 	    error: function(xhr, textStatus, errorThrown){ 
@@ -1363,21 +1405,41 @@ var cadastrarDeletarReserva = function(idResSem){
 	});	
 	
 };
+var retrocederReservaAlterar = function(enviar){
+	return $.ajax({  
+	    type:"post",  
+	    url: "${linkTo[ReservasController].retrocederSem() }", 
+	    data: enviar,
+	    dataType: "json",  // Isso diz que você espera um JSON do servidor
+	    beforeSend: function(xhr, settings){},  
+	    success: function(data, textStatus, xhr){
+	    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
+	    error: function(xhr, textStatus, errorThrown){ 
+	    	tratarErroAjax(xhr, textStatus, errorThrown);
+	    }
+	});
+}
 //Deletar Reserva Exporádica
 var cadastrarDeletarReservaExp = function(idResExp, dataMaraca, horaIni, horaFim){
+	var enviar = {"idResExp" : idResExp, "dataMarcada" : dataMaraca, "horaIni" : horaIni, "horaFim" : horaFim};
 	return $.ajax({  
 	    type:"post",  
 	    url: "${linkTo[ReservasController].deletarExp() }", 
-	    data: {"idResExp" : idResExp, "dataMarcada" : dataMaraca, "horaIni" : horaIni, "horaFim" : horaFim},
+	    data: enviar,
 	    dataType: "json",  // Isso diz que você espera um JSON do servidor
 	    beforeSend: function(xhr, settings){},  
 	    success: function(data, textStatus, xhr){
 	    	if (data.mensagem.indexOf("Erro") !== -1) {
 	    		formularErro(data.mensagem);
+    			retrocederReservaAlterarExp(enviar);
 			}else{
-				mensagemSucesso();
+				if (valoresAlterarReserva.length <= 0) {
+		    		mensagemSucesso();
+				}
 			}
-	    	listarSalasAjax();
+	    	if (valoresAlterarReserva.length <= 0) {
+		    	listarSalasAjax();
+			}
 // 	    	popularSelectAnoSemestre(data);
 	    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
 	    error: function(xhr, textStatus, errorThrown){ 
@@ -1386,7 +1448,20 @@ var cadastrarDeletarReservaExp = function(idResExp, dataMaraca, horaIni, horaFim
 	});	
 	
 };
-
+var retrocederReservaAlterarExp = function(enviar){
+	return $.ajax({  
+	    type:"post",  
+	    url: "${linkTo[ReservasController].retrocederExp() }", 
+	    data: enviar,
+	    dataType: "json",  // Isso diz que você espera um JSON do servidor
+	    beforeSend: function(xhr, settings){},  
+	    success: function(data, textStatus, xhr){
+	    },  // a variavel data vai ser o seu retorno do servidor, que no caso é um JSON
+	    error: function(xhr, textStatus, errorThrown){ 
+	    	tratarErroAjax(xhr, textStatus, errorThrown);
+	    }
+	});
+}
 </script>
 
 <!-- Acionar Modal de Mostrar Opções de Acordo com as Permissões // Antigo -->
@@ -1403,7 +1478,6 @@ var temPermissaoCurso = false;
 var temPermissaoDisciplina = false;
 var temPermissaoAnoSemestre = false;
 var temPermissaoSala = false;
-
 var verificarPermissao = function(){
 	$(permissoesUsuario).each(function(i,permi){
 		  if(permi== 4 || permi == 1){
@@ -1439,7 +1513,6 @@ var verificarPermissao = function(){
 	}
 }
 $(verificarPermissao());
-
 </script>
 <!-- Modais de Deletar -->
 <script type="text/javascript">
@@ -1537,6 +1610,18 @@ $(document).ready(function(){
 		valoresAlterarReserva[4] = $("#deletarHoraFimReservaExp").val();
 		$("#selecionarTipoReserva").val("exporadica").trigger("change");
 		aparecerModalReserva();
+		preencherAlteracaoReservaExp(valoresAlterarReserva[1], valoresAlterarReserva[2],
+				valoresAlterarReserva[3], valoresAlterarReserva[4]);
+		
+	});
+	$("#excluirReservaExpDup").on("click", function(){
+		valoresAlterarReserva = [];
+		$("#selecionarTipoReserva").val("exporadica").trigger("change");
+		aparecerModalReserva();
+		preencherAlteracaoReservaExp($("#deletarIdReservaExp").val(), $("#deletarDataReservaExp").val(),
+				$("#deletarHoraIniReservaExp").val(), $("#deletarHoraFimReservaExp").val());
+	})
+	var preencherAlteracaoReservaExp = function(idRes, dataRes, horaIniRes, horaFimRes){
 		$(reservasExporadica).each(function(indice_reserva, reserva){
 			var horaIni = retornarMinuto(reserva.horaInicio.hour)+":"+
 			retornarMinuto(reserva.horaInicio.minute);
@@ -1544,9 +1629,9 @@ $(document).ready(function(){
 			retornarMinuto(reserva.horaFim.minute);
 			var dataMarcadaExporadico = reserva.data.year+"-"+
 				retornarMinuto(reserva.data.month)+"-"+retornarMinuto(reserva.data.day);
-			if (reserva.idRes == valoresAlterarReserva[1]
-			&& valoresAlterarReserva[2] == dataMarcadaExporadico && valoresAlterarReserva[3] == horaIni &&
-			valoresAlterarReserva[4] == horaFim) {
+			if (reserva.idRes == idRes
+			&& dataRes == dataMarcadaExporadico && horaIniRes == horaIni &&
+			horaFimRes == horaFim) {
 				$("#modalReservaHoraInicio").val(retornarMinuto(reserva.horaInicio.hour)+":"+
 						retornarMinuto(reserva.horaInicio.minute));
 				$("#modalReservaHoraFim").val(retornarMinuto(reserva.horaFim.hour)+":"+
@@ -1560,7 +1645,12 @@ $(document).ready(function(){
 				$("#idObservacaoReserva").find('input').val(reserva.observacao).end();
 			}
 		});
-		
+	}
+	$("#excluirReservaSemDup").on("click", function(){
+		valoresAlterarReserva = [];
+		$("#selecionarTipoReserva").val("semestral").trigger("change");
+		aparecerModalReserva();
+		preencherAlteracaoReserva($("#deletarIdReservaSem").val());
 	});
 	$("#excluirReservaSemAlt").on("click", function(){
 		valoresAlterarReserva = [];
@@ -1568,8 +1658,11 @@ $(document).ready(function(){
 		valoresAlterarReserva[1] = $("#deletarIdReservaSem").val();
 		$("#selecionarTipoReserva").val("semestral").trigger("change");
 		aparecerModalReserva();
+		preencherAlteracaoReserva(valoresAlterarReserva[1]);
+	});
+	var preencherAlteracaoReserva = function(id){
 		$(reservasSemestral).each(function(indice_reserva, reserva){
-			if (reserva.id == valoresAlterarReserva[1]) {
+			if (reserva.id == id) {
 				$("#modalReservaHoraInicio").val(retornarMinuto(reserva.horaInicio.hour)+":"+
 						retornarMinuto(reserva.horaInicio.minute));
 				$("#modalReservaHoraFim").val(retornarMinuto(reserva.horaFim.hour)+":"+
@@ -1584,7 +1677,7 @@ $(document).ready(function(){
 			}
 			
 		});
-	});
+	}
 	$('#novaReserva').on('hidden.bs.modal', function () {
 		valoresAlterarReserva = [];
 	});
@@ -1609,11 +1702,8 @@ var acionarModalCurso = function(){
 	$("#novoCurso").modal('show');
 	return false;
 }
-
 </script>
 <script type="text/javascript">
-
-
 $(window).bind("scroll", function() {
 	atualizarCabecalho();
 });
@@ -1624,7 +1714,6 @@ var atualizarCabecalho = function(){
 	var $header = $("#tabelaGrade > thead").clone();
 	var $fixedHeader = $("#header-fixed").append($header);
     var offset = $(this).scrollTop();
-
     if (offset >= tableOffset && $fixedHeader.is(":hidden")) {
         $fixedHeader.show();
     }
@@ -1650,5 +1739,38 @@ var cancelouCarregar = function(valor){
 		inserirMensagemReserva = false;
 	}
 }
+
+</script>
+<!-- Correção da Fixação da Nav -->
+<script type="text/javascript">
+
+$(document).ready(function () {
+    $('.modal').on('show.bs.modal', function () {
+        if ($(document).height() > $(window).height()) {
+            // no-scroll
+            $('body').addClass("modal-open-noscroll");
+        }
+        else {
+            $('body').removeClass("modal-open-noscroll");
+        }
+    });
+    $('.modal').on('hide.bs.modal', function () {
+        $('body').removeClass("modal-open-noscroll");
+    });
+})
+</script>
+<script type="text/javascript">
+	$("#confirmarAcaoSim").on("click", function(){
+		$("#novoConfirmarAcao").modal("hide");
+		switch ($("#tipoConfirmarAcao").val()) {
+		case "0":
+			disicplinaConfirmada();
+			break;
+		case "1":
+			cursoConfirmado();
+			break;
+		}
+		return false;
+	});
 </script>
 </t:rodape>

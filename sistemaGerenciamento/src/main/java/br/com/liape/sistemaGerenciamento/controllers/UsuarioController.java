@@ -2,6 +2,7 @@ package br.com.liape.sistemaGerenciamento.controllers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
@@ -100,8 +101,13 @@ public class UsuarioController extends AbstractController{
 				usuario.setPessoa(pessoa);
 				usuarios.add(usuario);
 			}
-
 		}
+
+		Collections.sort(usuarios, new Comparator<Usuario>() {
+			  public int compare(Usuario o1, Usuario o2) {
+			      return o1.getPessoa().getDatanascimento().compareTo(o2.getPessoa().getDatanascimento());
+			  }
+			});
 		result.use(Results.json()).withoutRoot().from(usuarios).include("pessoa").include("grupo")
 				.include("pessoa.datanascimento").include("pessoa.telefones").exclude("senha").serialize();
 	}

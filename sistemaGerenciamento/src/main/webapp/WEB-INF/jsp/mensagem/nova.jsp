@@ -22,7 +22,7 @@
 		</h1>
 		<ol class="breadcrumb">
 			<li><a href="${linkTo[HomeController].index()}">Página Inicial</a></li>
-			<li class="active">Mensagens</li>
+			<li class="active">Nova</li>
 		</ol>
 		<form action="${linkTo[MensagemController].enviar(null) }" method="post"
 		id="formReserva">
@@ -79,7 +79,8 @@ var adicionarInputUsuarios = function(){
 			valoresPossiveis.push({login: usuario.login, 
 				nome: usuario.pessoa.nome+" "+usuario.pessoa.sobrenome});
 		});
-			
+		valoresPossiveis.push({login: "Todos", 
+			nome: "Todos"});	
 	});
 	$("#mensagemPara").on( "keydown", function( event ) {
         if ( event.keyCode === $.ui.keyCode.TAB &&

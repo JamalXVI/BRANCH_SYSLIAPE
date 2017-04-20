@@ -39,6 +39,8 @@
 <script src="<c:url value='/assets/js/object-watch.js' />"></script>
 <!-- jQuery -->
 <script src="<c:url value='/assets/js/jquery-1.9.1.min.js' />"></script>
+<!-- jQuery -->
+<script src="<c:url value='/assets/js/dropzone.js' />"></script>
 <!-- Bootstrap -->
 <script src="<c:url value='/assets/js/bootstrap.min.js' />"></script>
 <!-- FastClick -->
@@ -168,6 +170,9 @@ var mensagemSucesso =  function(){
 	+"</div><div class='col-lg-8'<p class='bg-success'>Ação Efetivada com Sucesso!</p></div>");
 	$("#novaMensagemSucesso").modal("show");
 }
+$("#novaMensagemSucesso").on("hide.bs.modal", function(){
+	$("body").removeClass("body.modal-open-noscroll");
+});
 var waitingDialog = waitingDialog || (function ($) {
     'use strict';
 
@@ -250,8 +255,7 @@ jQuery.validator.addMethod("horaMaiorQue",
 
 		    return isNaN(valor1) && isNaN(valor2) 
 		        || (Number(valor1) > Number(valor2)); 
-		},'Tem que ser maior que a entrada!');
-
+},'Tem que ser maior que a entrada!');
 </script>
 <!-- Rendeizar Scripts Personalizados -->
 <jsp:doBody></jsp:doBody>

@@ -12,13 +12,6 @@
 			id="codigoDisciplinaForm" classes="upperCase"></t:input>
 	</form>
 	<div class="col-xs-12">
-		<div class="input-group">
-			<span class="input-group-addon"><i class="fa fa-search"
-				aria-hidden="true"></i></span> <input type="text" class="form-control"
-				aria-label="Pesquisar Disciplina" id="pesquisarDisciplina">
-		</div>
-	</div>
-	<div class="col-xs-12">
 		<div class='table-responsive espaco_cima'>
 			<table id='tabelaDisciplinas'
 				class='table table-striped table-hover table-bordered'>

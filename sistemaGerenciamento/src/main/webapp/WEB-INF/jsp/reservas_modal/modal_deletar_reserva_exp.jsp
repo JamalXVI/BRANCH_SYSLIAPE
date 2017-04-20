@@ -1,6 +1,6 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib prefix="t" tagdir="/WEB-INF/tags"%>
-<t:modal_sem_save nomeLabel="Você tem certeza que deseja deletar a Reserva?" nome="DeletarReservaExp" genero="a">
+<t:modal_sem_save nomeLabel="O que deseja fazer com a Reserva?" nome="DeletarReservaExp" genero="a">
 	<div class="container-fluid">
 		<input type="hidden" name="deletarIdReservaExp" id="deletarIdReservaExp" />
 		<input type="hidden" name="deletarDataReservaExp" id="deletarDataReservaExp" />
@@ -11,6 +11,7 @@
 				<button class="btn btn-primary" id="excluirReservaExpNao" data-dismiss="modal" >Cancelar</button>
 				<button class="btn btn-danger" id="excluirReservaExpSim" data-dismiss="modal" >Remover</button>
 				<button class="btn btn-warning" id="excluirReservaExpAlt" data-dismiss="modal" >Alterar</button>
+			<button class="btn btn-success" id="excluirReservaExpDup" data-dismiss="modal" >Duplicar</button>
 		</div>
 	</div>
 </t:modal_sem_save>
