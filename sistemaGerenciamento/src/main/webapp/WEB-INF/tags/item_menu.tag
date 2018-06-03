@@ -78,8 +78,8 @@
 					Arquivos</a></li>
 			<li><a href="${linkTo[HomeController].linux()}"> Configurar
 					Wi-fi Linux</a></li>
-			<li><a href="${linkTo[HomeController].horariosEspeciais()}">
-					Horários Especiais </a></li>
+			<li><a href="${linkTo[RelatorioController].disciplina()}">
+					Relatórios </a></li>
 			<li><a href="${linkTo[AulasLiapeController].cadastro()}">
 					Painel de Informações </a></li>
 

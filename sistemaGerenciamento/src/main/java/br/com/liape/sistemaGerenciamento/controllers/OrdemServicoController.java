@@ -3,8 +3,12 @@ package br.com.liape.sistemaGerenciamento.controllers;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -20,34 +24,43 @@ import br.com.liape.sistemaGerenciamento.dao.GrupoPermissaoDao;
 import br.com.liape.sistemaGerenciamento.dao.OrdemServicoComputadorDao;
 import br.com.liape.sistemaGerenciamento.dao.OrdemServicoDao;
 import br.com.liape.sistemaGerenciamento.dao.OrdemServicoSalaDao;
+import br.com.liape.sistemaGerenciamento.dao.PessoaDao;
 import br.com.liape.sistemaGerenciamento.dao.SalaDao;
 import br.com.liape.sistemaGerenciamento.dao.SubOrdemDao;
 import br.com.liape.sistemaGerenciamento.dao.SubOrdemTurnoDao;
 import br.com.liape.sistemaGerenciamento.dao.SubOrdemUsuarioDao;
 import br.com.liape.sistemaGerenciamento.dao.SubOrdemVisualizadaDao;
 import br.com.liape.sistemaGerenciamento.dao.TurnoDao;
+import br.com.liape.sistemaGerenciamento.dao.UsuarioDao;
 import br.com.liape.sistemaGerenciamento.dao.UsuarioTurnoDao;
+import br.com.liape.sistemaGerenciamento.infra.Configuracoes;
 import br.com.liape.sistemaGerenciamento.model.Computador;
 import br.com.liape.sistemaGerenciamento.model.Grupo;
 import br.com.liape.sistemaGerenciamento.model.GrupoPermissao;
+import br.com.liape.sistemaGerenciamento.model.ModeloMensagem;
 import br.com.liape.sistemaGerenciamento.model.OrdemServico;
 import br.com.liape.sistemaGerenciamento.model.OrdemServicoComputador;
 import br.com.liape.sistemaGerenciamento.model.OrdemServicoSala;
+import br.com.liape.sistemaGerenciamento.model.Pessoa;
 import br.com.liape.sistemaGerenciamento.model.Sala;
 import br.com.liape.sistemaGerenciamento.model.SubOrdem;
 import br.com.liape.sistemaGerenciamento.model.SubOrdemTurno;
 import br.com.liape.sistemaGerenciamento.model.SubOrdemUsuario;
 import br.com.liape.sistemaGerenciamento.model.SubOrdemVisualizada;
 import br.com.liape.sistemaGerenciamento.model.Turno;
+import br.com.liape.sistemaGerenciamento.model.Usuario;
 import br.com.liape.sistemaGerenciamento.model.UsuarioTurno;
 import br.com.liape.sistemaGerenciamento.modelView.EditarOrdemView;
 import br.com.liape.sistemaGerenciamento.modelView.NovaOrdem;
 import br.com.liape.sistemaGerenciamento.modelView.NovaOrdemRedirecionada;
+import br.com.liape.sistemaGerenciamento.modelView.NovaPendencia;
 import br.com.liape.sistemaGerenciamento.modelView.SubOrdemView;
 import br.com.liape.sistemaGerenciamento.modelView.VisualizarSubOrdem;
 import br.com.liape.sistemaGerenciamento.outros.Conversor;
+import br.com.liape.sistemaGerenciamento.outros.Email;
 import br.com.liape.sistemaGerenciamento.outros.MensagemSistema;
 import br.com.liape.sistemaGerenciamento.seguranca.NivelPermissao;
+import br.com.liape.sistemaGerenciamento.tarefas.EnviarEmail;
 
 @Controller
 public class OrdemServicoController extends AbstractController {
@@ -65,13 +78,16 @@ public class OrdemServicoController extends AbstractController {
 	private UsuarioTurnoDao usuarioTurnoDao;
 	private GrupoDao grupoDao;
 	private GrupoPermissaoDao grupoPermissaoDao;
+	private UsuarioDao usuarioDao;
+	private PessoaDao pessoaDao;
 
 	@Inject
 	public OrdemServicoController(OrdemServicoDao ordemServicoDao, SubOrdemDao subOrdemDao,
 			SalaDao salaDao, ComputadorDao computadorDao, OrdemServicoComputadorDao ordemServicoComputadorDao,
 			OrdemServicoSalaDao ordemServicoSalaDao, SubOrdemTurnoDao subOrdemTurnoDao,
 			SubOrdemUsuarioDao subOrdemUsuarioDao, TurnoDao turnoDao, SubOrdemVisualizadaDao ordemVisualizadaDao,
-			UsuarioTurnoDao usuarioTurnoDao, GrupoDao grupoDao, GrupoPermissaoDao grupoPermissaoDao) {
+			UsuarioTurnoDao usuarioTurnoDao, GrupoDao grupoDao, GrupoPermissaoDao grupoPermissaoDao,
+			UsuarioDao usuarioDao, PessoaDao pessoaDao) {
 		this.ordemServicoDao = ordemServicoDao;
 		this.subOrdemDao = subOrdemDao;
 		this.salaDao = salaDao;
@@ -85,10 +101,12 @@ public class OrdemServicoController extends AbstractController {
 		this.usuarioTurnoDao = usuarioTurnoDao;
 		this.grupoDao = grupoDao;
 		this.grupoPermissaoDao = grupoPermissaoDao;
+		this.usuarioDao = usuarioDao;
+		this.pessoaDao = pessoaDao;
 	}
 
 	public OrdemServicoController() {
-		this(null, null, null, null, null, null, null, null, null, null, null, null, null);
+		this(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 	}
 
 	// CADASTRAR NOVA ORDEM DE SERVIÇO
@@ -281,7 +299,6 @@ public class OrdemServicoController extends AbstractController {
 	 */
 	@Post("/Visualizar/SubOrdem/")
 	public void visualizar(int idSor) {
-		MensagemSistema msg = new MensagemSistema("Sucesso");
 		List<SubOrdemVisualizada> listarId = ordemVisualizadaDao.listarIdLogin(idSor
 				, usuarioLogado.getUsuario().getLogin());
 		if (listarId.size() <= 0) {
@@ -295,6 +312,7 @@ public class OrdemServicoController extends AbstractController {
 			
 			
 		}
+		
 		List<SubOrdem> listarIdSub = subOrdemDao.listarIdSub(idSor);
 		if (listarIdSub.size() > 0) {
 			SubOrdem subOrdem = listarIdSub.get(0);
@@ -302,7 +320,42 @@ public class OrdemServicoController extends AbstractController {
 			VisualizarSubOrdem visualizarSubOrdem = new VisualizarSubOrdem();
 			visualizarSubOrdem.setDescricao(ordemServico.getDescricao());
 			visualizarSubOrdem.setJustificativa(subOrdem.getJustificativa());
+			List<SubOrdemUsuario> subUsrs = subOrdemUsuarioDao.listarId(subOrdem.getId());
+			if (subUsrs.size() > 0) {
+				List<Usuario> usuarios = usuarioDao.listarPorLogin(subUsrs.get(0).getLoginUsr());
+				if (usuarios.size() > 0) {			
+					visualizarSubOrdem.setDestinada(usuarios.get(0).getLogin());
+				}
+			}else{
+				List<SubOrdemTurno> subTurs = subOrdemTurnoDao.listarId(subOrdem.getId());
+				if (subTurs.size() >0) {
+					List<Turno> turnos = turnoDao.listarId(subTurs.get(0).getIdTur());
+					if (turnos.size() > 0) {
+						String turno = retornarNomeTurno(turnos.get(0).getPeriodo());
+						visualizarSubOrdem.setDestinada(turno);
+					}
+				}
+			}
+			List<OrdemServicoComputador> computador = ordemServicoComputadorDao.listarId(subOrdem.getIdOrs());
+			if (computador.size() > 0) {
+				List<Sala> salas = salaDao.listarId(computador.get(0).getIdSala());
+				if (salas.size() > 0) {
+					Sala sala = salas.get(0);
+					visualizarSubOrdem.setTipoOrdem("Sala: "+sala.getNome()+
+							" Micro: "+computador.get(0).getNumeroPc());
+				}
+			}else{
+				List<OrdemServicoSala> orSalas = ordemServicoSalaDao.listarId(subOrdem.getIdOrs());
+				if (orSalas.size() > 0) {
+					List<Sala> salas = salaDao.listarId(orSalas.get(0).getIdSala());
+					if (salas.size() > 0) {
+						visualizarSubOrdem.setTipoOrdem("Sala: "+salas.get(0).getNome());
+					}
+				}
+			}
 			visualizarSubOrdem.setLogin(subOrdem.getLogin());
+			visualizarSubOrdem.setDataParaSerExecutada(
+					Conversor.converterLocalDateTimeParaTimeStamp(subOrdem.getDataParaSerExecutada()));
 			result.include("ordem", visualizarSubOrdem);
 			
 		}else{
@@ -321,6 +374,7 @@ public class OrdemServicoController extends AbstractController {
 	 */
 	@NivelPermissao(idPermissao = 19)
 	public void redirecionar(NovaOrdemRedirecionada redirecionada) {
+		enviarEmailOrdem(redirecionada);
 		redirecionarOrdem(redirecionada);
 	}
 
@@ -330,6 +384,7 @@ public class OrdemServicoController extends AbstractController {
 		if (subUsr.size() > 0) {
 			SubOrdemUsuario subOrdemUsuario = subUsr.get(0);
 			if (subOrdemUsuario.getLoginUsr().equals(usuarioLogado.getUsuario().getLogin())) {
+				enviarEmailOrdem(redirecionada);
 				redirecionarOrdem(redirecionada);
 			} else {
 				result.redirectTo(ErrosController.class).erro_operacao();
@@ -497,6 +552,7 @@ public class OrdemServicoController extends AbstractController {
 					
 				}
 				if (inserir) {
+					enviarEmailOrdem(ordem);
 					result.redirectTo(HomeController.class).index();
 				} else {
 					result.redirectTo(ErrosController.class).erro_operacao();
@@ -508,7 +564,72 @@ public class OrdemServicoController extends AbstractController {
 			result.redirectTo(ErrosController.class).erro_operacao();
 		}
 	}
+	private void enviarEmailOrdem(NovaPendencia ordem) {
+		if (ordem.getDestinada() == 1) {
+			List<Turno> turnos = turnoDao.listarPeriodo(Integer.valueOf(ordem.getIdDestino()));
+			if (turnos.size() > 0) {
+				Turno turno = turnos.get(0);
+				List<UsuarioTurno> usuariosT = usuarioTurnoDao.listarId(turno.getId());
+				for (UsuarioTurno usuarioTurno : usuariosT) {
+					List<Usuario> usuarios = usuarioDao.listarPorLogin(usuarioTurno.getLoginUsr());
+					if (usuarios.size() > 0) {
+						String recado = "o turno da "+retornarNomeTurno(turno.getPeriodo());
+						enviarEmailParaUsuario(usuarios.get(0),recado , ordem);
+					}
+				}
+			}
+		}else{
+			List<Usuario> usuarios = usuarioDao.listarPorLogin(ordem.getIdDestino());
+			if (usuarios.size() > 0) {
+				String recado = "você!";
+				enviarEmailParaUsuario(usuarios.get(0),recado , ordem);
+			}
+		}
+		
+	}
 
+	private void enviarEmailParaUsuario(Usuario usuario, String recado, NovaPendencia ordem) {
+		List<Pessoa> pessoas = pessoaDao.listarPorId(usuario.getIdPes());
+		if (verificarSePesoaExiste(pessoas)) {
+			Pessoa pessoa = pessoas.get(0);
+			HashMap<String, String> mapa = new HashMap<>();
+			mapa.put("usuario", pessoa.getNome() + " " + pessoa.getSobrenome());
+			mapa.put("tipoOrdem", recado);
+			mapa.put("urlSite", Configuracoes.configuracao.getUrlSite()+"Listar/Ordem/Ativas/");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			mapa.put("prazo", Conversor.converterLocalDate(ordem.getDataExecutada()).format(formatter)
+					+ " às "+ordem.getDataExecutadaHora());
+			ModeloMensagem modelo = Email.NovaOrdem;
+			String email = pessoa.getEmail();
+			ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+			executorService.execute(new EnviarEmail(modelo, mapa, email));
+			executorService.shutdown();
+		}
+		
+	}
+	private boolean verificarSePesoaExiste(List<Pessoa> pessoas) {
+		if(pessoas.size() > 0)
+			return pessoas.get(0).getAtivo();
+		return false;
+	}
+	private String retornarNomeTurno(int turno) {
+		String nomeTurno = "";
+		switch (turno) {
+		case 1:
+			nomeTurno = "Manhã";
+			break;
+		case 2:
+			nomeTurno = "Tarde";
+			break;
+		case 3:
+			nomeTurno = "Noite";
+			break;
+		default:
+			break;
+		}
+		return nomeTurno;
+	}
 	// INSERIR SUBORDEM DE USUÁRIO - RAMIFICAÇÃO DE inserirSubOrdem
 	private boolean inserirSubOrdemUsuario(NovaOrdem ordem, int idSubOrdem) {
 		boolean inserir;

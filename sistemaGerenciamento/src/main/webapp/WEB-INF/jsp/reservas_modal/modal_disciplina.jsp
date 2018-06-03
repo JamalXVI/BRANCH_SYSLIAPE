@@ -12,6 +12,19 @@
 			id="codigoDisciplinaForm" classes="upperCase"></t:input>
 	</form>
 	<div class="col-xs-12">
+		<form>
+			<label>Selecione a Pesquisa:</label>
+			<label class="radio-inline">
+			   <input type="radio" name="opcoesDiscplinasPesquisa" id="dis-pesq-nome" value="1" >
+			   Nome
+			 </label>
+			 <label class="radio-inline">
+			   <input type="radio" name="opcoesDiscplinasPesquisa" id="dis-pesq-codigo" value="0" checked>
+			   Codigo
+			 </label>
+		</form>
+	</div>
+	<div class="col-xs-12">
 		<div class='table-responsive espaco_cima'>
 			<table id='tabelaDisciplinas'
 				class='table table-striped table-hover table-bordered'>

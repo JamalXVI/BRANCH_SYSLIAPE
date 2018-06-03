@@ -2,7 +2,10 @@ package br.com.liape.sistemaGerenciamento.controllers;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 
@@ -13,23 +16,31 @@ import br.com.caelum.vraptor.view.Results;
 import br.com.liape.sistemaGerenciamento.dao.MuralDao;
 import br.com.liape.sistemaGerenciamento.dao.MuralTurnoDao;
 import br.com.liape.sistemaGerenciamento.dao.MuralVisualizadoDao;
+import br.com.liape.sistemaGerenciamento.dao.PessoaDao;
 import br.com.liape.sistemaGerenciamento.dao.RecadoDao;
 import br.com.liape.sistemaGerenciamento.dao.RecadoUsuarioAlvoDao;
 import br.com.liape.sistemaGerenciamento.dao.TurnoDao;
+import br.com.liape.sistemaGerenciamento.dao.UsuarioDao;
 import br.com.liape.sistemaGerenciamento.dao.UsuarioTurnoDao;
+import br.com.liape.sistemaGerenciamento.infra.Configuracoes;
+import br.com.liape.sistemaGerenciamento.model.ModeloMensagem;
 import br.com.liape.sistemaGerenciamento.model.Mural;
 import br.com.liape.sistemaGerenciamento.model.MuralTurno;
 import br.com.liape.sistemaGerenciamento.model.MuralVisualizado;
+import br.com.liape.sistemaGerenciamento.model.Pessoa;
 import br.com.liape.sistemaGerenciamento.model.Recado;
 import br.com.liape.sistemaGerenciamento.model.RecadoUsuarioAlvo;
 import br.com.liape.sistemaGerenciamento.model.Turno;
+import br.com.liape.sistemaGerenciamento.model.Usuario;
 import br.com.liape.sistemaGerenciamento.model.UsuarioTurno;
 import br.com.liape.sistemaGerenciamento.modelView.Mensagem;
 import br.com.liape.sistemaGerenciamento.modelView.MuralUsuario;
 import br.com.liape.sistemaGerenciamento.modelView.RecadoUsuario;
 import br.com.liape.sistemaGerenciamento.outros.Conversor;
+import br.com.liape.sistemaGerenciamento.outros.Email;
 import br.com.liape.sistemaGerenciamento.outros.MensagemSistema;
 import br.com.liape.sistemaGerenciamento.seguranca.NivelPermissao;
+import br.com.liape.sistemaGerenciamento.tarefas.EnviarEmail;
 
 @Controller
 public class MuralController extends AbstractController{
@@ -41,21 +52,26 @@ public class MuralController extends AbstractController{
 	private UsuarioTurnoDao usuarioTurnoDao;
 	private MuralTurnoDao muralTurnoDao;
 	private MuralVisualizadoDao muralVisualizadoDao;
+	private UsuarioDao usuarioDao;
+	private PessoaDao pessoaDao;
 
 	@Inject
 	public MuralController(RecadoUsuarioAlvoDao recadoUsuarioAlvoDao,
 			TurnoDao turnoDao, MuralDao muralDao, UsuarioTurnoDao usuarioTurnoDao,
-			MuralTurnoDao muralTurnoDao, MuralVisualizadoDao muralVisualizadoDao) {
+			MuralTurnoDao muralTurnoDao, MuralVisualizadoDao muralVisualizadoDao,
+			UsuarioDao usuarioDao, PessoaDao  pessoaDao) {
 		this.recadoUsuarioAlvoDao = recadoUsuarioAlvoDao;
 		this.turnoDao = turnoDao;
 		this.muralDao = muralDao;
 		this.usuarioTurnoDao = usuarioTurnoDao;
 		this.muralTurnoDao = muralTurnoDao;
 		this.muralVisualizadoDao = muralVisualizadoDao;
+		this.usuarioDao = usuarioDao;
+		this.pessoaDao = pessoaDao;
 	}
 
 	public MuralController() {
-		this(null, null, null, null, null, null);
+		this(null, null, null, null, null, null, null, null);
 	}
 
 	/*
@@ -261,11 +277,13 @@ public class MuralController extends AbstractController{
 							List<Turno> turnosAlvo = turnoDao.listarPeriodo(retornarHorario(recado));
 							if (turnosAlvo.size() > 0) {
 								int idTur = turnosAlvo.get(0).getId();
+								enviarMuralEmail(recado, mural.getTitulo(), idTur, mensagem.getMensagem() );
 								cadastrarMuralParaTurno(idMur, idTur);
 							}
 						}else{
 							List<Turno> turnos = turnoDao.listar();
 							for (Turno turnoAlvo : turnos) {
+								enviarMuralEmail(recado, mural.getTitulo(), turnoAlvo.getId(), mensagem.getMensagem() );
 								cadastrarMuralParaTurno(idMur, turnoAlvo.getId());
 							}
 						}
@@ -284,6 +302,43 @@ public class MuralController extends AbstractController{
 		} else {
 			result.redirectTo(ErrosController.class).erro_operacao();
 		}
+	}
+	private void enviarMuralEmail(String recado, String titulo, int idTur, String descricao) {
+		List<UsuarioTurno> usuarios = usuarioTurnoDao.listarId(idTur);
+		for (UsuarioTurno usuarioTurno : usuarios) {
+			List<Usuario> usuariosEsc = usuarioDao.listarPorLogin(usuarioTurno.getLoginUsr());
+			if (usuariosEsc.size() > 0) {
+				fazerEnvioEmail(recado, titulo,  usuariosEsc.get(0), descricao);
+			}
+		}
+		
+	}
+
+	private void fazerEnvioEmail(String recado, String titulo, Usuario usuario, String descricao) {
+		List<Pessoa> pessoas = pessoaDao.listarPorId(usuario.getIdPes());
+		if (verificarSePesoaExiste(pessoas)) {
+			Pessoa pessoa = pessoas.get(0);
+			HashMap<String, String> mapa = new HashMap<>();
+			mapa.put("usuario", pessoa.getNome() + " " + pessoa.getSobrenome());
+			mapa.put("remetente", usuarioLogado.getUsuario().getPessoa().getNome() + " "
+					+ usuarioLogado.getUsuario().getPessoa().getSobrenome());
+			mapa.put("titulo", titulo);
+			mapa.put("urlSite", Configuracoes.configuracao.getUrlSite()+"Mural/Entrada/");
+			mapa.put("turno", recado);
+			mapa.put("descricao", descricao);
+			ModeloMensagem modelo = Email.NovaMensagemTurno;
+			String email = pessoa.getEmail();
+			ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+			executorService.execute(new EnviarEmail(modelo, mapa, email));
+			executorService.shutdown();
+		}
+	}
+
+	private boolean verificarSePesoaExiste(List<Pessoa> pessoas) {
+		if(pessoas.size() > 0)
+			return pessoas.get(0).getAtivo();
+		return false;
 	}
 
 	private void cadastrarMuralParaTurno(int idMur, int idTur) {
@@ -316,14 +371,14 @@ public class MuralController extends AbstractController{
 		int valor;
 		switch (turno.toLowerCase()) {
 		case "tarde":
-			valor = 1;
+			valor = 2;
 			break;
 		case "noite":
-			valor = 2;
+			valor = 3;
 			break;
 
 		default:
-			valor = 0;
+			valor = 1;
 			break;
 		}
 		return valor;

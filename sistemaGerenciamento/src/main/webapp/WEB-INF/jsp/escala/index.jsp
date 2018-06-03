@@ -123,65 +123,33 @@
 				}
 			});
 			$(escalas).each(function(indice_escala, escala){
-				var mesAtual = new Date(montarDataVal(escala.dataIni)).getMonth();
-				
+				var mesAtual = new Date(montarDataVal(escala.dataIni)).adicionarDias(1).getMonth();
 				if (mesAtual == $("#selectFiltrarHora").val()) {
-					
 					$.when(coletarUsuariosEscala(escala.id, indice_escala)).done(function(){
+						var texto = "";
+						texto = montar_base_texto(escala);
+						var textos_usuarios = []
 						$(usuariosEscalas[indice_escala]).each(function(indice_usr_escala,usr_escala){
 							$(usuarios).each(function(indice_usuario, usuario){
 								if (usr_escala.loginUsr == usuario.login) {
 									if (!fotos_perfil[usuario.idPes]) {
 										$.when(guardarFotoPerfil(usuario)).done(function(){
-											var texto = "<tr><td>";
-											if (escala.dataFim.day == escala.dataIni.day &&
-												escala.dataFim.month == escala.dataIni.month &&
-												escala.dataFim.year == escala.dataIni.year) {
-												texto += montarData(escala.dataIni)+"</td><td>";
-											}else{
-												texto += montarData(escala.dataIni)+" - "
-												+montarData(escala.dataFim)+"</td><td>";
-												
-											}
-											texto += montarHora(escala.horaInicio)+"</td><td>";
-											texto += montarHora(escala.horaFim)+"</td><td>";
-											texto += texto_usuario(texto, usuario);
-											texto += "</td><td>";
-											texto += criarTextoAcao("removerEscala",
-													"fa fa-trash", indice_escala);
-											texto += criarTextoAcao("editarEscala",
-												"fa fa-pencil", indice_escala)+"</td>";
-											textos[indice_escala] = texto;
-											acrescentarTextos(textos, numeroSelecionados);	
+											textos_usuarios.push(texto_usuario(usuario));
+											finalizar(textos, textos_usuarios, texto, escala,
+													indice_escala, numeroSelecionados, usuariosEscalas);
+											
 										})
 									}else{
-										var texto = "<tr><td>";
-										if (escala.dataFim.day == escala.dataIni.day &&
-											escala.dataFim.month == escala.dataIni.month &&
-											escala.dataFim.year == escala.dataIni.year) {
-											texto += montarData(escala.dataIni)+"</td><td>";
-										}else{
-											texto += montarData(escala.dataIni)+" - "
-											+montarData(escala.dataFim)+"</td><td>";
-											
-										}
-										texto += montarHora(escala.horaInicio)+"</td><td>";
-										texto += montarHora(escala.horaFim)+"</td><td>";
-										texto += texto_usuario(texto, usuario);
-										texto += "</td><td>";
-										texto += criarTextoAcao("removerEscala",
-												"fa fa-trash", indice_escala);
-										texto += criarTextoAcao("editarEscala",
-											"fa fa-pencil", indice_escala)+"</td>";
-										textos[indice_escala] = texto;
-										acrescentarTextos(textos, numeroSelecionados);	
+										textos_usuarios.push(texto_usuario(usuario));
+										finalizar(textos, textos_usuarios, texto, escala,
+												indice_escala, numeroSelecionados, usuariosEscalas);
 									}
 									
 									
 								};
 							});
 						});
-						
+							
 						
 					});
 				}
@@ -192,13 +160,70 @@
 				acrescentarTextos(textos, numeroSelecionados);	
 			}
 		}
+		var finalizar = function(textos, textos_usuarios, texto, escala,
+				indice_escala, numeroSelecionados, usuariosEscalas){
+			if (textos_usuarios.length >= usuariosEscalas[indice_escala].length) {
+				$(textos_usuarios).each(function(i,e){
+					texto += e;
+				});
+				texto += finalizar_texto(escala, indice_escala);
+				textos.push([texto, escala]);
+				acrescentarTextos(textos, numeroSelecionados);	
+			}
+		}
 		var acrescentarTextos = function(textos, numeroSelecionados){
 			$("#corpoTabelaMensagens").find("tr").remove().end();
 			if (textos.length >= numeroSelecionados) {
+				textos = textos.sort(function(a,b){
+					var k = a[1];
+					var y = b[1];
+					if(k.dataIni.day > y.dataIni.day)
+				    {
+						return 1;
+				    }else if (k.dataIni.day == y.dataIni.day){
+						if(k.horaInicio.hour > y.horaInicio.hour){
+							return 1;
+				        }else if (k.horaInicio.hour == y.horaInicio.hour){
+							if(k.horaInicio.minute > y.horaInicio.minute){
+								return 1;
+				            }else{
+								return -1;
+				            }
+				        }else{
+							return -1;
+						}
+				    }else{
+						return -1;
+				    }
+				});
 				$(textos).each(function(indice,texto){
-					$("#corpoTabelaMensagens").append(texto);
+					$("#corpoTabelaMensagens").append(texto[0]);
 				});
 			}
+		}
+		var finalizar_texto = function(escala, indice_escala){
+			var texto = "";
+			texto += "</td><td>";
+			texto += criarTextoAcao("removerEscala",
+					"fa fa-trash", indice_escala);
+			texto += criarTextoAcao("editarEscala",
+				"fa fa-pencil", indice_escala)+"</td>";
+			return texto;
+		}
+		var montar_base_texto = function(escala){
+			var texto = "<tr><td>";
+			if (escala.dataFim.day == escala.dataIni.day &&
+				escala.dataFim.month == escala.dataIni.month &&
+				escala.dataFim.year == escala.dataIni.year) {
+				texto += montarData(escala.dataIni)+"</td><td>";
+			}else{
+				texto += montarData(escala.dataIni)+" - "
+				+montarData(escala.dataFim)+"</td><td>";
+				
+			}
+			texto += montarHora(escala.horaInicio)+"</td><td>";
+			texto += montarHora(escala.horaFim)+"</td><td>";
+			return texto;
 		}
 		var removerEscala = function(indice_escala){
 			
@@ -470,7 +495,7 @@
 			
 		});
 	}
-	var texto_usuario = function(texto, usuario){
+	var texto_usuario = function(usuario){
 		return "<img style='width:6%;margin-right:10px;' class='img-circle' src='data:image/png;base64," + fotos_perfil[usuario.idPes]+"'></img>"
 		+usuario.pessoa.nome+" "+usuario.pessoa.sobrenome+" / ";
 	}

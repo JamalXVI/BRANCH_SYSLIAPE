@@ -2,6 +2,7 @@ package br.com.liape.sistemaGerenciamento.modelView;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 public class VisualizarSubOrdem implements Serializable {
 	private static final long serialVersionUID = 4439213987021006244L;
@@ -10,6 +11,20 @@ public class VisualizarSubOrdem implements Serializable {
 	private String login;
 	private String descricao;
 	private String justificativa;
+	private String destinada;
+	private String tipoOrdem;
+	public String getTipoOrdem() {
+		return tipoOrdem;
+	}
+	public void setTipoOrdem(String tipoOrdem) {
+		this.tipoOrdem = tipoOrdem;
+	}
+	public String getDestinada() {
+		return destinada;
+	}
+	public void setDestinada(String destinada) {
+		this.destinada = destinada;
+	}
 	public Timestamp getDataGerada() {
 		return dataGerada;
 	}
@@ -40,5 +55,8 @@ public class VisualizarSubOrdem implements Serializable {
 	public void setJustificativa(String justificativa) {
 		this.justificativa = justificativa;
 	}
-	
+	public String dataParaSerExecutadaTexto()
+	{
+		return new SimpleDateFormat("dd/MM/yyyy").format(getDataParaSerExecutada());
+	}
 }

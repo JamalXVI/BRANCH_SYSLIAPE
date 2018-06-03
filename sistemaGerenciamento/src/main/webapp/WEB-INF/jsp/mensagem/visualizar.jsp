@@ -37,10 +37,16 @@
 			 <div class="col-xs-12">
 			 <label for="mensagem.texto">Texto:</label>
 			 <textarea rows="5" cols=""
-			  name="mensagem.mensagem" class="form-control" readonly="readonly">
-			  ${recado.descricao }
-			  </textarea>
-			  
+			  name="mensagem.mensagem" class="form-control" readonly="readonly">${recado.descricao }</textarea>
+			  <c:if test="${idArq != 0 }">
+			  		<div class="col-xs-12">
+			  			<h3>Anexo</h3>
+			  			<a href="${linkTo[MensagemController].download()}${idArq}"
+			  			rel='nofollow' download target='_blank'>
+			  			Download
+			  			</a>
+			  		</div>
+			  </c:if>
 			 </div>
 		</div>
 	</div>

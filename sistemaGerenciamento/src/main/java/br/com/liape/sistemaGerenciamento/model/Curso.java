@@ -37,7 +37,6 @@ public class Curso implements Serializable, Comparable<Curso>{
 	}
 	@Override
 	public int compareTo(Curso curso) {
-		// TODO Auto-generated method stub
 		return this.getCodigo().compareTo(curso.getCodigo());
 	}
 	

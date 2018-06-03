@@ -37,9 +37,7 @@
 			 <div class="col-xs-12">
 			 <label for="mensagem.texto">Texto:</label>
 			 <textarea rows="5" cols=""
-			  name="mensagem.mensagem" class="form-control" readonly="readonly">
-			  ${recado.descricao }
-			  </textarea>
+			  name="mensagem.mensagem" class="form-control" readonly="readonly">${recado.descricao }</textarea>
 			  
 			 </div>
 		</div>

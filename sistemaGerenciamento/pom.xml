@@ -64,6 +64,16 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>br.com.caelum.vraptor</groupId>
+			<artifactId>vraptor-quartzjob</artifactId>
+			<version>4.0.7</version>
+		</dependency>
+		<dependency>
 			<groupId>br.com.caelum</groupId>
 			<artifactId>vraptor</artifactId>
 			<version>4.1.4</version>
@@ -82,14 +92,14 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-		    <groupId>com.thoughtworks.xstream</groupId>
-		    <artifactId>xstream</artifactId>
-		    <version>1.4.9</version>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<version>1.4.9</version>
 		</dependency>
 		<dependency>
-		    <groupId>xpp3</groupId>
-		    <artifactId>xpp3_min</artifactId>
-		    <version>1.1.4c</version>
+			<groupId>xpp3</groupId>
+			<artifactId>xpp3_min</artifactId>
+			<version>1.1.4c</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.validation</groupId>
@@ -132,7 +142,7 @@
 			<version>3.0.0</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>br.com.caelum.vraptor</groupId>
 			<artifactId>vraptor-jpa</artifactId>
@@ -157,13 +167,27 @@
 			<version>1.0.0.Final</version>
 			<scope>compile</scope>
 		</dependency>
-<!-- 		<DEPENDENCY> -->
-<!-- 			<GROUPID>COM.LIAPE</GROUPID> -->
-<!-- 			<ARTIFACTID>PERSISTENCEJDBC</ARTIFACTID> -->
-<!-- 			<VERSION>1.0</VERSION> -->
-<!-- 			<SCOPE>SYSTEM</SCOPE> -->
-<!-- 			<SYSTEMPATH>${BASEDIR}/LIB/PERSISTENCEJDBC.JAR</SYSTEMPATH> -->
-<!-- 		</DEPENDENCY> -->
+		<!-- https://mvnrepository.com/artifact/org.xhtmlrenderer/core-renderer -->
+		<dependency>
+			<groupId>org.xhtmlrenderer</groupId>
+			<artifactId>core-renderer</artifactId>
+			<version>R8pre2</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/net.sf.jtidy/jtidy -->
+		<dependency>
+			<groupId>net.sf.jtidy</groupId>
+			<artifactId>jtidy</artifactId>
+			<version>r938</version>
+		</dependency>
+
+
+		<!-- <DEPENDENCY> -->
+		<!-- <GROUPID>COM.LIAPE</GROUPID> -->
+		<!-- <ARTIFACTID>PERSISTENCEJDBC</ARTIFACTID> -->
+		<!-- <VERSION>1.0</VERSION> -->
+		<!-- <SCOPE>SYSTEM</SCOPE> -->
+		<!-- <SYSTEMPATH>${BASEDIR}/LIB/PERSISTENCEJDBC.JAR</SYSTEMPATH> -->
+		<!-- </DEPENDENCY> -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -171,15 +195,58 @@
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
-			<artifactId	>hibernate-validator-cdi</artifactId>
+			<artifactId>hibernate-validator-cdi</artifactId>
 			<version>5.1.1.Final</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-		   <groupId>com.google.code.ksoap2-android</groupId>
-		   <artifactId>ksoap2-android-assembly</artifactId>
-		   <version>3.6.2</version>
+			<groupId>com.google.code.ksoap2-android</groupId>
+			<artifactId>ksoap2-android-assembly</artifactId>
+			<version>3.6.2</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
+		<dependency>
+		    <groupId>commons-beanutils</groupId>
+		    <artifactId>commons-beanutils</artifactId>
+		    <version>1.8.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/commons-collections/commons-collections -->
+		<dependency>
+		    <groupId>commons-collections</groupId>
+		    <artifactId>commons-collections</artifactId>
+		    <version>2.1.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/commons-digester/commons-digester -->
+		<dependency>
+		    <groupId>commons-digester</groupId>
+		    <artifactId>commons-digester</artifactId>
+		    <version>2.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/commons-logging/commons-logging -->
+		<dependency>
+		    <groupId>commons-logging</groupId>
+		    <artifactId>commons-logging</artifactId>
+		    <version>1.1.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
+		<dependency>
+		    <groupId>org.codehaus.groovy</groupId>
+		    <artifactId>groovy-all</artifactId>
+		    <version>2.0.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.lowagie/itext -->
+		<dependency>
+		    <groupId>com.lowagie</groupId>
+		    <artifactId>itext</artifactId>
+		    <version>2.1.7</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports -->
+		<dependency>
+		    <groupId>net.sf.jasperreports</groupId>
+		    <artifactId>jasperreports</artifactId>
+		    <version>5.5.0</version>
+		</dependency>
+		
 	</dependencies>
 	<build>
 		<plugins>
@@ -236,20 +303,20 @@
 
 
 		</plugins>
-		
+
 	</build>
 	<repositories>
-			<repository>
-			    <id>ksoap2-android</id>
-			    <name>ksoap2-android</name>
-			    <url>https://oss.sonatype.org/content/repositories/ksoap2-android-releases/</url>
-			</repository>
+		<repository>
+			<id>ksoap2-android</id>
+			<name>ksoap2-android</name>
+			<url>https://oss.sonatype.org/content/repositories/ksoap2-android-releases/</url>
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
-		    <id>ksoap2-android</id>
-		    <name>ksoap2-android</name>
-		    <url>https://oss.sonatype.org/content/repositories/ksoap2-android-releases/</url>
+			<id>ksoap2-android</id>
+			<name>ksoap2-android</name>
+			<url>https://oss.sonatype.org/content/repositories/ksoap2-android-releases/</url>
 		</pluginRepository>
 	</pluginRepositories>
 </project>

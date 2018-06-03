@@ -2,6 +2,7 @@ package br.com.liape.sistemaGerenciamento.outros;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import org.joda.time.LocalDate;
 
@@ -32,5 +33,8 @@ public class Conversor {
 	public static Timestamp converterLocalDateTimeParaTimeStamp(LocalDateTime ldt)
 	{
 		return Timestamp.valueOf(ldt);
+	}
+	public static java.time.LocalDate converterUtilDateParaLocalDate(java.util.Date data){
+		return data.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 	}
 }

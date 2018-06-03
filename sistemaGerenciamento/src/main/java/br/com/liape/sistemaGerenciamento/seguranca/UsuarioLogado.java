@@ -51,7 +51,15 @@ public class UsuarioLogado implements Serializable {
 	public List<Permissao> pegarAutorizacao() {
 		return this.usuario.getGrupo().getPermissoes();
 	}
-
+	public boolean ehAdmin()
+	{
+		for (Permissao permissao : this.usuario.getGrupo().getPermissoes()) {
+			if (permissao.getId() == 1) {
+				return true;
+			}
+		}
+		return false;
+	}
 	public Calendar getHorario_login() {
 		return horario_login;
 	}

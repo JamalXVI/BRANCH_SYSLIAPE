@@ -421,8 +421,7 @@ $("#excluirUsuarioSim").on("click", function(){
 				    (iniMensagemAlerta+"Por Favor insira ao menos {0} caracteres."+fimMensagemAlerta)
 			  
 			  }}
-			);	
-	});
+			);
 </script>
 <!-- Novo Usuário -->
 <script type="text/javascript" >

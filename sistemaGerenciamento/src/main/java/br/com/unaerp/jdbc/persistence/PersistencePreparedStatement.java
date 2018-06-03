@@ -94,21 +94,22 @@ class PersistencePreparedStatement
               SQL_WHERE.append(" =?");
             }
             listaWhere.add(getObject(field, obj));
+          }else{
+        	  Coluna column = (Coluna)field.getAnnotation(Coluna.class);
+        	  if (SQL_COLUMN.toString().isEmpty())
+        	  {
+        		  SQL_COLUMN.append("SET ");
+        		  SQL_COLUMN.append(column.nome());
+        		  SQL_COLUMN.append(" =?");
+        	  }
+        	  else
+        	  {
+        		  SQL_COLUMN.append(",");
+        		  SQL_COLUMN.append(column.nome());
+        		  SQL_COLUMN.append(" =?");
+        	  }
+        	  listaParam.add(getObject(field, obj));
           }
-          Coluna column = (Coluna)field.getAnnotation(Coluna.class);
-          if (SQL_COLUMN.toString().isEmpty())
-          {
-            SQL_COLUMN.append("SET ");
-            SQL_COLUMN.append(column.nome());
-            SQL_COLUMN.append(" =?");
-          }
-          else
-          {
-            SQL_COLUMN.append(",");
-            SQL_COLUMN.append(column.nome());
-            SQL_COLUMN.append(" =?");
-          }
-          listaParam.add(getObject(field, obj));
         }
       }
       StringBuilder SQL = new StringBuilder();

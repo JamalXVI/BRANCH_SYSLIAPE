@@ -76,6 +76,14 @@
 	}
 	posicionarFotoPerfil(".imagem-perfil", idCaboclo);
 </script>
+<script type="text/javascript">
+Date.prototype.adicionarDias = function(days) {
+  var dat = new Date(this.valueOf());
+  dat.setDate(dat.getDate() + days);
+  return dat;
+}
+
+</script>
 <!-- Enviar Foto Perfil -->
 <script type="text/javascript">
 	$('#file').change(function() {

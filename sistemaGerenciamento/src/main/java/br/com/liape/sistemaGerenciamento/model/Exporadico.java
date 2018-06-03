@@ -38,6 +38,7 @@ public class Exporadico implements Serializable{
 	private Reserva reserva;
 	@Coluna(nome="ID_SAL")
 	@NotNull
+	@Chave
 	private int idSal;
 	
 	@Coluna(nome="ATIVO_EXP")

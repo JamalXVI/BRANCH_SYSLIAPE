@@ -1,4 +1,4 @@
-package br.com.liape.sistemaGerenciamento.infra;
+]package br.com.liape.sistemaGerenciamento.infra;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,13 +9,19 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
+import br.com.liape.sistemaGerenciamento.model.ConfEmail;
 import br.com.liape.sistemaGerenciamento.model.MenuUsuarioItem;
 
 public class Configuracoes {
 	private int tempoAntesDaAula;
 	private String caminhoSalvarArquivo;
+	private String caminhoRelatorios;
 	@XStreamImplicit(itemFieldName = "menuOrdens")
 	private List<MenuUsuarioItem> menuOrdens;
+	private ConfEmail email;
+	private String urlSite;
+	private String horaEnvioEmailEscala;
+	private int tempoIntervalo;
 	public static final Configuracoes configuracao = iniciarConfiguracao();
 
 	public Configuracoes(int tempoAntesDaAula, String caminhoSalvarArquivo) {
@@ -33,6 +39,9 @@ public class Configuracoes {
 			return (Configuracoes) xstream.fromXML(in);
 		} catch (FileNotFoundException e) {
 			System.err.println("ERRO: " + e.getMessage());
+		} catch (Exception e){
+			System.err.println("ERRO: " + e.getMessage());
+			
 		}
 		return null;
 	}
@@ -61,5 +70,47 @@ public class Configuracoes {
 		this.menuOrdens = menuOrdens;
 	}
 
+	public ConfEmail getEmail() {
+		return email;
+	}
+
+	public void setEmail(ConfEmail email) {
+		this.email = email;
+	}
+
+	public String getUrlSite() {
+		return urlSite;
+	}
+
+	public void setUrlSite(String urlSite) {
+		this.urlSite = urlSite;
+	}
+
+	public String getHoraEnvioEmailEscala() {
+		return horaEnvioEmailEscala;
+	}
+
+	public void setHoraEnvioEmailEscala(String horaEnvioEmailEscala) {
+		this.horaEnvioEmailEscala = horaEnvioEmailEscala;
+	}
+
+	public String getCaminhoRelatorios() {
+		return caminhoRelatorios;
+	}
+
+	public void setCaminhoRelatorios(String caminhoRelatorios) {
+		this.caminhoRelatorios = caminhoRelatorios;
+	}
+
+	public int getTempoIntervalo() {
+		return tempoIntervalo;
+	}
+
+	public void setTempoIntervalo(int tempoIntervalo) {
+		this.tempoIntervalo = tempoIntervalo;
+	}
+	
+	
+	
 	
 }

@@ -7,7 +7,6 @@ import java.time.LocalTime;
 import java.util.List;
 
 import br.com.liape.sistemaGerenciamento.model.Exporadico;
-import br.com.liape.sistemaGerenciamento.model.Semestral;
 import br.com.sistemaGerenciamento.conexao.ConnectionFactory;
 import br.com.unaerp.jdbc.persistence.PersistenceJDBC;
 
@@ -20,7 +19,7 @@ public class ExporadicaDao extends PersistenceJDBC<Exporadico> {
 	private static String SQL_LISTAR_ESPECIFICO_F = "SELECT * FROM EXPORADICO WHERE ID_RES = ?"
 			+ " AND DATA_MARCADA_EXP = ? AND HORA_INICIO_EXP = ? AND HORA_FIM_EXP = ? AND ATIVO_EXP = FALSE";
 	private static String SQL_VER_SE_EXISTE = "SELECT * FROM EXPORADICO WHERE ID_RES = ?"
-			+ " AND DATA_MARCADA_EXP = ? AND HORA_INICIO_EXP = ? AND HORA_FIM_EXP = ?";
+			+ " AND DATA_MARCADA_EXP = ? AND HORA_INICIO_EXP = ? AND HORA_FIM_EXP = ? AND ID_SAL=?";
 	private static String SQL_POR_MES = "SELECT * FROM EXPORADICO WHERE MONTH(DATA_MARCADA_EXP) = "
 			+ "? AND ATIVO_EXP = TRUE ORDER BY DATA_MARCADA_EXP";
 	private static String SQL_LISTAR_HORA = "SELECT * FROM EXPORADICO WHERE (HORA_INICIO_EXP >= ? AND"
@@ -28,6 +27,8 @@ public class ExporadicaDao extends PersistenceJDBC<Exporadico> {
 			+ " AND ID_RES = ? AND DATA_MARCADA_EXP = ? AND ATIVO_EXP = TRUE)"
 			+ " OR (HORA_FIM_EXP >= ? AND HORA_INICIO_EXP <= ?"
 			+ " AND ID_RES = ? AND DATA_MARCADA_EXP = ? AND ATIVO_EXP = TRUE)";
+	private static String SQL_LISTAR_INTERVALO_DATAS = "SELECT * FROM EXPORADICO WHERE (DATA_MARCADA_EXP >= ? AND"
+			+ " DATA_MARCADA_EXP <= ? AND ID_RES = ? AND ATIVO_EXP = TRUE)";
 	
 	public ExporadicaDao() {
 	}
@@ -64,11 +65,14 @@ public class ExporadicaDao extends PersistenceJDBC<Exporadico> {
 		
 	}
 	public List<Exporadico> verSeExite(int idResExp, LocalDate data, LocalTime horaIni,
-			LocalTime horaFim) {
-		return super.consultarLista(SQL_VER_SE_EXISTE, idResExp, data, horaIni, horaFim);
+			LocalTime horaFim, int idSal) {
+		return super.consultarLista(SQL_VER_SE_EXISTE, idResExp, data, horaIni, horaFim, idSal);
 		
 	}
 	public List<Exporadico> listarMes(int mes){
 		return super.consultarLista(SQL_POR_MES, mes);
+	}
+	public List<Exporadico> listarIntervalo(LocalDate dataInicio, LocalDate dataFim, int idResExp){
+		return super.consultarLista(SQL_LISTAR_INTERVALO_DATAS, dataInicio, dataFim, idResExp);
 	}
 }

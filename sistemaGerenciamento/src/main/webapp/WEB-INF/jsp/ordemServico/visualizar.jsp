@@ -1,5 +1,6 @@
 <!-- Importação JSTLs -->
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix = "fmt" uri = "http://java.sun.com/jsp/jstl/fmt" %>
 
 <!-- Importação das Tags -->
 <%@taglib prefix="t" tagdir="/WEB-INF/tags"%>
@@ -28,17 +29,24 @@
 			<li class="active">Visualizar</li>
 		</ol>
 		<div class="col-xs-12">
+			<t:input divCol="col-xs-4"  
+			id="destinadaPara" nome="destinadaPara" nomeLabel="Destinada Para:" 
+			valorPadrao="${ordem.destinada }" tipo="text" editavel="1"></t:input>
+			<t:input divCol="col-xs-4"  
+			id="dataExecutada" nome="dataExecutada" nomeLabel="Data para ser Executada:" 
+			valorPadrao="${ordem.dataParaSerExecutadaTexto() }" 
+			tipo="text" editavel="1"></t:input>
+			<t:input divCol="col-xs-4"  
+			id="tipoOrdem" nome="tipoOrdem" nomeLabel="Tipo de Ordem:" 
+			valorPadrao="${ordem.tipoOrdem }" 
+			tipo="text" editavel="1"></t:input>
 			<div class="col-xs-12 text-center">
 			<label for="descricao">Descrição</label>
-				<textarea id="descricao" rows="5" class="form-control" readonly="readonly">
-				 ${ordem.descricao }
-				</textarea>
+				<textarea id="descricao" rows="5" class="form-control" readonly="readonly">${ordem.descricao }</textarea>
 			</div>
 			<div class="col-xs-12 text-center">
 				<label for="justificativa">Justificativa de Repasse (Caso Tenha)</label>
-				<textarea id="justificativa" rows="5" class="form-control" readonly="readonly">
-				${ordem.justificativa }
-				</textarea>
+				<textarea id="justificativa" rows="5" class="form-control" readonly="readonly">${ordem.justificativa }</textarea>
 			</div>
 			<t:input divCol="col-xs-12" 
 			id="pessoaRepasse" nome="" nomeLabel="Repassado Por" valorPadrao="${ordem.login }"

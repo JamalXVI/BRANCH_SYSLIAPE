@@ -25,7 +25,7 @@
 			<li class="active">Nova</li>
 		</ol>
 		<form action="${linkTo[MensagemController].enviar(null) }" method="post"
-		id="formReserva">
+		id="formMensagem">
 			<t:input divCol="col-xs-12"
 			 id="mensagemPara" nome="mensagem.para" nomeLabel="Para:" valorPadrao=""
 			  tipo="text" classes=""></t:input>
@@ -34,10 +34,26 @@
 			  tipo="text" classes=""></t:input>
 			 <div class="col-xs-12">
 			 <label for="mensagem.texto">Texto:</label>
-			 <textarea rows="5" cols="" name="mensagem.mensagem" class="form-control"></textarea>
+			 <textarea rows="5" cols="" name="mensagem.mensagem" class="form-control" id="mensagemTexto"></textarea>
 			 </div>
-			 <button type="submit" class="btn btn-primary btn-enviar" id="enviarMensagem">Enviar</button>
+			 
 		</form>
+		<div class="col-xs-12"
+			style="margin-top: 15px; margin-bottom: 15px;">
+			<form id="my-awesome-dropzone" class="dropzone"
+				action="${linkTo[MensagemController].enviar(null, null) }" method="POST">
+				<div class="dropzone-previews"></div>
+				<div class="fallback">
+				<!-- this is the fallback if JS isn't working -->
+					<input name="file" type="file" />
+				</div>
+				<input type="hidden" name="mensagem.para" id="paraMensagem" value="${idArq }" /> 
+				<input type="hidden" name="mensagem.titulo" id="tituloMensagem" /> 
+				<input type="hidden" name="mensagem.mensagem" id="mensagemMensagem" />
+				<button type="submit" style="display: none" id="enviar"></button>
+			</form>
+		</div>
+		<button type="submit" class="btn btn-primary btn-enviar" id="enviarMensagem" onclick="enviando();">Enviar</button>
 </div>
 	
 </div>
@@ -124,6 +140,109 @@ var adicionarInputUsuarios = function(){
 adicionarInputUsuarios();
 </script>
 <script type="text/javascript">
+$("#formMensagem").submit(function(e){
+    return false;
+});
+var validarFormulario = function(){
+	$("#formMensagem").validate(function(){});
+	$("#mensagemTexto").rules("add",{
+		required: true,
+		  minlength: 5,
+		  maxlength: 1000,
+		  messages: {
+		    required: iniMensagemAlerta+"Campo Obrigatório"+fimMensagemAlerta,
+		    minlength: jQuery.validator.format
+		    (iniMensagemAlerta+"Por Favor insira ao menos {0} caracteres."+fimMensagemAlerta),
+		    maxlength: jQuery.validator.format
+		    (iniMensagemAlerta+"Por Favor insira até {0} caracteres."+fimMensagemAlerta)
+		  }}
+		);
+	$("#mensagemTitulo").rules("add",{
+		required: true,
+		  minlength: 5,
+		  maxlength: 255,
+		  messages: {
+		    required: iniMensagemAlerta+"Campo Obrigatório"+fimMensagemAlerta,
+		    minlength: jQuery.validator.format
+		    (iniMensagemAlerta+"Por Favor insira ao menos {0} caracteres."+fimMensagemAlerta),
+		    maxlength: jQuery.validator.format
+		    (iniMensagemAlerta+"Por Favor insira até {0} caracteres."+fimMensagemAlerta)
+		  }}
+		);
+	$("#mensagemPara").rules("add",{
+		required: true,
+		  minlength: 5,
+		  maxlength: 255,
+		  messages: {
+		    required: iniMensagemAlerta+"Campo Obrigatório"+fimMensagemAlerta,
+		    minlength: jQuery.validator.format
+		    (iniMensagemAlerta+"Por Favor insira ao menos {0} caracteres."+fimMensagemAlerta),
+		    maxlength: jQuery.validator.format
+		    (iniMensagemAlerta+"Por Favor insira até {0} caracteres."+fimMensagemAlerta)
+		  }}
+		);
+}
+var enviando = function() {
+	var esseForm = $('#formMensagem');
+    if (esseForm.valid()) {
+    	debugger;
+		$("#paraMensagem").val($("#mensagemPara").val());
+		$("#tituloMensagem").val($("#mensagemTitulo").val());
+		$("#mensagemMensagem").val($("#mensagemTexto").val());
+		 
+		$("#enviar").submit();
+    }else{
+    	esseForm.validate();
+    	formularErro("Formulário Inválido!");
+    }
+}
+Dropzone.options.myAwesomeDropzone = { // The camelized version of the ID of the form element
 
+		// The configuration we've talked about above
+		autoProcessQueue : false,
+		uploadMultiple : false,
+		addRemoveLinks : true,
+		clickable : true,
+		// The setting up of the dropzone
+		init : function() {
+			var myDropzone = this;
+
+			// First change the button to actually tell Dropzone to process the queue.
+			$("button[type=submit]").on("submit", function(e) {
+				// Make sure that the form isn't actually being sent.
+				e.preventDefault();
+				e.stopPropagation();
+				if (myDropzone.getQueuedFiles().length > 0) {                        
+		            myDropzone.processQueue();  
+		        } else {                       
+		            $("#my-awesome-dropzone").submit(); //send empty 
+		        } 
+				
+			});
+
+			myDropzone.on("addedfile", function(file) {
+				/* Maybe display some more file information on your page */
+				console.log(file);
+			});
+			myDropzone.on("complete", function(file, resposta){
+				sucessoEnvio(file, resposta, myDropzone);
+				
+			});
+		}
+
+	}
+async function sucessoEnvio(file, resposta, myDropzone){
+	setTimeout(function(){
+		myDropzone.removeAllFiles(true);
+		window.location.replace("${linkTo[MensagemController].entrada()}");
+		},3000);
+	
+}
+</script>
+<script type="text/javascript">
+	$(document).on("ready", function(){
+		validarFormulario();
+		
+	})
 </script>
 </t:rodape>

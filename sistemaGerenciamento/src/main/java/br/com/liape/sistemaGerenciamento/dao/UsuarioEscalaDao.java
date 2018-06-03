@@ -21,7 +21,7 @@ public class UsuarioEscalaDao extends PersistenceJDBC<UsuarioEscala> {
 	public List<UsuarioEscala> listar_ativo(int id) {
 		return consultarLista(LISTAR_ESCALA, id);
 	}
-	public List<UsuarioEscala> deletar_id(int id) {
-		return consultarLista(DELETAR_ESCALA, id);
+	public boolean deletar_id(int id) {
+		return atualizar(DELETAR_ESCALA, id);
 	}
 }

@@ -329,16 +329,30 @@ $("#nomeDisciplinaForm").on("tap", function(){
 	atualizarPesquisaDisciplina();
 });
 var atualizarPesquisaDisciplina = function(){
-	var textoFiltroCod = $("#codigoDisciplinaForm").val().toLowerCase();
+	var textoFiltroCod = "";
+	if($("#dis-pesq-nome").is(':checked'))
+	{
+		textoFiltroCod = $("#nomeDisciplinaForm").val().toLowerCase();
+		
+	}else{
+		textoFiltroCod = $("#codigoDisciplinaForm").val().toLowerCase();
+	}
 	contagemDisciplinas = 0;
 	$("#corpotabelaDisciplinas")
 	.find('tr')
 	.remove()
 	.end();
 	$.each(hashDisciplina, function (key, disciplina) {
-		if (disciplina.codigo.toLowerCase().indexOf(textoFiltroCod) != -1) {
+		var resultado;
+		if($("#dis-pesq-nome").is(':checked'))
+		{
+			resultado = disciplina.nome.toLowerCase().indexOf(textoFiltroCod) != -1;
+		}else{
+		 	resultado = disciplina.codigo.toLowerCase().indexOf(textoFiltroCod) != -1;
+		}
+		if (resultado) {
 				adicionarDisicplinaPesquisa(disciplina);
-			}
+		}
 	});
 }
 var adicionarDisicplinaPesquisa = function(disciplina){
@@ -467,15 +481,35 @@ $("#codigoCursoForm").on("keydown", function(){
 $("#codigoCursoForm").on("tap", function(){
 	atualizarPesquisaCursos();
 });
+$("#nomeCursoForm").on("keyup", function(){
+	atualizarPesquisaCursos();
+});
+$("#nomeCursoForm").on("keydown", function(){
+	atualizarPesquisaCursos();
+});
+$("#nomeCursoForm").on("tap", function(){
+	atualizarPesquisaCursos();
+});
 var atualizarPesquisaCursos = function(){
-	var textoFiltro = $("#codigoCursoForm").val().toLowerCase();
+	var textoFiltro = "";
+	if($("#cur-pesq-nome").is(':checked')){
+		textoFiltro = $("#nomeCursoForm").val().toLowerCase();
+	}else{
+		textoFiltro = $("#codigoCursoForm").val().toLowerCase();
+	}
 	contagemCursos = 0;
 	$("#corpotabelaCursos")
 	.find('tr')
 	.remove()
 	.end();
 	$.each(hashCurso, function (key, curso) {
-		if (curso.codigo.toLowerCase().indexOf(textoFiltro) != -1) {
+		var resultado;
+		if($("#cur-pesq-nome").is(':checked')){
+			resultado = curso.nome.toLowerCase().indexOf(textoFiltro) != -1;			
+		}else{
+			resultado = curso.codigo.toLowerCase().indexOf(textoFiltro) != -1;
+		}
+		if (resultado) {
 				adicionarCursosPesquisa(curso);
 			}
 	});
@@ -501,7 +535,7 @@ var cursoConfirmado = function(){
 	if($("#formCurso").valid())
 	{
 		$.ajax({  
-		    type:"post",  
+		    type:"POST",  
 		    url: "${linkTo[CursoController].postar() }", 
 		    data: $("#formCurso").serialize(),
 		    dataType: "json",  // Isso diz que você espera um JSON do servidor

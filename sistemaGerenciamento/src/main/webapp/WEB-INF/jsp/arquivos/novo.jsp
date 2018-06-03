@@ -136,7 +136,6 @@
 				});
 				myDropzone.on("complete", function(file, resposta){
 					sucessoEnvio(file, resposta, myDropzone);
-					
 				});
 			}
 
