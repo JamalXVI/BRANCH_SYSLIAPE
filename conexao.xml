@@ -1,0 +1,7 @@
+<conexao xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<database>DATABASE_HERE</database>
+	<host>HOST_HERE</host>
+	<driver>com.mysql.jdbc.Driver</driver>
+	<usuario>USER</usuario>
+	<password>PASSWORD</password>
+</conexao>
